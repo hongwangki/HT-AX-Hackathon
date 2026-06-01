@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신청 목록 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<main class="page-shell admin-shell">
+    <header class="page-header admin-header">
+        <div>
+            <span class="eyebrow">ADMINISTRATION</span>
+            <h1>신청 목록</h1>
+            <p>HT AX 해커톤 참가 신청 현황을 확인합니다.</p>
+        </div>
+        <div class="count-card"><strong th:text="${applicationCount}">0</strong><span>전체 접수</span></div>
+    </header>
+    <section class="card table-card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>ID</th><th>팀명</th><th>주제</th><th>구성인원</th><th>상태</th><th>신청일시</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${applications}">
+                    <td th:text="${item.id}">1</td>
+                    <td class="strong-cell" th:text="${item.teamName}">팀명</td>
+                    <td th:text="${item.topic}">주제</td>
+                    <td th:text="${#lists.size(item.members)} + '명'">1명</td>
+                    <td><span class="badge" th:classappend="${'badge-' + item.status.name().toLowerCase()}"
+                              th:text="${item.status}">SUBMITTED</span></td>
+                    <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-01 12:00</td>
+                    <td><a class="button button-secondary button-small" th:href="@{/admin/applications/{id}(id=${item.id})}">상세보기</a></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(applications)}">
+                    <td class="empty-cell" colspan="7">아직 접수된 신청서가 없습니다.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

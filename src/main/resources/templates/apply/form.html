@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>참가 접수 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<main class="page-shell form-shell">
+    <header class="page-header">
+        <span class="eyebrow">HT AX HACKATHON</span>
+        <h1>참가 신청서</h1>
+        <p>팀 정보와 아이디어를 입력해 주세요. 첨부파일은 선택 사항입니다.</p>
+    </header>
+
+    <form class="card form-card" th:action="@{/apply}" th:object="${applicationForm}" method="post"
+          enctype="multipart/form-data">
+        <div class="global-errors" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="error : ${#fields.globalErrors()}" th:text="${error}">오류 메시지</p>
+        </div>
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span>01</span>
+                <div>
+                    <h2>팀 정보</h2>
+                    <p>참가팀을 구분할 수 있는 팀명을 입력해 주세요.</p>
+                </div>
+            </div>
+            <label class="field">
+                <span>팀명 <b>*</b></span>
+                <input type="text" th:field="*{teamName}" placeholder="팀명을 입력해 주세요">
+                <small class="field-error" th:errors="*{teamName}"></small>
+            </label>
+        </section>
+
+        <section class="form-section">
+            <div class="section-heading section-heading-action">
+                <div class="heading-copy">
+                    <span>02</span>
+                    <div>
+                        <h2>구성인원</h2>
+                        <p>최소 1명 이상의 팀원을 입력해 주세요.</p>
+                    </div>
+                </div>
+                <button class="button button-secondary button-small" id="add-member" type="button">팀원 추가</button>
+            </div>
+            <p class="field-error" th:errors="*{members}"></p>
+            <div class="member-list" id="member-list">
+                <div class="member-row" th:each="member, stat : *{members}">
+                    <div class="member-row-header">
+                        <strong>팀원 <span class="member-number" th:text="${stat.count}">1</span></strong>
+                        <button class="text-button remove-member" type="button">삭제</button>
+                    </div>
+                    <div class="member-fields">
+                        <label class="field">
+                            <span>소속 <b>*</b></span>
+                            <input type="text" th:field="*{members[__${stat.index}__].department}" placeholder="예: AX기획팀">
+                            <small class="field-error" th:errors="*{members[__${stat.index}__].department}"></small>
+                        </label>
+                        <label class="field">
+                            <span>사번 <b>*</b></span>
+                            <input type="text" th:field="*{members[__${stat.index}__].employeeNo}" placeholder="숫자 7자리" inputmode="numeric" maxlength="7" pattern="\d{7}">
+                            <small class="field-error" th:errors="*{members[__${stat.index}__].employeeNo}"></small>
+                        </label>
+                        <label class="field">
+                            <span>이름 <b>*</b></span>
+                            <input type="text" th:field="*{members[__${stat.index}__].name}" placeholder="이름">
+                            <small class="field-error" th:errors="*{members[__${stat.index}__].name}"></small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span>03</span>
+                <div>
+                    <h2>아이디어</h2>
+                    <p>제안할 주제와 구체적인 내용을 작성해 주세요.</p>
+                </div>
+            </div>
+            <label class="field">
+                <span>주제 <b>*</b></span>
+                <input type="text" th:field="*{topic}" placeholder="아이디어 주제를 입력해 주세요">
+                <small class="field-error" th:errors="*{topic}"></small>
+            </label>
+            <label class="field">
+                <span>내용 <b>*</b></span>
+                <textarea th:field="*{content}" rows="8" placeholder="아이디어의 배경, 주요 기능, 기대 효과를 자유롭게 작성해 주세요"></textarea>
+                <small class="field-error" th:errors="*{content}"></small>
+            </label>
+        </section>
+
+        <section class="form-section">
+            <div class="section-heading">
+                <span>04</span>
+                <div>
+                    <h2>첨부파일</h2>
+                    <p>필요한 자료가 있다면 첨부해 주세요. 여러 파일을 선택할 수 있습니다.</p>
+                </div>
+            </div>
+            <label class="file-field">
+                <input type="file" th:field="*{attachments}" multiple>
+                <span class="file-button">파일 선택</span>
+                <span class="file-guide" id="file-guide">선택된 파일 없음</span>
+            </label>
+        </section>
+
+        <div class="form-actions">
+            <a class="button button-ghost" th:href="@{/}">처음으로</a>
+            <button class="button button-primary" type="submit">등록하기</button>
+        </div>
+    </form>
+</main>
+<script th:src="@{/js/application-form.js}"></script>
+</body>
+</html>

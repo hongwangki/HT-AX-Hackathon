@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신청 삭제 확인 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<main class="center-shell">
+    <section class="card danger-card">
+        <span class="danger-label">DELETE APPLICATION</span>
+        <h1>정말 삭제하시겠습니까?</h1>
+        <p>삭제한 신청서와 첨부파일 정보는 복구할 수 없습니다.</p>
+        <dl class="delete-summary">
+            <div><dt>팀명</dt><dd th:text="${hackathonApplication.teamName}">팀명</dd></div>
+            <div><dt>주제</dt><dd th:text="${hackathonApplication.topic}">주제</dd></div>
+            <div><dt>신청일시</dt><dd th:text="${#temporals.format(hackathonApplication.createdAt, 'yyyy-MM-dd HH:mm')}">일시</dd></div>
+        </dl>
+        <div class="form-actions">
+            <a class="button button-secondary" th:href="@{/admin/applications}">목록으로 돌아가기</a>
+            <form th:action="@{/admin/applications/{id}/delete(id=${hackathonApplication.id})}" method="post">
+                <button class="button button-danger" type="submit">삭제 실행</button>
+            </form>
+        </div>
+    </section>
+</main>
+</body>
+</html>

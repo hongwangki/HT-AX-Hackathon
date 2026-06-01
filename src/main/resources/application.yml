@@ -1,0 +1,38 @@
+server:
+  # 운영 서버에서는 보통 0.0.0.0으로 열고 방화벽 또는 프록시에서 접근을 제한합니다.
+  address: ${SERVER_ADDRESS:0.0.0.0}
+  port: ${SERVER_PORT:8080}
+
+spring:
+  config:
+    # 실행 디렉터리의 .env 파일을 읽습니다. 실제 비밀번호는 Git에 커밋하지 않습니다.
+    import: optional:file:.env[.properties]
+
+  datasource:
+    # 로컬 MySQL은 .env.example 값을 사용합니다.
+    # 운영 Oracle 전환 시 서버의 .env에서 아래 4개 DB_* 값만 Oracle 정보로 교체합니다.
+    # Oracle 서비스명 방식 URL: jdbc:oracle:thin:@//DB서버IP:1521/서비스명
+    # Oracle SID 방식 URL:     jdbc:oracle:thin:@DB서버IP:1521:SID
+    # Oracle 드라이버 클래스:  oracle.jdbc.OracleDriver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+
+  jpa:
+    hibernate:
+      # 로컬은 update, 운영 Oracle은 validate 권장입니다.
+      # 최초 테이블 생성 또는 변경은 DBA와 협의 후 진행합니다.
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 30MB
+
+file:
+  upload-dir: ${FILE_UPLOAD_DIR:uploads}
