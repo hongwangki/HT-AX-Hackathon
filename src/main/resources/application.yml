@@ -6,19 +6,19 @@ server:
 spring:
   config:
     # 실행 디렉터리의 .env 파일을 읽습니다. 실제 비밀번호는 Git에 커밋하지 않습니다.
-    import: optional:file:.env
+    import: optional:file:.env[.properties]
 
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    driver-class-name: ${DB_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+    driver-class-name: ${DB_DRIVER_CLASS_NAME:com.microsoft.sqlserver.jdbc.SQLServerDriver}
 
   jpa:
     hibernate:
-      # 로컬은 update, 운영 Oracle은 validate 권장입니다.
+      # 운영 SQL Server에서는 수동으로 준비한 테이블을 검증만 합니다.
       # 최초 테이블 생성 또는 변경은 DBA와 협의 후 진행합니다.
-      ddl-auto: ${JPA_DDL_AUTO:update}
+      ddl-auto: ${JPA_DDL_AUTO:validate}
     show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:

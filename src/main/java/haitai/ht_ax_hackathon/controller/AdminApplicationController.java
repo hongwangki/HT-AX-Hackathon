@@ -3,7 +3,9 @@ package haitai.ht_ax_hackathon.controller;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.ApplicationForm;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
+import haitai.ht_ax_hackathon.dto.ExcelDownload;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
+import haitai.ht_ax_hackathon.service.ApplicationExcelExportService;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.List;
 public class AdminApplicationController {
 
     private final HackathonApplicationService applicationService;
+    private final ApplicationExcelExportService excelExportService;
 
     @GetMapping
     public String applicationList(Model model) {
@@ -37,6 +40,20 @@ public class AdminApplicationController {
         model.addAttribute("applications", applications);
         model.addAttribute("applicationCount", applications.size());
         return "admin/application-list";
+    }
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportApplications() {
+        ExcelDownload download = excelExportService.createDownload();
+        ContentDisposition disposition = ContentDisposition.attachment()
+                .filename(download.fileName(), StandardCharsets.UTF_8)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .contentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ))
+                .body(download.content());
     }
 
     @GetMapping("/{id}")

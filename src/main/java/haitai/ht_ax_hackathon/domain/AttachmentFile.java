@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
 
@@ -33,17 +34,21 @@ public class AttachmentFile {
     private Long id;
 
     @Column(nullable = false)
+    @Nationalized
     private String originalFileName;
 
     @Column(nullable = false)
+    @Nationalized
     private String storedFileName;
 
     @Column(nullable = false, length = 1000)
+    @Nationalized
     private String filePath;
 
     @Column(nullable = false)
     private long fileSize;
 
+    @Nationalized
     private String contentType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

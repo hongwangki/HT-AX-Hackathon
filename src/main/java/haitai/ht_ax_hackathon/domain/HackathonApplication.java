@@ -8,7 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -17,6 +16,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,17 +38,20 @@ public class HackathonApplication {
     private Long id;
 
     @Column(nullable = false, length = 100)
+    @Nationalized
     private String teamName;
 
     @Column(nullable = false, length = 200)
+    @Nationalized
     private String topic;
 
-    @Lob
-    @Column(nullable = false)
+    @Nationalized
+    @Column(nullable = false, columnDefinition = "nvarchar(max)")
     private String content;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
+    @Nationalized
     private ApplicationStatus status;
 
     @Column(nullable = false, updatable = false)

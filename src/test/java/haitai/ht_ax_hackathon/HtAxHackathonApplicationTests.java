@@ -2,6 +2,7 @@ package haitai.ht_ax_hackathon;
 
 import haitai.ht_ax_hackathon.repository.HackathonApplicationRepository;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -68,6 +70,33 @@ class HtAxHackathonApplicationTests {
         mockMvc.perform(get("/admin/applications"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/application-list"));
+
+        byte[] excelContent = mockMvc.perform(get("/admin/applications/export"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        try (var workbook = new XSSFWorkbook(new ByteArrayInputStream(excelContent))) {
+            assertThat(workbook.getSheet("팀별 신청 요약")).isNotNull();
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(3).getCell(0).getStringCellValue())
+                    .isEqualTo("1팀  |  AX Test Team");
+            assertThat(workbook.getSheet("팀별 신청 요약").getNumMergedRegions()).isGreaterThan(1);
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(4).getCell(0).getStringCellValue())
+                    .isEqualTo("구성인원");
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(6).getCell(0).getStringCellValue())
+                    .isEqualTo("주제");
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(7).getCell(0).getStringCellValue())
+                    .isEqualTo("아이디어 내용");
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(7).getHeightInPoints()).isGreaterThanOrEqualTo(42);
+            assertThat(workbook.getSheet("팀별 신청 요약").getColumnWidth(1)).isEqualTo(9 * 256);
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(5).getCell(0).getCellStyle())
+                    .isEqualTo(workbook.getSheet("팀별 신청 요약").getRow(4).getCell(0).getCellStyle());
+            assertThat(workbook.getNumberOfSheets()).isEqualTo(1);
+        }
 
         mockMvc.perform(get("/admin/applications/{id}", id))
                 .andExpect(status().isOk())

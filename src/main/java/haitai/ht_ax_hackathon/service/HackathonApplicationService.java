@@ -97,6 +97,13 @@ public class HackathonApplicationService {
     }
 
     @Transactional(readOnly = true)
+    public List<HackathonApplication> findAllApplicationsForExport() {
+        List<HackathonApplication> applications = applicationRepository.findAllByOrderByCreatedAtDesc();
+        applications.forEach(application -> application.getFiles().size());
+        return applications;
+    }
+
+    @Transactional(readOnly = true)
     public HackathonApplication findApplication(Long id) {
         HackathonApplication application = findById(id);
         // Initialize both collections while the transaction is open for Thymeleaf rendering.

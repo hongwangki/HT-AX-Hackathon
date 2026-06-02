@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Table(name = "team_members")
@@ -30,12 +31,15 @@ public class TeamMember {
     private Long id;
 
     @Column(nullable = false, length = 100)
+    @Nationalized
     private String department;
 
     @Column(nullable = false, length = 50)
+    @Nationalized
     private String employeeNo;
 
     @Column(nullable = false, length = 50)
+    @Nationalized
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

@@ -14,8 +14,11 @@
             <h1>신청 목록</h1>
             <p>HT AX 해커톤 참가 신청 현황을 확인합니다.</p>
         </div>
-        <div class="count-card"><strong th:text="${applicationCount}">0</strong><span>전체 접수</span></div>
     </header>
+    <div class="admin-toolbar">
+        <div class="count-card"><span>전체 접수</span><strong th:text="${applicationCount}">0</strong><span>건</span></div>
+        <a class="button button-primary" th:href="@{/admin/applications/export}">전체 엑셀 다운로드</a>
+    </div>
     <section class="card table-card">
         <div class="table-wrap">
             <table>
