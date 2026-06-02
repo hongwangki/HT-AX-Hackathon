@@ -10,7 +10,7 @@
 <main class="page-shell admin-shell">
     <header class="page-header admin-header">
         <div>
-            <span class="eyebrow">ADMINISTRATION</span>
+            <span class="eyebrow">관리자</span>
             <h1>신청 목록</h1>
             <p>HT AX 해커톤 참가 신청 현황을 확인합니다.</p>
         </div>
@@ -29,7 +29,7 @@
                     <td th:text="${item.topic}">주제</td>
                     <td th:text="${#lists.size(item.members)} + '명'">1명</td>
                     <td><span class="badge" th:classappend="${'badge-' + item.status.name().toLowerCase()}"
-                              th:text="${item.status}">SUBMITTED</span></td>
+                              th:text="${item.status.label}">접수</span></td>
                     <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-01 12:00</td>
                     <td><a class="button button-secondary button-small" th:href="@{/admin/applications/{id}(id=${item.id})}">상세보기</a></td>
                 </tr>

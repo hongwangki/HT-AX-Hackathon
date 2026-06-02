@@ -81,6 +81,13 @@ class HtAxHackathonApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(view().name("admin/application-edit"));
 
+        mockMvc.perform(post("/admin/applications/{id}/files/{fileId}/delete", id, fileId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/applications/" + id + "/edit"));
+
+        assertThat(applicationService.findApplication(id).getFiles()).isEmpty();
+        assertThat(Files.exists(uploadedFile)).isFalse();
+
         mockMvc.perform(multipart("/admin/applications/{id}/edit", id)
                         .param("teamName", "Updated AX Team")
                         .param("members[0].department", "Updated Team")

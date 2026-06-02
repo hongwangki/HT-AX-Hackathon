@@ -12,6 +12,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,7 +29,12 @@ import java.util.List;
 public class HackathonApplication {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "hackathon_applications_seq",
+            sequenceName = "seq_hackathon_applications",
+            allocationSize = 1
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hackathon_applications_seq")
     private Long id;
 
     @Column(nullable = false, length = 100)
@@ -74,6 +80,10 @@ public class HackathonApplication {
     public void addFile(AttachmentFile file) {
         files.add(file);
         file.assignApplication(this);
+    }
+
+    public void removeFile(AttachmentFile file) {
+        files.remove(file);
     }
 
     /** Updates editable fields while preserving status and existing attachments. */

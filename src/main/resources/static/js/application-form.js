@@ -1,8 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
     const memberList = document.querySelector("#member-list");
     const addMemberButton = document.querySelector("#add-member");
-    const fileInput = document.querySelector("input[type='file']");
+    const filePicker = document.querySelector("#attachment-picker");
+    const fileInput = document.querySelector(".file-submission-input");
     const fileGuide = document.querySelector("#file-guide");
+    const selectedFileList = document.querySelector("#selected-file-list");
 
     const renumberMembers = () => {
         const rows = memberList.querySelectorAll(".member-row");
@@ -37,11 +39,72 @@ document.addEventListener("DOMContentLoaded", () => {
         bindRemoveButtons();
     });
 
-    fileInput.addEventListener("change", () => {
-        fileGuide.textContent = fileInput.files.length
-            ? `${fileInput.files.length}개 파일 선택됨`
-            : "선택된 파일 없음";
-    });
+    if (filePicker && fileInput && fileGuide && selectedFileList) {
+        const selectedFiles = new DataTransfer();
+
+        const formatFileSize = (size) => {
+            if (size < 1024) {
+                return `${size} bytes`;
+            }
+            if (size < 1024 * 1024) {
+                return `${(size / 1024).toFixed(1)} KB`;
+            }
+            return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+        };
+
+        const isSameFile = (first, second) =>
+            first.name === second.name
+            && first.size === second.size
+            && first.lastModified === second.lastModified;
+
+        const renderSelectedFiles = () => {
+            selectedFileList.replaceChildren();
+            Array.from(selectedFiles.files).forEach((file, index) => {
+                const item = document.createElement("li");
+                item.className = "selected-file-item";
+
+                const fileInfo = document.createElement("span");
+                fileInfo.className = "selected-file-info";
+
+                const fileName = document.createElement("strong");
+                fileName.textContent = file.name;
+
+                const fileSize = document.createElement("small");
+                fileSize.textContent = formatFileSize(file.size);
+
+                const removeButton = document.createElement("button");
+                removeButton.className = "text-button";
+                removeButton.type = "button";
+                removeButton.textContent = "삭제";
+                removeButton.addEventListener("click", () => {
+                    const remainingFiles = Array.from(selectedFiles.files)
+                        .filter((_, fileIndex) => fileIndex !== index);
+                    selectedFiles.items.clear();
+                    remainingFiles.forEach((remainingFile) => selectedFiles.items.add(remainingFile));
+                    fileInput.files = selectedFiles.files;
+                    renderSelectedFiles();
+                });
+
+                fileInfo.append(fileName, fileSize);
+                item.append(fileInfo, removeButton);
+                selectedFileList.append(item);
+            });
+
+            fileGuide.textContent = selectedFiles.files.length
+                ? `${selectedFiles.files.length}개 파일이 추가되었습니다.`
+                : "추가할 파일을 선택해 주세요.";
+        };
+
+        filePicker.addEventListener("change", () => {
+            const newFile = filePicker.files[0];
+            if (newFile && !Array.from(selectedFiles.files).some((file) => isSameFile(file, newFile))) {
+                selectedFiles.items.add(newFile);
+            }
+            fileInput.files = selectedFiles.files;
+            filePicker.value = "";
+            renderSelectedFiles();
+        });
+    }
 
     renumberMembers();
     bindRemoveButtons();

@@ -9,7 +9,7 @@
 <body>
 <main class="page-shell form-shell">
     <header class="page-header">
-        <span class="eyebrow">EDIT APPLICATION</span>
+        <span class="eyebrow">신청 수정</span>
         <h1>신청서 수정</h1>
         <p>신청 정보와 팀원을 수정하고 필요한 첨부파일을 추가합니다.</p>
     </header>
@@ -45,11 +45,19 @@
             <label class="field"><span>내용 <b>*</b></span><textarea th:field="*{content}" rows="8"></textarea><small class="field-error" th:errors="*{content}"></small></label>
         </section>
         <section class="form-section">
-            <div class="section-heading"><span>04</span><div><h2>첨부파일 추가</h2><p>기존 파일은 유지되며 새 파일을 추가할 수 있습니다.</p></div></div>
+            <div class="section-heading"><span>04</span><div><h2>첨부파일</h2><p>기존 파일을 삭제하거나 새 파일을 추가할 수 있습니다.</p></div></div>
             <div class="existing-files" th:if="${!#lists.isEmpty(existingFiles)}">
-                <a class="file-link" th:each="file : ${existingFiles}" th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${applicationId},fileId=${file.id})}" th:text="${file.originalFileName}">파일명</a>
+                <div class="existing-file-item" th:each="file : ${existingFiles}">
+                    <a class="file-link" th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${applicationId},fileId=${file.id})}" th:text="${file.originalFileName}">파일명</a>
+                    <button class="text-button" type="submit" formmethod="post" formnovalidate
+                            th:formaction="@{/admin/applications/{id}/files/{fileId}/delete(id=${applicationId},fileId=${file.id})}">
+                        삭제
+                    </button>
+                </div>
             </div>
-            <label class="file-field"><input type="file" th:field="*{attachments}" multiple><span class="file-button">파일 선택</span><span class="file-guide" id="file-guide">선택된 파일 없음</span></label>
+            <label class="file-field"><input type="file" id="attachment-picker"><span class="file-button">파일 추가</span><span class="file-guide" id="file-guide">추가할 파일을 선택해 주세요.</span></label>
+            <input class="file-submission-input" type="file" th:field="*{attachments}" multiple>
+            <ul class="selected-file-list" id="selected-file-list"></ul>
         </section>
         <div class="form-actions">
             <a class="button button-ghost" th:href="@{/admin/applications/{id}(id=${applicationId})}">취소</a>

@@ -121,15 +121,23 @@ public class HackathonApplicationService {
     @Transactional(readOnly = true)
     public AttachmentDownload getAttachmentDownload(Long applicationId, Long fileId) {
         HackathonApplication application = findApplication(applicationId);
-        AttachmentFile file = application.getFiles().stream()
-                .filter(item -> item.getId().equals(fileId))
-                .findFirst()
-                .orElseThrow(() -> new AttachmentFileNotFoundException(fileId));
+        AttachmentFile file = findAttachment(application, fileId);
         return new AttachmentDownload(
                 fileStorageService.loadAsResource(file.getFilePath()),
                 file.getOriginalFileName(),
                 file.getContentType()
         );
+    }
+
+    @Transactional
+    public void deleteAttachment(Long applicationId, Long fileId) {
+        HackathonApplication application = findById(applicationId);
+        AttachmentFile file = findAttachment(application, fileId);
+        String filePath = file.getFilePath();
+
+        application.removeFile(file);
+        applicationRepository.flush();
+        fileStorageService.deleteQuietly(filePath);
     }
 
     private TeamMemberForm toMemberForm(TeamMember member) {
@@ -143,5 +151,12 @@ public class HackathonApplicationService {
     private HackathonApplication findById(Long id) {
         return applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException(id));
+    }
+
+    private AttachmentFile findAttachment(HackathonApplication application, Long fileId) {
+        return application.getFiles().stream()
+                .filter(item -> item.getId().equals(fileId))
+                .findFirst()
+                .orElseThrow(() -> new AttachmentFileNotFoundException(fileId));
     }
 }

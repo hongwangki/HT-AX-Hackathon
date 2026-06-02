@@ -99,14 +99,16 @@
                 <span>04</span>
                 <div>
                     <h2>첨부파일</h2>
-                    <p>필요한 자료가 있다면 첨부해 주세요. 여러 파일을 선택할 수 있습니다.</p>
+                    <p>필요한 자료가 있다면 파일을 하나씩 추가해 주세요.</p>
                 </div>
             </div>
             <label class="file-field">
-                <input type="file" th:field="*{attachments}" multiple>
-                <span class="file-button">파일 선택</span>
-                <span class="file-guide" id="file-guide">선택된 파일 없음</span>
+                <input type="file" id="attachment-picker">
+                <span class="file-button">파일 추가</span>
+                <span class="file-guide" id="file-guide">추가할 파일을 선택해 주세요.</span>
             </label>
+            <input class="file-submission-input" type="file" th:field="*{attachments}" multiple>
+            <ul class="selected-file-list" id="selected-file-list"></ul>
         </section>
 
         <div class="form-actions">
@@ -114,6 +116,7 @@
             <button class="button button-primary" type="submit">등록하기</button>
         </div>
     </form>
+    <footer class="site-footer">© 2026 HT AX. All rights reserved.</footer>
 </main>
 <script th:src="@{/js/application-form.js}"></script>
 </body>

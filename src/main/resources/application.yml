@@ -6,14 +6,9 @@ server:
 spring:
   config:
     # 실행 디렉터리의 .env 파일을 읽습니다. 실제 비밀번호는 Git에 커밋하지 않습니다.
-    import: optional:file:.env[.properties]
+    import: optional:file:.env
 
   datasource:
-    # 로컬 MySQL은 .env.example 값을 사용합니다.
-    # 운영 Oracle 전환 시 서버의 .env에서 아래 4개 DB_* 값만 Oracle 정보로 교체합니다.
-    # Oracle 서비스명 방식 URL: jdbc:oracle:thin:@//DB서버IP:1521/서비스명
-    # Oracle SID 방식 URL:     jdbc:oracle:thin:@DB서버IP:1521:SID
-    # Oracle 드라이버 클래스:  oracle.jdbc.OracleDriver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}

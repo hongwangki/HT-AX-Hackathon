@@ -8,13 +8,25 @@
 </head>
 <body class="landing-page">
 <main class="landing-shell">
-    <section class="landing-card">
-        <div class="accent-line"></div>
-        <span class="event-label">제1회</span>
-        <h1>HT AX 해커톤</h1>
-        <p class="landing-subtitle">해태제과 사내 AI 경연대회</p>
-        <p class="landing-description">업무의 새로운 가능성을 발견하고<br>함께 아이디어를 현실로 만들어 보세요.</p>
-        <a class="button button-primary button-large" th:href="@{/apply}">참가 접수</a>
+    <section class="event-stage" aria-label="제1회 HT AX 해커톤">
+        <div class="event-dots event-dots-left"></div>
+        <div class="event-waves"></div>
+        <div class="event-sparkles"></div>
+        <div class="event-bubbles"></div>
+        <div class="event-swoosh"></div>
+        <div class="event-card landing-event-card">
+            <div class="event-ribbon"></div>
+            <span class="event-round">제1회</span>
+            <h1>HT AX 해커톤</h1>
+            <p class="event-subtitle">해태제과 사내 AI 경연대회</p>
+            <div class="event-divider"><span>✦</span></div>
+            <p class="event-description">우리 일의 불편함을 AI로 바꾸는 시간<br>작은 아이디어가 더 나은 업무가 됩니다.</p>
+            <a class="event-button" th:href="@{/apply}">참가 접수</a>
+            <div class="event-dots card-dots"></div>
+        </div>
+        <img class="product-image product-ace" th:src="@{/images/ace.png}" alt="">
+        <img class="product-image product-homerun" th:src="@{/images/homerun.png}" alt="">
+        <img class="product-image product-oyes" th:src="@{/images/oyes.png}" alt="">
     </section>
 </main>
 </body>

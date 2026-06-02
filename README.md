@@ -103,15 +103,74 @@ TEAM_MEMBERS
 ATTACHMENT_FILES
 ```
 
-운영 환경에서는 다음 설정을 권장합니다.
+운영 Oracle 10g DB는 `IDENTITY` 컬럼을 지원하지 않습니다. 애플리케이션은 테이블별
+시퀀스를 사용하므로 최초 배포 전에 DBA와 협의하여 아래 SQL을 실행합니다.
+
+부분 생성된 테이블이 있다면 데이터가 없는 것을 확인한 뒤 삭제합니다.
+
+```sql
+DROP TABLE attachment_files CASCADE CONSTRAINTS;
+DROP TABLE team_members CASCADE CONSTRAINTS;
+DROP TABLE hackathon_applications CASCADE CONSTRAINTS;
+
+DROP SEQUENCE seq_attachment_files;
+DROP SEQUENCE seq_team_members;
+DROP SEQUENCE seq_hackathon_applications;
+```
+
+없는 객체의 삭제 오류는 무시합니다. 테이블과 시퀀스를 생성합니다. Oracle 10g는
+식별자 길이가 최대 30자이므로 제약 조건 이름은 짧게 지정합니다.
+
+```sql
+CREATE SEQUENCE seq_hackathon_applications START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE seq_team_members START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE seq_attachment_files START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE hackathon_applications (
+    id NUMBER(19) PRIMARY KEY,
+    team_name VARCHAR2(100) NOT NULL,
+    topic VARCHAR2(200) NOT NULL,
+    content CLOB NOT NULL,
+    status VARCHAR2(20) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    CONSTRAINT chk_app_status
+        CHECK (status IN ('SUBMITTED', 'REVIEWING', 'APPROVED', 'REJECTED'))
+);
+
+CREATE TABLE team_members (
+    id NUMBER(19) PRIMARY KEY,
+    department VARCHAR2(100) NOT NULL,
+    employee_no VARCHAR2(50) NOT NULL,
+    name VARCHAR2(50) NOT NULL,
+    application_id NUMBER(19) NOT NULL,
+    CONSTRAINT fk_team_app
+        FOREIGN KEY (application_id)
+        REFERENCES hackathon_applications (id)
+);
+
+CREATE TABLE attachment_files (
+    id NUMBER(19) PRIMARY KEY,
+    original_file_name VARCHAR2(255) NOT NULL,
+    stored_file_name VARCHAR2(255) NOT NULL,
+    file_path VARCHAR2(1000) NOT NULL,
+    file_size NUMBER(19) NOT NULL,
+    content_type VARCHAR2(255),
+    application_id NUMBER(19) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT fk_file_app
+        FOREIGN KEY (application_id)
+        REFERENCES hackathon_applications (id)
+);
+```
+
+테이블 생성 후 운영 환경에서는 다음 설정을 사용합니다.
 
 ```properties
 JPA_DDL_AUTO=validate
 ```
 
-`validate`는 기존 테이블 구조를 검증하며 테이블을 자동 생성하지 않습니다. 최초
-스키마 생성은 DBA와 협의합니다. DBA 승인 아래 애플리케이션으로 초기 생성을 시도할
-때만 일시적으로 `JPA_DDL_AUTO=update`를 사용하고, 이후 다시 `validate`로 변경합니다.
+`validate`는 기존 테이블 구조를 검증하며 테이블을 자동 생성하거나 변경하지 않습니다.
 
 ## 배포 JAR 생성
 

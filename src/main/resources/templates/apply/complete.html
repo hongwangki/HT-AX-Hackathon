@@ -6,14 +6,27 @@
     <title>접수 완료 | HT AX 해커톤</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
-<main class="center-shell">
-    <section class="card result-card">
-        <div class="result-mark">✓</div>
-        <span class="eyebrow">APPLICATION COMPLETE</span>
-        <h1>참가 신청이 완료되었습니다.</h1>
-        <p>제1회 HT AX 해커톤에 관심을 가져주셔서 감사합니다.<br>접수된 내용은 담당자가 확인할 예정입니다.</p>
-        <a class="button button-primary" th:href="@{/}">메인으로 돌아가기</a>
+<body class="success-page">
+<main class="success-shell">
+    <section class="event-stage" aria-label="HT AX 해커톤 참가 신청 완료">
+        <div class="event-dots event-dots-left"></div>
+        <div class="event-waves"></div>
+        <div class="event-sparkles"></div>
+        <div class="event-bubbles"></div>
+        <div class="event-swoosh"></div>
+        <div class="event-card success-event-card">
+            <div class="event-ribbon"></div>
+            <span class="event-round">제1회</span>
+            <div class="success-mark">✓</div>
+            <p class="success-label">접수 완료</p>
+            <h1>참가 신청이 완료되었습니다.</h1>
+            <p class="event-description">제1회 HT AX 해커톤 참가 신청이 정상적으로 접수되었습니다.<br>제출해주신 내용은 담당자가 확인 후 안내드릴 예정입니다.</p>
+            <a class="event-button" th:href="@{/}">메인으로 돌아가기</a>
+            <div class="event-dots card-dots"></div>
+        </div>
+        <img class="product-image product-ace" th:src="@{/images/ace.png}" alt="">
+        <img class="product-image product-homerun" th:src="@{/images/homerun.png}" alt="">
+        <img class="product-image product-oyes" th:src="@{/images/oyes.png}" alt="">
     </section>
 </main>
 </body>

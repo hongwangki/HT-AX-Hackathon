@@ -87,6 +87,12 @@ public class AdminApplicationController {
                 .body(download.resource());
     }
 
+    @PostMapping("/{id}/files/{fileId}/delete")
+    public String deleteAttachment(@PathVariable Long id, @PathVariable Long fileId) {
+        applicationService.deleteAttachment(id, fileId);
+        return "redirect:/admin/applications/" + id + "/edit";
+    }
+
     @GetMapping("/{id}/delete")
     public String deleteConfirmation(@PathVariable Long id, Model model) {
         model.addAttribute("hackathonApplication", applicationService.findApplication(id));
