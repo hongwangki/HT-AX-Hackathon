@@ -1,5 +1,6 @@
 package haitai.ht_ax_hackathon.service;
 
+import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.AttachmentFile;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.domain.TeamMember;
@@ -49,7 +50,16 @@ public class ApplicationExcelExportService {
         try (Workbook workbook = new XSSFWorkbook();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             Styles styles = createStyles(workbook);
-            createTeamSummarySheet(workbook, applications, styles);
+            createTeamSummarySheet(workbook, "팀별 신청 요약", "HT AX 해커톤 팀별 신청 현황", applications, styles);
+            createTeamSummarySheet(
+                    workbook,
+                    "승인된 팀",
+                    "HT AX 해커톤 승인 팀 명단",
+                    applications.stream()
+                            .filter(application -> application.getStatus() == ApplicationStatus.APPROVED)
+                            .toList(),
+                    styles
+            );
             workbook.write(outputStream);
 
             return new ExcelDownload(
@@ -63,10 +73,12 @@ public class ApplicationExcelExportService {
 
     private void createTeamSummarySheet(
             Workbook workbook,
+            String sheetName,
+            String title,
             List<HackathonApplication> applications,
             Styles styles
     ) {
-        Sheet sheet = workbook.createSheet("팀별 신청 요약");
+        Sheet sheet = workbook.createSheet(sheetName);
         sheet.setDisplayGridlines(false);
         sheet.setColumnWidth(0, 14 * 256);
         sheet.setColumnWidth(1, 9 * 256);
@@ -74,7 +86,7 @@ public class ApplicationExcelExportService {
         sheet.setColumnWidth(3, 18 * 256);
         sheet.setColumnWidth(4, 18 * 256);
 
-        createMergedRow(sheet, 0, 0, 4, "HT AX 해커톤 팀별 신청 현황", styles.title, 32);
+        createMergedRow(sheet, 0, 0, 4, title, styles.title, 32);
         createMergedRow(
                 sheet,
                 1,
@@ -84,6 +96,11 @@ public class ApplicationExcelExportService {
                 styles.summary,
                 20
         );
+
+        if (applications.isEmpty()) {
+            createMergedRow(sheet, 3, 0, 4, "표시할 팀이 없습니다.", styles.body, 22);
+            return;
+        }
 
         int rowIndex = 3;
         int teamIndex = 1;
@@ -117,6 +134,12 @@ public class ApplicationExcelExportService {
             createLabelValueRow(sheet, rowIndex++, "주제", application.getTopic(), styles);
             createLabelValueRow(sheet, rowIndex++, "아이디어 내용", application.getContent(), styles);
             createLabelValueRow(sheet, rowIndex++, "신청일시", formatDateTime(application.getCreatedAt()), styles);
+            CellStyle statusStyle = switch (application.getStatus()) {
+                case APPROVED -> styles.statusApproved;
+                case REJECTED -> styles.statusRejected;
+                default -> styles.wrappedBody;
+            };
+            createLabelValueRow(sheet, rowIndex++, "심사 상태", application.getStatus().getLabel(), styles, statusStyle);
             createLabelValueRow(sheet, rowIndex++, "첨부파일", summarizeFiles(application.getFiles()), styles);
             rowIndex++;
         }
@@ -140,11 +163,22 @@ public class ApplicationExcelExportService {
     }
 
     private void createLabelValueRow(Sheet sheet, int rowIndex, String label, String value, Styles styles) {
+        createLabelValueRow(sheet, rowIndex, label, value, styles, styles.wrappedBody);
+    }
+
+    private void createLabelValueRow(
+            Sheet sheet,
+            int rowIndex,
+            String label,
+            String value,
+            Styles styles,
+            CellStyle valueStyle
+    ) {
         Row row = sheet.createRow(rowIndex);
         row.setHeightInPoints(calculateRowHeight(label, value));
         writeCell(row, 0, label, styles.sectionHeader);
         for (int columnIndex = 1; columnIndex <= 4; columnIndex++) {
-            writeCell(row, columnIndex, columnIndex == 1 ? value : "", styles.wrappedBody);
+            writeCell(row, columnIndex, columnIndex == 1 ? value : "", valueStyle);
         }
         mergeAndApplyBorders(sheet, new CellRangeAddress(rowIndex, rowIndex, 1, 4));
     }
@@ -222,7 +256,27 @@ public class ApplicationExcelExportService {
         setFontColor(sectionHeaderFont, 23, 59, 112);
         sectionHeader.setFont(sectionHeaderFont);
 
-        return new Styles(title, summary, header, body, wrappedBody, teamTitle, sectionHeader);
+        // Light green / red status fills matching the web badge colors.
+        CellStyle statusApproved = workbook.createCellStyle();
+        statusApproved.cloneStyleFrom(wrappedBody);
+        setFillColor(statusApproved, 222, 247, 235);
+        Font approvedFont = workbook.createFont();
+        approvedFont.setBold(true);
+        setFontColor(approvedFont, 22, 112, 75);
+        statusApproved.setFont(approvedFont);
+
+        CellStyle statusRejected = workbook.createCellStyle();
+        statusRejected.cloneStyleFrom(wrappedBody);
+        setFillColor(statusRejected, 255, 229, 232);
+        Font rejectedFont = workbook.createFont();
+        rejectedFont.setBold(true);
+        setFontColor(rejectedFont, 179, 57, 72);
+        statusRejected.setFont(rejectedFont);
+
+        return new Styles(
+                title, summary, header, body, wrappedBody, teamTitle, sectionHeader,
+                statusApproved, statusRejected
+        );
     }
 
     private void setFillColor(CellStyle style, int red, int green, int blue) {
@@ -278,7 +332,9 @@ public class ApplicationExcelExportService {
             CellStyle body,
             CellStyle wrappedBody,
             CellStyle teamTitle,
-            CellStyle sectionHeader
+            CellStyle sectionHeader,
+            CellStyle statusApproved,
+            CellStyle statusRejected
     ) {
     }
 }

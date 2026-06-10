@@ -49,6 +49,15 @@ public class HackathonApplication {
     @Column(nullable = false, columnDefinition = "nvarchar(max)")
     private String content;
 
+    @Column(nullable = false, length = 20)
+    @Nationalized
+    private String representativePhone;
+
+    /** Stored as plain text so admins can look it up for applicants who forgot it. */
+    @Column(nullable = false, length = 72)
+    @Nationalized
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Nationalized
@@ -66,11 +75,23 @@ public class HackathonApplication {
     @OneToMany(mappedBy = "application", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<AttachmentFile> files = new ArrayList<>();
 
-    public HackathonApplication(String teamName, String topic, String content) {
+    public HackathonApplication(
+            String teamName,
+            String topic,
+            String content,
+            String representativePhone,
+            String password
+    ) {
         this.teamName = teamName;
         this.topic = topic;
         this.content = content;
+        this.representativePhone = representativePhone;
+        this.password = password;
         this.status = ApplicationStatus.SUBMITTED;
+    }
+
+    public void changeStatus(ApplicationStatus status) {
+        this.status = status;
     }
 
     /** Keeps both sides of the application-member relationship synchronized. */
@@ -89,11 +110,12 @@ public class HackathonApplication {
         files.remove(file);
     }
 
-    /** Updates editable fields while preserving status and existing attachments. */
-    public void update(String teamName, String topic, String content) {
+    /** Updates editable fields while preserving status, password, and existing attachments. */
+    public void update(String teamName, String topic, String content, String representativePhone) {
         this.teamName = teamName;
         this.topic = topic;
         this.content = content;
+        this.representativePhone = representativePhone;
     }
 
     /** Replaces member rows so the submitted edit form becomes the source of truth. */

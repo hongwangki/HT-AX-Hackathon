@@ -19,6 +19,7 @@
         <dl class="detail-grid">
             <div><dt>팀명</dt><dd th:text="${hackathonApplication.teamName}">팀명</dd></div>
             <div><dt>신청일시</dt><dd th:text="${#temporals.format(hackathonApplication.createdAt, 'yyyy-MM-dd HH:mm')}">일시</dd></div>
+            <div><dt>대표 전화번호</dt><dd th:text="${hackathonApplication.representativePhone ?: '-'}">전화번호</dd></div>
             <div class="detail-full"><dt>주제</dt><dd th:text="${hackathonApplication.topic}">주제</dd></div>
             <div class="detail-full"><dt>내용</dt><dd class="pre-line" th:text="${hackathonApplication.content}">내용</dd></div>
         </dl>
@@ -38,6 +39,22 @@
             <tr th:each="file : ${hackathonApplication.files}"><td><a class="file-link" th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${hackathonApplication.id},fileId=${file.id})}" th:text="${file.originalFileName}">파일명</a></td><td th:text="${#numbers.formatInteger(file.fileSize, 1, 'COMMA')} + ' bytes'">0 bytes</td><td th:text="${file.contentType ?: '-'}">-</td></tr>
             <tr th:if="${#lists.isEmpty(hackathonApplication.files)}"><td class="empty-cell" colspan="3">첨부파일이 없습니다.</td></tr>
             </tbody></table>
+        </div>
+    </section>
+    <section class="card detail-card review-card">
+        <div class="detail-title"><h2>심사 처리</h2></div>
+        <p class="review-guide">승인 또는 거절 결과는 신청자가 신청현황 조회 페이지에서 바로 확인합니다.</p>
+        <div class="review-actions">
+            <form th:action="@{/admin/applications/{id}/approve(id=${hackathonApplication.id})}" method="post"
+                  th:if="${hackathonApplication.status.name() != 'APPROVED'}">
+                <button class="button button-approve" type="submit">승인</button>
+            </form>
+            <form th:action="@{/admin/applications/{id}/reject(id=${hackathonApplication.id})}" method="post"
+                  th:if="${hackathonApplication.status.name() != 'REJECTED'}">
+                <button class="button button-danger" type="submit">거절</button>
+            </form>
+            <span class="review-done" th:if="${hackathonApplication.status.name() == 'APPROVED'}">현재 승인된 신청입니다.</span>
+            <span class="review-done" th:if="${hackathonApplication.status.name() == 'REJECTED'}">현재 거절된 신청입니다.</span>
         </div>
     </section>
     <div class="detail-actions">

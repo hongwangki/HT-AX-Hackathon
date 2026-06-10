@@ -18,7 +18,10 @@
     </header>
     <div class="admin-toolbar">
         <div class="count-card"><span>전체 접수</span><strong th:text="${applicationCount}">0</strong><span>건</span></div>
-        <a class="button button-primary" th:href="@{/admin/applications/export}">전체 엑셀 다운로드</a>
+        <div class="toolbar-buttons">
+            <a class="button button-secondary" th:href="@{/admin/applications/password-lookup}">비밀번호 조회</a>
+            <a class="button button-primary" th:href="@{/admin/applications/export}">전체 엑셀 다운로드</a>
+        </div>
     </div>
     <section class="card table-card">
         <div class="table-wrap">

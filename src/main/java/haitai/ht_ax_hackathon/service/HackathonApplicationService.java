@@ -1,5 +1,6 @@
 package haitai.ht_ax_hackathon.service;
 
+import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.AttachmentFile;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.domain.TeamMember;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +29,13 @@ public class HackathonApplicationService {
     /** Persists the application graph and cleans up already stored files if persistence fails. */
     @Transactional
     public HackathonApplication createApplication(ApplicationForm form) {
-        HackathonApplication application =
-                new HackathonApplication(form.getTeamName(), form.getTopic(), form.getContent());
+        HackathonApplication application = new HackathonApplication(
+                form.getTeamName(),
+                form.getTopic(),
+                form.getContent(),
+                normalizePhone(form.getRepresentativePhone()),
+                form.getPassword()
+        );
 
         for (TeamMemberForm memberForm : form.getMembers()) {
             application.addMember(new TeamMember(
@@ -59,6 +66,7 @@ public class HackathonApplicationService {
         HackathonApplication application = findApplication(id);
         ApplicationForm form = new ApplicationForm();
         form.setTeamName(application.getTeamName());
+        form.setRepresentativePhone(application.getRepresentativePhone());
         form.setTopic(application.getTopic());
         form.setContent(application.getContent());
         form.setMembers(application.getMembers().stream()
@@ -71,7 +79,12 @@ public class HackathonApplicationService {
     @Transactional
     public void updateApplication(Long id, ApplicationForm form) {
         HackathonApplication application = findById(id);
-        application.update(form.getTeamName(), form.getTopic(), form.getContent());
+        application.update(
+                form.getTeamName(),
+                form.getTopic(),
+                form.getContent(),
+                normalizePhone(form.getRepresentativePhone())
+        );
         application.replaceMembers(form.getMembers().stream()
                 .map(member -> new TeamMember(member.getDepartment(), member.getEmployeeNo(), member.getName()))
                 .toList());
@@ -94,6 +107,59 @@ public class HackathonApplicationService {
     @Transactional(readOnly = true)
     public List<HackathonApplication> findAllApplications() {
         return applicationRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    /**
+     * Returns the applicant's full submission history for the status page, newest first.
+     * One matching password unlocks every row for the phone number, because re-submissions
+     * are forced to reuse the same password. An empty list means no application exists for
+     * the phone number or the password is wrong — the two cases are intentionally
+     * indistinguishable to the caller.
+     */
+    @Transactional(readOnly = true)
+    public List<HackathonApplication> findMyApplications(String representativePhone, String rawPassword) {
+        List<HackathonApplication> applications = applicationRepository
+                .findByRepresentativePhoneOrderByCreatedAtDesc(normalizePhone(representativePhone));
+        boolean authenticated = applications.stream()
+                .anyMatch(application -> rawPassword.equals(application.getPassword()));
+        return authenticated ? applications : List.of();
+    }
+
+    /**
+     * A phone number keeps a single password across re-submissions so applicants always see
+     * their full history with one credential pair. Rows with a blank password (data predating
+     * the password feature) are ignored rather than locking the phone number out forever.
+     */
+    @Transactional(readOnly = true)
+    public boolean passwordConflictsWithExisting(String representativePhone, String rawPassword) {
+        List<HackathonApplication> existing = applicationRepository
+                .findByRepresentativePhoneOrderByCreatedAtDesc(normalizePhone(representativePhone))
+                .stream()
+                .filter(application -> application.getPassword() != null
+                        && !application.getPassword().isBlank())
+                .toList();
+        return !existing.isEmpty() && existing.stream()
+                .noneMatch(application -> rawPassword.equals(application.getPassword()));
+    }
+
+    @Transactional
+    public void changeStatus(Long id, ApplicationStatus status) {
+        findById(id).changeStatus(status);
+    }
+
+    /**
+     * Admin recovery path for applicants who forgot their password: looks the stored
+     * password up by phone number so the admin can relay it. Blank passwords
+     * (data predating the password feature) are skipped. Empty when the phone is unknown.
+     */
+    @Transactional(readOnly = true)
+    public Optional<String> findPasswordByPhone(String representativePhone) {
+        return applicationRepository
+                .findByRepresentativePhoneOrderByCreatedAtDesc(normalizePhone(representativePhone))
+                .stream()
+                .map(HackathonApplication::getPassword)
+                .filter(password -> password != null && !password.isBlank())
+                .findFirst();
     }
 
     @Transactional(readOnly = true)
@@ -145,6 +211,11 @@ public class HackathonApplicationService {
         application.removeFile(file);
         applicationRepository.flush();
         fileStorageService.deleteQuietly(filePath);
+    }
+
+    /** Strips spaces so "010-1234-5678" and "010 - 1234 - 5678" match the same stored value. */
+    private String normalizePhone(String phone) {
+        return phone == null ? null : phone.replaceAll("\\s", "");
     }
 
     private TeamMemberForm toMemberForm(TeamMember member) {

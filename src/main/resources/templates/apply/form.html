@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>참가 접수 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260610-2')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body>
@@ -34,6 +34,20 @@
                 <input type="text" th:field="*{teamName}" placeholder="팀명을 입력해 주세요">
                 <small class="field-error" th:errors="*{teamName}"></small>
             </label>
+            <div class="field-pair">
+                <label class="field">
+                    <span>대표 전화번호 <b>*</b></span>
+                    <input type="tel" th:field="*{representativePhone}" placeholder="예: 010-1234-5678" inputmode="tel" maxlength="20">
+                    <small class="field-hint">신청현황 조회 시 사용됩니다.</small>
+                    <small class="field-error" th:errors="*{representativePhone}"></small>
+                </label>
+                <label class="field">
+                    <span>비밀번호 <b>*</b></span>
+                    <input type="password" th:field="*{password}" placeholder="4자 이상" autocomplete="new-password">
+                    <small class="field-hint">신청현황 조회에 사용되며, 재신청 시에도 동일한 비밀번호를 사용합니다. 다른 곳에서 쓰는 개인 비밀번호는 사용하지 마세요.</small>
+                    <small class="field-error" th:errors="*{password}"></small>
+                </label>
+            </div>
         </section>
 
         <section class="form-section">
@@ -57,7 +71,7 @@
                     <div class="member-fields">
                         <label class="field">
                             <span>소속 <b>*</b></span>
-                            <input type="text" th:field="*{members[__${stat.index}__].department}" placeholder="예: AX기획팀">
+                            <input type="text" th:field="*{members[__${stat.index}__].department}" placeholder="예: 인사팀">
                             <small class="field-error" th:errors="*{members[__${stat.index}__].department}"></small>
                         </label>
                         <label class="field">

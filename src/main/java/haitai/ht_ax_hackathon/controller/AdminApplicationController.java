@@ -1,9 +1,11 @@
 package haitai.ht_ax_hackathon.controller;
 
+import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.ApplicationForm;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
 import haitai.ht_ax_hackathon.dto.ExcelDownload;
+import haitai.ht_ax_hackathon.dto.PasswordLookupForm;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
 import haitai.ht_ax_hackathon.service.ApplicationExcelExportService;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
@@ -60,6 +62,47 @@ public class AdminApplicationController {
     public String applicationDetail(@PathVariable Long id, Model model) {
         model.addAttribute("hackathonApplication", applicationService.findApplication(id));
         return "admin/application-detail";
+    }
+
+    @GetMapping("/password-lookup")
+    public String passwordLookupForm(Model model) {
+        model.addAttribute("passwordLookupForm", new PasswordLookupForm());
+        return "admin/password-lookup";
+    }
+
+    /** Renders the result directly so the password is never exposed in a URL. */
+    @PostMapping("/password-lookup")
+    public String lookupPassword(
+            @Valid @ModelAttribute("passwordLookupForm") PasswordLookupForm form,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "admin/password-lookup";
+        }
+
+        applicationService.findPasswordByPhone(form.getRepresentativePhone())
+                .ifPresentOrElse(
+                        password -> {
+                            model.addAttribute("foundPhone", form.getRepresentativePhone());
+                            model.addAttribute("foundPassword", password);
+                        },
+                        () -> bindingResult.rejectValue("representativePhone", "phone.notFound",
+                                "이 전화번호로 접수된 신청이 없습니다.")
+                );
+        return "admin/password-lookup";
+    }
+
+    @PostMapping("/{id}/approve")
+    public String approveApplication(@PathVariable Long id) {
+        applicationService.changeStatus(id, ApplicationStatus.APPROVED);
+        return "redirect:/admin/applications/" + id;
+    }
+
+    @PostMapping("/{id}/reject")
+    public String rejectApplication(@PathVariable Long id) {
+        applicationService.changeStatus(id, ApplicationStatus.REJECTED);
+        return "redirect:/admin/applications/" + id;
     }
 
     @GetMapping("/{id}/edit")

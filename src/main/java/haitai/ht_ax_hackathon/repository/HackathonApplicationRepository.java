@@ -10,4 +10,6 @@ public interface HackathonApplicationRepository extends JpaRepository<HackathonA
 
     @EntityGraph(attributePaths = "members")
     List<HackathonApplication> findAllByOrderByCreatedAtDesc();
+
+    List<HackathonApplication> findByRepresentativePhoneOrderByCreatedAtDesc(String representativePhone);
 }

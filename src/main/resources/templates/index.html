@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>해태제과 사내 AI 경연대회</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260604-1')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260610-1')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="landing-page">
@@ -22,7 +22,10 @@
             <div class="event-divider"><span>✦</span></div>
             <p class="event-description">우리 일의 불편함을 AI로 바꾸는 시간<br>작은 아이디어가 더 나은 업무가 됩니다.</p>
             <p class="ai-made-note">이 페이지는 AI를 활용해 제작되었습니다.</p>
-            <a class="event-button" th:href="@{/apply}">참가 접수</a>
+            <div class="event-actions">
+                <a class="event-button" th:href="@{/apply}">참가 접수</a>
+                <a class="event-button event-button-outline" th:href="@{/status}">신청현황 조회</a>
+            </div>
             <div class="event-dots card-dots"></div>
         </div>
         <img class="product-image product-ace" th:src="@{/images/ace.png}" alt="">

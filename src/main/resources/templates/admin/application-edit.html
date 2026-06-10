@@ -20,8 +20,9 @@
             <p th:each="error : ${#fields.globalErrors()}" th:text="${error}">오류 메시지</p>
         </div>
         <section class="form-section">
-            <div class="section-heading"><span>01</span><div><h2>팀 정보</h2><p>팀명을 수정할 수 있습니다.</p></div></div>
+            <div class="section-heading"><span>01</span><div><h2>팀 정보</h2><p>팀명과 대표 전화번호를 수정할 수 있습니다. 비밀번호는 변경되지 않습니다.</p></div></div>
             <label class="field"><span>팀명 <b>*</b></span><input type="text" th:field="*{teamName}"><small class="field-error" th:errors="*{teamName}"></small></label>
+            <label class="field"><span>대표 전화번호 <b>*</b></span><input type="tel" th:field="*{representativePhone}" inputmode="tel" maxlength="20"><small class="field-error" th:errors="*{representativePhone}"></small></label>
         </section>
         <section class="form-section">
             <div class="section-heading section-heading-action">

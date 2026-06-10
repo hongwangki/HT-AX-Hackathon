@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신청현황 조회 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body>
+<main class="page-shell status-shell">
+    <header class="page-header">
+        <span class="eyebrow">HT AX HACKATHON</span>
+        <h1>신청현황 조회</h1>
+        <p>신청 시 입력한 대표 전화번호와 비밀번호를 입력해 주세요.</p>
+    </header>
+
+    <form class="card form-card" th:action="@{/status}" th:object="${statusCheckForm}" method="post">
+        <div class="global-errors" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="error : ${#fields.globalErrors()}" th:text="${error}">오류 메시지</p>
+        </div>
+
+        <section class="form-section">
+            <label class="field">
+                <span>대표 전화번호 <b>*</b></span>
+                <input type="tel" th:field="*{representativePhone}" placeholder="예: 010-1234-5678" inputmode="tel" maxlength="20">
+                <small class="field-error" th:errors="*{representativePhone}"></small>
+            </label>
+            <label class="field">
+                <span>비밀번호 <b>*</b></span>
+                <input type="password" th:field="*{password}" placeholder="신청 시 입력한 비밀번호" autocomplete="current-password">
+                <small class="field-error" th:errors="*{password}"></small>
+            </label>
+        </section>
+
+        <div class="form-actions">
+            <a class="button button-ghost" th:href="@{/}">처음으로</a>
+            <button class="button button-primary" type="submit">조회하기</button>
+        </div>
+    </form>
+    <footer class="site-footer">© 2026 HT AX. All rights reserved.</footer>
+</main>
+</body>
+</html>
