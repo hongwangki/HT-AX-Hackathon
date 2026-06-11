@@ -1,37 +1,266 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>해태제과 사내 AI 경연대회</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260610-1')}">
-    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>제1회 HT AX 해커톤 | 사내 AI 경연대회</title>
+  <link rel="stylesheet" href="/css/landing-v2/style.css?v=20260611-schedule-date-fit" />
+  <link rel="icon" type="image/png" href="/images/Logo.png">
 </head>
-<body class="landing-page">
-<main class="landing-shell">
-    <section class="event-stage" aria-label="제1회 해태제과 사내 AI 경연대회">
-        <div class="event-dots event-dots-left"></div>
-        <div class="event-waves"></div>
-        <div class="event-sparkles"></div>
-        <div class="event-bubbles"></div>
-        <div class="event-swoosh"></div>
-        <div class="event-card landing-event-card">
-            <p class="event-badge"><span>제1회</span> HT AX HACKATHON</p>
-            <p class="event-subtitle event-brand">해태제과</p>
-            <h1 class="event-main-title">사내 AI 경연대회</h1>
-            <div class="event-divider"><span>✦</span></div>
-            <p class="event-description">우리 일의 불편함을 AI로 바꾸는 시간<br>작은 아이디어가 더 나은 업무가 됩니다.</p>
-            <p class="ai-made-note">이 페이지는 AI를 활용해 제작되었습니다.</p>
-            <div class="event-actions">
-                <a class="event-button" th:href="@{/apply}">참가 접수</a>
-                <a class="event-button event-button-outline" th:href="@{/status}">신청현황 조회</a>
-            </div>
-            <div class="event-dots card-dots"></div>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#top" class="brand" aria-label="해태"><img src="/images/landing-v2/logo.png?v=20260611-schedule-date-fit" alt="해태"></a>
+      <nav class="nav" aria-label="주요 메뉴">
+        <a href="#about">공모 안내</a>
+        <a href="#schedule">일정</a>
+        <a href="#reward">포상</a>
+        <a href="#process">참여 방법</a>
+      </nav>
+
+      <a th:if="${statusCheckOpen}" href="/status" class="header-cta">접수 결과확인</a>
+      <a th:unless="${statusCheckOpen}" href="#" class="header-cta is-disabled" aria-disabled="true"
+         onclick="alert('아직 신청결과 확인 기간이 아닙니다.'); return false;">접수 결과확인</a>
+    </div>
+
+  </header>
+
+  <main id="top">
+   <section class="hero">
+  <!-- 1920px 안에서만 고정되는 배경 이미지 영역 -->
+  <div class="hero-bg-wrap"></div>
+
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="hero-kicker">제1회 HT AX 해커톤</p>
+
+      <h1>
+        사내 <span>AI</span><br />
+        경연대회
+      </h1>
+
+      <div class="hero-divider"></div>
+
+      <p class="hero-desc">
+        <strong>AI로 혁신하고, 아이디어로 성장하는 해태</strong><br />
+        우리의 아이디어가 일하는 방식을 바꿉니다!
+      </p>
+
+      <div class="hero-divider"></div>
+
+      <p class="hero-prize">
+        총 상금 <b>1,000</b>만원
+      </p>
+
+      <div class="hero-actions" >
+        <a href="#apply" class="btn-primary is-disabled js-apply-gate" aria-disabled="true"
+           data-open-at="2026-06-17T08:30:00+09:00"
+           data-open-text="공모전 참가접수"
+           data-closed-text="6월 17일 접수오픈 예정">6월 17일 접수오픈 예정</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section class="summary-section" id="about">
+      <div class="container">
+        <div class="section-title white">
+          <span>HT AX HACKATHON</span>
+          <h2>공모전 안내</h2>
+          <p>임직원의 AI 활용 역량을 높이고, 실무에 바로 적용 가능한 아이디어를 발굴합니다.</p>
         </div>
-        <img class="product-image product-ace" th:src="@{/images/ace.png}" alt="">
-        <img class="product-image product-homerun" th:src="@{/images/homerun.png}" alt="">
-        <img class="product-image product-oyes" th:src="@{/images/oyes.png}" alt="">
+
+        <div class="info-card">
+          <div class="info-row">
+            <div class="label">목적</div>
+            <div class="content">
+              <p>임직원 AI 관심도 제고 및 역량 강화</p>
+              <p>AI 실무 활용을 통한 업무 프로세스 최적화와 비즈니스 성과 창출</p>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="label">대상</div>
+            <div class="content">전 임직원</div>
+          </div>
+          <div class="info-row">
+            <div class="label">주제</div>
+            <div class="content">
+              <strong>업무 효율화 및 비용 절감</strong>
+              <ul>
+                <li>신제품 개발 기간 단축</li>
+                <li>제품 생산 효율화 및 원가 절감</li>
+                <li>업무 프로세스 효율화 등</li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-row">
+            <div class="label">조 편성</div>
+            <div class="content">1인 이상 자율 편성
+				<small>- 소속 제한 없음</small></div>
+          </div>
+          <div class="info-row">
+            <div class="label">지원</div>
+            <div class="content">참가 조당 AI툴 사용료 10만원 지원 <br>
+             <small>- 과제 제출자에 한함</small>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
-</main>
+
+    <section class="content-section" id="schedule">
+      <div class="container">
+        <div class="section-title">
+          <span>SCHEDULE</span>
+          <h2>진행 일정</h2>
+          <p>접수부터 과제 수행, 발표 평가, 당선작 선정까지 단계별로 진행됩니다.</p>
+        </div>
+
+        <div class="timeline">
+          <article class="timeline-item">
+            <div class="date">6월 17일 ~ 6월 30일</div>
+            <div class="timeline-content">
+              <h3>접수 & 선정</h3>
+              <p>온라인 접수로 아이디어를 제안하고, 1인 이상 소속에 제한없이 자율 편성으로 조를 구성합니다.</p>
+            </div>
+          </article>
+			<article class="timeline-item">
+            <div class="date">8월 5일</div>
+            <div class="timeline-content">
+              <h3>과제 제출 마감일</h3>
+              <p>발표할 PPT자료 제출</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <div class="date">8월중</div>
+            <div class="timeline-content">
+              <h3>발표 및 시연 평가</h3>
+              <p>조별 발표와 평가를 진행하며, 부서장 및 임원 평가가 함께 실시됩니다.</p>
+            </div>
+          </article>
+          <article class="timeline-item">
+            <div class="date">8월중</div>
+            <div class="timeline-content">
+              <h3>당선작 선정 및 포상</h3>
+              <p>우수 아이디어를 선정하고 포상합니다. 세부 일정 확정 시 공지 예정입니다.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section dark" id="reward">
+      <div class="container two-column">
+        <div>
+          <div class="section-title left white">
+            <span>REWARD</span>
+            <h2>포상 및 평가 기준</h2>
+            <p>업무 현장에 적용 가능한 실질적 아이디어를 중심으로 평가합니다.</p>
+          </div>
+          <div class="criteria-grid">
+            <div>업무 효율의 증대성</div>
+            <div>비용 절감 효과</div>
+            <div>실용성</div>
+            <div>아이디어 혁신성</div>
+          </div>
+          <p class="note">평가 요소별 배점이 부여된 평가표를 이용하여 평가가 진행됩니다.
+			 <br>향후 업무 기여도에 따라 추가 포상 검토
+			</p>
+
+        </div>
+
+        <div class="reward-card">
+          <h3>총 상금 1,000만원</h3>
+          <ul>
+            <li><b>1등</b><span>300만원</span></li>
+            <li><b>2등</b><span>200만원</span></li>
+            <li><b>3등</b><span>2개조 / 각 100만원</span></li>
+			<li><b>장려상</b><span>6개조 / 각 50만원</span></li>
+			</ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section" id="process">
+      <div class="container">
+        <div class="section-title">
+          <span>PROCESS</span>
+          <h2>참여 프로세스</h2>
+          <p>아이디어 제안부터 발표 심사까지 순서대로 참여해 주세요.</p>
+        </div>
+        <div class="process-list">
+          <div class="process-card">
+            <span>01</span>
+            <h3>아이디어 제안</h3>
+            <p>6월 30일까지 온라인으로 아이디어를 접수합니다.</p>
+          </div>
+          <div class="process-card">
+            <span>02</span>
+            <h3>과제 선정</h3>
+            <p>접수된 아이디어 중 수행 과제를 선정합니다.</p>
+          </div>
+          <div class="process-card">
+            <span>03</span>
+            <h3>과제 수행</h3>
+            <p>AI툴을 활용해 결과물과 개선 효과를 구체화합니다.</p>
+          </div>
+          <div class="process-card">
+            <span>04</span>
+            <h3>발표 및 심사</h3>
+            <p>조별 발표와 평가를 통해 최종 당선작을 선정합니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="apply-section" id="apply">
+      <div class="container apply-box">
+        <div>
+          <span>APPLY NOW</span>
+          <h2>AI로 바꿀 수 있는 일,<br />지금 제안해 주세요.</h2>
+          <p>작은 아이디어가 업무 방식을 바꾸고, 해태의 AX 전환을 앞당깁니다.</p>
+        </div>
+        <a href="#" class="apply-button is-disabled js-apply-gate" aria-disabled="true"
+           data-open-at="2026-06-17T08:30:00+09:00"
+           data-open-text="바로 참가신청 하기"
+           data-closed-text="참가신청 6월 17일 오픈예정">참가신청 6월 17일 오픈예정</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>* 본 페이지는 Ai를 활용해 제작되었습니다.</p>
+  </footer>
+  <script>
+    (() => {
+      const applyButtons = document.querySelectorAll(".js-apply-gate");
+      const closedMessage = "아직 신청기간이 아닙니다. 6월 17일 접수 오픈 예정입니다.";
+
+      const syncApplyButtons = () => {
+        const now = Date.now();
+        applyButtons.forEach((button) => {
+          const openAt = new Date(button.dataset.openAt).getTime();
+          const isOpen = now >= openAt;
+
+          button.textContent = isOpen ? button.dataset.openText : button.dataset.closedText;
+          button.classList.toggle("is-disabled", !isOpen);
+          button.setAttribute("aria-disabled", String(!isOpen));
+          button.setAttribute("href", isOpen ? "/apply" : "#apply");
+        });
+      };
+
+      applyButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          if (button.getAttribute("aria-disabled") === "true") {
+            event.preventDefault();
+            alert(closedMessage);
+          }
+        });
+      });
+
+      syncApplyButtons();
+      window.setInterval(syncApplyButtons, 1000);
+    })();
+  </script>
 </body>
 </html>

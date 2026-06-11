@@ -12,4 +12,6 @@ public interface HackathonApplicationRepository extends JpaRepository<HackathonA
     List<HackathonApplication> findAllByOrderByCreatedAtDesc();
 
     List<HackathonApplication> findByRepresentativePhoneOrderByCreatedAtDesc(String representativePhone);
+
+    List<HackathonApplication> findByRepresentativePhoneInOrderByCreatedAtDesc(List<String> representativePhones);
 }

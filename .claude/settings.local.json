@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava --console=plain -q)",
+      "Read(//usr/lib/**)",
+      "Read(//mnt/c/Program Files/Java/**)",
+      "Read(//mnt/c/Program Files/**)",
+      "Bash(cmd.exe /c \"gradlew.bat compileJava --console=plain -q\")",
+      "Bash(cmd.exe /c \"gradlew.bat test --console=plain\")",
+      "Bash(grep -no \"#ff[de][0-9a-f]*\\\\|#ffc[0-9a-f]\\\\{2,\\\\}\\\\|rgba\\(25[0-5], 2[0-2][0-9],[^\\)]*\\)\" style.css)",
+      "Bash(git diff *)",
+      "Bash(./gradlew compileJava -q)",
+      "Bash(pip3 install *)",
+      "Bash(sudo apt list --installed)",
+      "Bash(python3 -m pip --version)"
+    ]
+  }
+}

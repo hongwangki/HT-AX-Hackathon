@@ -1,5 +1,6 @@
 package haitai.ht_ax_hackathon.controller;
 
+import haitai.ht_ax_hackathon.domain.ApplicationCategory;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.ApplicationForm;
 import haitai.ht_ax_hackathon.dto.StatusCheckForm;
@@ -21,6 +22,12 @@ import java.util.List;
 public class ApplicationController {
 
     private final HackathonApplicationService applicationService;
+
+    /** Select-box options for the apply form, available on every render including validation errors. */
+    @ModelAttribute("categories")
+    public ApplicationCategory[] categories() {
+        return ApplicationCategory.values();
+    }
 
     @GetMapping("/apply")
     public String applicationForm(Model model) {

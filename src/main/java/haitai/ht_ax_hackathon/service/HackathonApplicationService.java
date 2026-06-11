@@ -31,6 +31,7 @@ public class HackathonApplicationService {
     public HackathonApplication createApplication(ApplicationForm form) {
         HackathonApplication application = new HackathonApplication(
                 form.getTeamName(),
+                form.getCategory(),
                 form.getTopic(),
                 form.getContent(),
                 normalizePhone(form.getRepresentativePhone()),
@@ -67,6 +68,7 @@ public class HackathonApplicationService {
         ApplicationForm form = new ApplicationForm();
         form.setTeamName(application.getTeamName());
         form.setRepresentativePhone(application.getRepresentativePhone());
+        form.setCategory(application.getCategory());
         form.setTopic(application.getTopic());
         form.setContent(application.getContent());
         form.setMembers(application.getMembers().stream()
@@ -81,6 +83,7 @@ public class HackathonApplicationService {
         HackathonApplication application = findById(id);
         application.update(
                 form.getTeamName(),
+                form.getCategory(),
                 form.getTopic(),
                 form.getContent(),
                 normalizePhone(form.getRepresentativePhone())
@@ -119,7 +122,7 @@ public class HackathonApplicationService {
     @Transactional(readOnly = true)
     public List<HackathonApplication> findMyApplications(String representativePhone, String rawPassword) {
         List<HackathonApplication> applications = applicationRepository
-                .findByRepresentativePhoneOrderByCreatedAtDesc(normalizePhone(representativePhone));
+                .findByRepresentativePhoneInOrderByCreatedAtDesc(phoneLookupKeys(representativePhone));
         boolean authenticated = applications.stream()
                 .anyMatch(application -> rawPassword.equals(application.getPassword()));
         return authenticated ? applications : List.of();
@@ -133,7 +136,7 @@ public class HackathonApplicationService {
     @Transactional(readOnly = true)
     public boolean passwordConflictsWithExisting(String representativePhone, String rawPassword) {
         List<HackathonApplication> existing = applicationRepository
-                .findByRepresentativePhoneOrderByCreatedAtDesc(normalizePhone(representativePhone))
+                .findByRepresentativePhoneInOrderByCreatedAtDesc(phoneLookupKeys(representativePhone))
                 .stream()
                 .filter(application -> application.getPassword() != null
                         && !application.getPassword().isBlank())
@@ -155,7 +158,7 @@ public class HackathonApplicationService {
     @Transactional(readOnly = true)
     public Optional<String> findPasswordByPhone(String representativePhone) {
         return applicationRepository
-                .findByRepresentativePhoneOrderByCreatedAtDesc(normalizePhone(representativePhone))
+                .findByRepresentativePhoneInOrderByCreatedAtDesc(phoneLookupKeys(representativePhone))
                 .stream()
                 .map(HackathonApplication::getPassword)
                 .filter(password -> password != null && !password.isBlank())
@@ -213,9 +216,23 @@ public class HackathonApplicationService {
         fileStorageService.deleteQuietly(filePath);
     }
 
-    /** Strips spaces so "010-1234-5678" and "010 - 1234 - 5678" match the same stored value. */
+    /** Keeps only digits so mobile numeric keyboards can be used without hyphens. */
     private String normalizePhone(String phone) {
-        return phone == null ? null : phone.replaceAll("\\s", "");
+        return phone == null ? null : phone.replaceAll("\\D", "");
+    }
+
+    private List<String> phoneLookupKeys(String phone) {
+        String normalized = normalizePhone(phone);
+        if (normalized == null || normalized.isBlank()) {
+            return List.of("");
+        }
+        if (normalized.length() == 11) {
+            return List.of(
+                    normalized,
+                    normalized.replaceFirst("(\\d{3})(\\d{4})(\\d{4})", "$1-$2-$3")
+            );
+        }
+        return List.of(normalized);
     }
 
     private TeamMemberForm toMemberForm(TeamMember member) {

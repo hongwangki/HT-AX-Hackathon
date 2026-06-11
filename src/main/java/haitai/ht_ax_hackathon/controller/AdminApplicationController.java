@@ -1,5 +1,6 @@
 package haitai.ht_ax_hackathon.controller;
 
+import haitai.ht_ax_hackathon.domain.ApplicationCategory;
 import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.ApplicationForm;
@@ -9,6 +10,7 @@ import haitai.ht_ax_hackathon.dto.PasswordLookupForm;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
 import haitai.ht_ax_hackathon.service.ApplicationExcelExportService;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
+import haitai.ht_ax_hackathon.service.StatusAccessService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ContentDisposition;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -35,13 +38,27 @@ public class AdminApplicationController {
 
     private final HackathonApplicationService applicationService;
     private final ApplicationExcelExportService excelExportService;
+    private final StatusAccessService statusAccessService;
+
+    /** Select-box options for the edit form, available on every render including validation errors. */
+    @ModelAttribute("categories")
+    public ApplicationCategory[] categories() {
+        return ApplicationCategory.values();
+    }
 
     @GetMapping
     public String applicationList(Model model) {
         List<HackathonApplication> applications = applicationService.findAllApplications();
         model.addAttribute("applications", applications);
         model.addAttribute("applicationCount", applications.size());
+        model.addAttribute("statusCheckOpen", statusAccessService.isStatusCheckOpen());
         return "admin/application-list";
+    }
+
+    @PostMapping("/status-access")
+    public String updateStatusAccess(@RequestParam boolean open) {
+        statusAccessService.setStatusCheckOpen(open);
+        return "redirect:/admin/applications";
     }
 
     @GetMapping("/export")

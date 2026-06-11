@@ -131,6 +131,13 @@ public class ApplicationExcelExportService {
                 writeCell(memberRow, 4, member.getName(), styles.body);
             }
 
+            createLabelValueRow(
+                    sheet,
+                    rowIndex++,
+                    "분류",
+                    application.getCategory() == null ? "-" : application.getCategory().getLabel(),
+                    styles
+            );
             createLabelValueRow(sheet, rowIndex++, "주제", application.getTopic(), styles);
             createLabelValueRow(sheet, rowIndex++, "아이디어 내용", application.getContent(), styles);
             createLabelValueRow(sheet, rowIndex++, "신청일시", formatDateTime(application.getCreatedAt()), styles);

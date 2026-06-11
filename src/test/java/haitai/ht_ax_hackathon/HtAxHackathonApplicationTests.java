@@ -60,6 +60,7 @@ class HtAxHackathonApplicationTests {
                         .param("members[0].department", "AX Team")
                         .param("members[0].employeeNo", "1000001")
                         .param("members[0].name", "Tester")
+                        .param("category", "MARKETING")
                         .param("topic", "Internal AI Assistant")
                         .param("content", "Test application content"))
                 .andExpect(status().is3xxRedirection())
@@ -92,13 +93,17 @@ class HtAxHackathonApplicationTests {
             assertThat(workbook.getSheet("팀별 신청 요약").getRow(4).getCell(0).getStringCellValue())
                     .isEqualTo("구성인원");
             assertThat(workbook.getSheet("팀별 신청 요약").getRow(6).getCell(0).getStringCellValue())
-                    .isEqualTo("주제");
+                    .isEqualTo("분류");
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(6).getCell(1).getStringCellValue())
+                    .isEqualTo("마케팅");
             assertThat(workbook.getSheet("팀별 신청 요약").getRow(7).getCell(0).getStringCellValue())
+                    .isEqualTo("주제");
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(8).getCell(0).getStringCellValue())
                     .isEqualTo("아이디어 내용");
-            assertThat(workbook.getSheet("팀별 신청 요약").getRow(7).getHeightInPoints()).isGreaterThanOrEqualTo(42);
-            assertThat(workbook.getSheet("팀별 신청 요약").getRow(9).getCell(0).getStringCellValue())
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(8).getHeightInPoints()).isGreaterThanOrEqualTo(42);
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(10).getCell(0).getStringCellValue())
                     .isEqualTo("심사 상태");
-            assertThat(workbook.getSheet("팀별 신청 요약").getRow(9).getCell(1).getStringCellValue())
+            assertThat(workbook.getSheet("팀별 신청 요약").getRow(10).getCell(1).getStringCellValue())
                     .isEqualTo("접수");
             assertThat(workbook.getSheet("팀별 신청 요약").getColumnWidth(1)).isEqualTo(9 * 256);
             assertThat(workbook.getSheet("팀별 신청 요약").getRow(5).getCell(0).getCellStyle())
@@ -125,7 +130,7 @@ class HtAxHackathonApplicationTests {
                 .getResponse()
                 .getContentAsByteArray();
         try (var workbook = new XSSFWorkbook(new ByteArrayInputStream(approvedExcel))) {
-            var statusCell = workbook.getSheet("팀별 신청 요약").getRow(9).getCell(1);
+            var statusCell = workbook.getSheet("팀별 신청 요약").getRow(10).getCell(1);
             assertThat(statusCell.getStringCellValue()).isEqualTo("승인");
             assertThat(((org.apache.poi.xssf.usermodel.XSSFCellStyle) statusCell.getCellStyle())
                     .getFillForegroundColorColor().getRGB())
@@ -177,6 +182,7 @@ class HtAxHackathonApplicationTests {
                         .param("members[0].department", "Updated Team")
                         .param("members[0].employeeNo", "2000002")
                         .param("members[0].name", "Updated Tester")
+                        .param("category", "MARKETING")
                         .param("topic", "Updated Topic")
                         .param("content", "Updated content"))
                 .andExpect(status().is3xxRedirection())
@@ -205,6 +211,7 @@ class HtAxHackathonApplicationTests {
                         .param("members[0].department", "AX Team")
                         .param("members[0].employeeNo", "3000003")
                         .param("members[0].name", "Tester")
+                        .param("category", "MARKETING")
                         .param("topic", "First Topic")
                         .param("content", "First content"))
                 .andExpect(status().is3xxRedirection())
@@ -218,6 +225,7 @@ class HtAxHackathonApplicationTests {
                         .param("members[0].department", "AX Team")
                         .param("members[0].employeeNo", "3000003")
                         .param("members[0].name", "Tester")
+                        .param("category", "MARKETING")
                         .param("topic", "Second Topic")
                         .param("content", "Second content"))
                 .andExpect(status().isOk())
@@ -230,6 +238,7 @@ class HtAxHackathonApplicationTests {
                         .param("members[0].department", "AX Team")
                         .param("members[0].employeeNo", "3000003")
                         .param("members[0].name", "Tester")
+                        .param("category", "MARKETING")
                         .param("topic", "Second Topic")
                         .param("content", "Second content"))
                 .andExpect(status().is3xxRedirection())

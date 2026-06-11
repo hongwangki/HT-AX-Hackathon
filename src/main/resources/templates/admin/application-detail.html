@@ -4,59 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신청 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
-<body>
-<main class="page-shell admin-shell">
-    <header class="page-header">
-        <span class="eyebrow">신청 상세</span>
-        <h1 th:text="${hackathonApplication.teamName}">팀명</h1>
-        <p>참가 신청 상세 내용을 확인합니다.</p>
+<body class="workspace-page admin-detail-page">
+<main class="page-shell admin-shell admin-detail-shell">
+    <header class="page-header admin-detail-header">
+        <div class="admin-detail-brand">
+            <img th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <div>
+                <h1>신청현황 상세</h1>
+                <p>신청한 항목의 상세 정보를 확인하세요.</p>
+            </div>
+        </div>
+        <a class="button button-secondary admin-detail-back" th:href="@{/admin/applications}">← 목록으로 돌아가기</a>
     </header>
-    <section class="card detail-card">
-        <div class="detail-title"><h2>신청 정보</h2><span class="badge" th:classappend="${'badge-' + hackathonApplication.status.name().toLowerCase()}" th:text="${hackathonApplication.status.label}">접수</span></div>
-        <dl class="detail-grid">
-            <div><dt>팀명</dt><dd th:text="${hackathonApplication.teamName}">팀명</dd></div>
-            <div><dt>신청일시</dt><dd th:text="${#temporals.format(hackathonApplication.createdAt, 'yyyy-MM-dd HH:mm')}">일시</dd></div>
-            <div><dt>대표 전화번호</dt><dd th:text="${hackathonApplication.representativePhone ?: '-'}">전화번호</dd></div>
-            <div class="detail-full"><dt>주제</dt><dd th:text="${hackathonApplication.topic}">주제</dd></div>
-            <div class="detail-full"><dt>내용</dt><dd class="pre-line" th:text="${hackathonApplication.content}">내용</dd></div>
-        </dl>
-    </section>
-    <section class="card detail-card">
-        <h2>구성인원 <small th:text="${#lists.size(hackathonApplication.members)} + '명'">1명</small></h2>
-        <div class="table-wrap">
-            <table><thead><tr><th>소속</th><th>사번</th><th>이름</th></tr></thead>
-            <tbody><tr th:each="member : ${hackathonApplication.members}"><td th:text="${member.department}">소속</td><td th:text="${member.employeeNo}">사번</td><td th:text="${member.name}">이름</td></tr></tbody></table>
+
+    <section class="card admin-detail-panel">
+        <div class="admin-detail-hero">
+            <span class="admin-status-chip" th:classappend="${' admin-status-' + hackathonApplication.status.name().toLowerCase()}"
+                  th:text="${hackathonApplication.status.label}">접수</span>
+            <div>
+                <h2 th:text="${hackathonApplication.teamName}">팀명</h2>
+                <p th:text="${hackathonApplication.topic}">주제</p>
+            </div>
+            <dl class="admin-detail-date">
+                <dt>신청일시</dt>
+                <dd th:text="${#temporals.format(hackathonApplication.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-11 16:45</dd>
+            </dl>
         </div>
-    </section>
-    <section class="card detail-card">
-        <h2>첨부파일 <small th:text="${#lists.size(hackathonApplication.files)} + '개'">0개</small></h2>
-        <div class="table-wrap">
-            <table><thead><tr><th>원본 파일명</th><th>파일 크기</th><th>파일 형식</th></tr></thead>
-            <tbody>
-            <tr th:each="file : ${hackathonApplication.files}"><td><a class="file-link" th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${hackathonApplication.id},fileId=${file.id})}" th:text="${file.originalFileName}">파일명</a></td><td th:text="${#numbers.formatInteger(file.fileSize, 1, 'COMMA')} + ' bytes'">0 bytes</td><td th:text="${file.contentType ?: '-'}">-</td></tr>
-            <tr th:if="${#lists.isEmpty(hackathonApplication.files)}"><td class="empty-cell" colspan="3">첨부파일이 없습니다.</td></tr>
-            </tbody></table>
+
+        <section class="admin-detail-section">
+            <h3>기본 정보</h3>
+            <dl class="admin-info-grid">
+                <div>
+                    <dt><span class="admin-info-icon"></span> 대표 전화번호</dt>
+                    <dd th:text="${hackathonApplication.representativePhone ?: '-'}">전화번호</dd>
+                </div>
+                <div>
+                    <dt><span class="admin-info-icon"></span> 분류</dt>
+                    <dd th:text="${hackathonApplication.category?.label ?: '-'}">분류</dd>
+                </div>
+                <div class="admin-info-full">
+                    <dt><span class="admin-info-icon"></span> 주제</dt>
+                    <dd th:text="${hackathonApplication.topic}">주제</dd>
+                </div>
+                <div class="admin-info-full">
+                    <dt><span class="admin-info-icon"></span> 내용</dt>
+                    <dd class="pre-line" th:text="${hackathonApplication.content}">내용</dd>
+                </div>
+            </dl>
+        </section>
+
+        <div class="admin-detail-columns">
+            <section class="admin-sub-panel">
+                <div class="admin-sub-heading">
+                    <h3>구성 인원 <small th:text="${#lists.size(hackathonApplication.members)} + '명'">1명</small></h3>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>소속</th><th>사번</th><th>이름</th></tr></thead>
+                        <tbody>
+                        <tr th:each="member : ${hackathonApplication.members}">
+                            <td th:text="${member.department}">소속</td>
+                            <td th:text="${member.employeeNo}">사번</td>
+                            <td th:text="${member.name}">이름</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <section class="admin-sub-panel">
+                <div class="admin-sub-heading">
+                    <h3>첨부 파일 <small th:text="${#lists.size(hackathonApplication.files)} + '개'">0개</small></h3>
+                </div>
+                <div class="table-wrap" th:if="${!#lists.isEmpty(hackathonApplication.files)}">
+                    <table>
+                        <thead><tr><th>파일명</th><th>크기</th><th>형식</th></tr></thead>
+                        <tbody>
+                        <tr th:each="file : ${hackathonApplication.files}">
+                            <td><a class="file-link" th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${hackathonApplication.id},fileId=${file.id})}" th:text="${file.originalFileName}">파일명</a></td>
+                            <td th:text="${#numbers.formatInteger(file.fileSize, 1, 'COMMA')} + ' bytes'">0 bytes</td>
+                            <td th:text="${file.contentType ?: '-'}">-</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="admin-empty-file" th:if="${#lists.isEmpty(hackathonApplication.files)}">
+                    <strong>첨부 파일이 없습니다.</strong>
+                    <span>파일을 제출한 경우 이곳에서 다운로드할 수 있습니다.</span>
+                </div>
+            </section>
         </div>
+
+        <section class="admin-review-panel">
+            <div>
+                <h3>심사 처리</h3>
+                <p>승인 또는 거절 결과는 신청자가 신청현황 조회 페이지에서 바로 확인합니다.</p>
+            </div>
+            <div class="review-actions">
+                <form th:action="@{/admin/applications/{id}/approve(id=${hackathonApplication.id})}" method="post"
+                      th:if="${hackathonApplication.status.name() != 'APPROVED'}">
+                    <button class="button button-approve" type="submit">✓ 승인</button>
+                </form>
+                <form th:action="@{/admin/applications/{id}/reject(id=${hackathonApplication.id})}" method="post"
+                      th:if="${hackathonApplication.status.name() != 'REJECTED'}">
+                    <button class="button button-danger" type="submit">× 거절</button>
+                </form>
+                <span class="review-done" th:if="${hackathonApplication.status.name() == 'APPROVED'}">현재 승인된 신청입니다.</span>
+                <span class="review-done" th:if="${hackathonApplication.status.name() == 'REJECTED'}">현재 거절된 신청입니다.</span>
+            </div>
+        </section>
     </section>
-    <section class="card detail-card review-card">
-        <div class="detail-title"><h2>심사 처리</h2></div>
-        <p class="review-guide">승인 또는 거절 결과는 신청자가 신청현황 조회 페이지에서 바로 확인합니다.</p>
-        <div class="review-actions">
-            <form th:action="@{/admin/applications/{id}/approve(id=${hackathonApplication.id})}" method="post"
-                  th:if="${hackathonApplication.status.name() != 'APPROVED'}">
-                <button class="button button-approve" type="submit">승인</button>
-            </form>
-            <form th:action="@{/admin/applications/{id}/reject(id=${hackathonApplication.id})}" method="post"
-                  th:if="${hackathonApplication.status.name() != 'REJECTED'}">
-                <button class="button button-danger" type="submit">거절</button>
-            </form>
-            <span class="review-done" th:if="${hackathonApplication.status.name() == 'APPROVED'}">현재 승인된 신청입니다.</span>
-            <span class="review-done" th:if="${hackathonApplication.status.name() == 'REJECTED'}">현재 거절된 신청입니다.</span>
-        </div>
-    </section>
+
     <div class="detail-actions">
         <a class="button button-secondary" th:href="@{/admin/applications}">목록으로 돌아가기</a>
         <a class="button button-primary" th:href="@{/admin/applications/{id}/edit(id=${hackathonApplication.id})}">수정</a>

@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신청 수정 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
-<body>
+<body class="workspace-page">
 <main class="page-shell form-shell">
     <header class="page-header">
         <span class="eyebrow">신청 수정</span>
@@ -27,7 +27,7 @@
         <section class="form-section">
             <div class="section-heading section-heading-action">
                 <div class="heading-copy"><span>02</span><div><h2>구성인원</h2><p>사번은 숫자 7자리로 입력해 주세요.</p></div></div>
-                <button class="button button-secondary button-small" id="add-member" type="button">팀원 추가</button>
+                <button class="button button-secondary button-small" id="add-member" type="button">+ 구성원 추가</button>
             </div>
             <p class="field-error" th:errors="*{members}"></p>
             <div class="member-list" id="member-list">
@@ -43,6 +43,15 @@
         </section>
         <section class="form-section">
             <div class="section-heading"><span>03</span><div><h2>아이디어</h2><p>주제와 내용을 수정할 수 있습니다.</p></div></div>
+            <div class="field"><span>분류 <b>*</b></span>
+                <div class="category-options">
+                    <label class="category-chip" th:each="cat : ${categories}">
+                        <input type="radio" th:field="*{category}" th:value="${cat}">
+                        <span th:text="${cat.label}">기타</span>
+                    </label>
+                </div>
+                <small class="field-error" th:errors="*{category}"></small>
+            </div>
             <label class="field"><span>주제 <b>*</b></span><input type="text" th:field="*{topic}"><small class="field-error" th:errors="*{topic}"></small></label>
             <label class="field"><span>내용 <b>*</b></span><textarea th:field="*{content}" rows="8"></textarea><small class="field-error" th:errors="*{content}"></small></label>
         </section>
@@ -67,6 +76,6 @@
         </div>
     </form>
 </main>
-<script th:src="@{/js/application-form.js}"></script>
+<script th:src="@{/js/application-form.js(v='20260611-schedule-date-fit')}"></script>
 </body>
 </html>

@@ -1,8 +1,10 @@
 package haitai.ht_ax_hackathon.dto;
 
+import haitai.ht_ax_hackathon.domain.ApplicationCategory;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +31,9 @@ public class ApplicationForm {
     @NotEmpty(message = "구성인원을 1명 이상 입력해 주세요.")
     @Valid
     private List<TeamMemberForm> members = new ArrayList<>();
+
+    @NotNull(message = "분류를 선택해 주세요.")
+    private ApplicationCategory category;
 
     @NotBlank(message = "주제를 입력해 주세요.")
     private String topic;

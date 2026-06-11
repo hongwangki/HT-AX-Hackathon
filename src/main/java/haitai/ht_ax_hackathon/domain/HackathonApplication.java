@@ -41,6 +41,11 @@ public class HackathonApplication {
     @Nationalized
     private String teamName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Nationalized
+    private ApplicationCategory category;
+
     @Column(nullable = false, length = 200)
     @Nationalized
     private String topic;
@@ -77,12 +82,14 @@ public class HackathonApplication {
 
     public HackathonApplication(
             String teamName,
+            ApplicationCategory category,
             String topic,
             String content,
             String representativePhone,
             String password
     ) {
         this.teamName = teamName;
+        this.category = category;
         this.topic = topic;
         this.content = content;
         this.representativePhone = representativePhone;
@@ -111,8 +118,9 @@ public class HackathonApplication {
     }
 
     /** Updates editable fields while preserving status, password, and existing attachments. */
-    public void update(String teamName, String topic, String content, String representativePhone) {
+    public void update(String teamName, ApplicationCategory category, String topic, String content, String representativePhone) {
         this.teamName = teamName;
+        this.category = category;
         this.topic = topic;
         this.content = content;
         this.representativePhone = representativePhone;
