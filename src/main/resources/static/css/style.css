@@ -730,13 +730,13 @@ body.status-page.status-page::after {
 .status-page .status-shell.status-shell {
     position: relative;
     z-index: 1;
-    width: min(740px, calc(100% - 40px));
+    width: min(640px, calc(100% - 40px));
 }
 .status-panel {
     position: relative;
     overflow: hidden;
-    padding: 36px 42px 24px;
-    min-height: 570px;
+    padding: 30px 34px 22px;
+    min-height: 500px;
     border: 1px solid rgba(255, 255, 255, .78);
     border-radius: 16px;
     background: rgba(255, 255, 255, .76);
@@ -753,10 +753,10 @@ body.status-page.status-page::after {
 .status-panel-logo {
     position: static;
     display: block;
-    width: 82px;
-    height: 66px;
+    width: 72px;
+    height: 56px;
     flex: 0 0 auto;
-    padding: 14px 12px;
+    padding: 11px 10px;
     border: 1px solid #ffc9d8;
     border-radius: 15px;
     background: rgba(255, 247, 250, .82);
@@ -768,30 +768,30 @@ body.status-page.status-page::after {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 22px;
-    min-height: 66px;
-    margin-bottom: 26px !important;
+    gap: 18px;
+    min-height: 56px;
+    margin-bottom: 20px !important;
     padding-bottom: 38px;
     border-bottom: 1px solid #e1e6ef;
     text-align: left !important;
 }
 .status-page .status-shell.status-shell .page-header {
-    margin-bottom: 26px !important;
-    padding-bottom: 16px;
+    margin-bottom: 20px !important;
+    padding-bottom: 14px;
     text-align: left !important;
 }
 .status-page .page-header > div {
     max-width: 560px;
-    padding-left: 22px;
+    padding-left: 18px;
     border-left: 1px solid #e3e7ef;
 }
 .status-page .eyebrow {
     display: none;
 }
 .status-page .page-header h1 {
-    margin-bottom: 6px !important;
+    margin-bottom: 4px !important;
     color: #06142b;
-    font-size: clamp(30px, 3.4vw, 38px) !important;
+    font-size: clamp(26px, 3vw, 32px) !important;
     font-weight: 950;
     letter-spacing: -.06em;
     line-height: 1.12;
@@ -799,7 +799,7 @@ body.status-page.status-page::after {
 .status-page .page-header p {
     display: block;
     color: #5f6b80 !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     font-weight: 800;
 }
 .status-page .page-header p::before,
@@ -810,7 +810,7 @@ body.status-page.status-page::after {
     position: relative;
     z-index: 1;
     display: block;
-    padding: 30px 32px 30px;
+    padding: 24px 26px 24px;
     border: 1px solid rgba(255, 255, 255, .86);
     border-radius: 16px;
     background: rgba(255, 255, 255, .72);
@@ -829,17 +829,17 @@ body.status-page.status-page::after {
     margin-top: 0;
 }
 .status-page .field + .field {
-    margin-top: 26px;
+    margin-top: 20px;
 }
 .status-page .field > span {
-    margin-bottom: 9px;
+    margin-bottom: 7px;
     color: #07162d;
     font-size: 14px !important;
     font-weight: 950;
 }
 .status-page input {
-    height: 56px !important;
-    padding: 0 18px 0 64px !important;
+    height: 48px !important;
+    padding: 0 15px 0 56px !important;
     border: 1px solid #cfd8e6;
     border-radius: 12px;
     background: rgba(255, 255, 255, .9);
@@ -848,7 +848,7 @@ body.status-page.status-page::after {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
 }
 .status-page .status-input-wrap input {
-    padding-left: 64px !important;
+    padding-left: 56px !important;
 }
 .status-input-wrap {
     position: relative;
@@ -856,11 +856,11 @@ body.status-page.status-page::after {
 .status-input-icon {
     position: absolute;
     top: 50%;
-    left: 12px;
+    left: 10px;
     z-index: 1;
     display: grid;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     place-items: center;
     border-radius: 9px;
     color: #ee2f78;
@@ -872,12 +872,22 @@ body.status-page.status-page::after {
 .status-input-icon-phone::before {
     content: "☎";
 }
-.status-input-icon-lock::before {
+.admin-input-icon-user::before {
     position: absolute;
     left: 50%;
     top: 50%;
     width: 19px;
     height: 19px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ee2f78' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21a8 8 0 0 1 16 0'/%3E%3C/svg%3E") center / contain no-repeat;
+    content: "";
+    transform: translate(-50%, -50%);
+}
+.status-input-icon-lock::before {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 17px;
+    height: 17px;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ee2f78' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E") center / contain no-repeat;
     content: "";
     transform: translate(-50%, -50%);
@@ -897,16 +907,16 @@ body.status-page.status-page::after {
 }
 .status-page .form-actions {
     justify-content: center !important;
-    gap: 14px;
-    margin-top: 28px;
-    padding-top: 26px !important;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 20px !important;
     border-top: 1px solid rgba(220, 226, 236, .72);
 }
 .status-page .button {
-    min-width: 190px;
-    min-height: 54px !important;
+    min-width: 160px;
+    min-height: 46px !important;
     border-radius: 12px !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
     font-weight: 950;
 }
 .status-page .button-ghost {
@@ -921,7 +931,7 @@ body.status-page.status-page::after {
 .status-page .site-footer {
     position: relative;
     z-index: 1;
-    margin-top: 26px;
+    margin-top: 18px;
     padding-top: 0;
     border-top: 0;
     color: #98a3b8;
@@ -962,7 +972,7 @@ body.status-list-page.status-list-page::after {
     position: relative;
     z-index: 1;
     display: block;
-    width: min(1120px, calc(100% - 56px));
+    width: min(980px, calc(100% - 56px));
     min-height: 100vh;
     padding: 28px 0 30px;
 }
@@ -971,7 +981,7 @@ body.status-list-page.status-list-page::after {
     display: flex;
     align-items: center;
     gap: 18px;
-    margin: 0 0 28px !important;
+    margin: 0 0 22px !important;
     padding: 0 !important;
     border-bottom: 0;
     border-radius: 0;
@@ -983,7 +993,7 @@ body.status-list-page.status-list-page::after {
     content: none;
 }
 .status-list-logo {
-    width: 84px;
+    width: 72px;
     height: auto;
     flex: 0 0 auto;
     padding: 0;
@@ -996,13 +1006,13 @@ body.status-list-page.status-list-page::after {
     display: none;
 }
 .status-list-page .status-list-header > div {
-    padding-left: 28px;
+    padding-left: 22px;
     border-left: 1px solid #d9dee8;
 }
 .status-list-page .status-list-header h1 {
     margin: 0 0 8px;
     color: #07162d;
-    font-size: clamp(34px, 4vw, 45px);
+    font-size: clamp(28px, 3.4vw, 36px);
     font-weight: 700 !important;
     letter-spacing: -.06em;
     line-height: 1.05;
@@ -1010,18 +1020,18 @@ body.status-list-page.status-list-page::after {
 .status-list-page .status-list-header p {
     margin: 0;
     color: #5d687d;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500 !important;
 }
 .status-list-page .status-item {
     position: relative;
     display: grid;
-    grid-template-columns: 56px 1fr 320px;
-    gap: 28px;
+    grid-template-columns: 48px 1fr 280px;
+    gap: 22px;
     align-items: center;
     overflow: hidden;
     margin-bottom: 18px;
-    padding: 30px 32px;
+    padding: 24px 28px;
     border: 1px solid rgba(255, 255, 255, .76);
     border-radius: 16px;
     background: rgba(255, 255, 255, .82);
@@ -1079,7 +1089,7 @@ body.status-list-page.status-list-page::after {
 .status-list-page .detail-title h2 {
     margin: 0;
     color: #07162d;
-    font-size: 21px;
+    font-size: 19px;
     font-weight: 950;
     letter-spacing: -.03em;
 }
@@ -1108,11 +1118,11 @@ body.status-list-page.status-list-page::after {
     grid-column: 2;
     grid-template-columns: 1fr 1.35fr 1.15fr;
     gap: 10px;
-    margin-top: 24px;
+    margin-top: 18px;
     border-top: 0;
 }
 .status-list-page .detail-grid div {
-    padding: 14px 18px;
+    padding: 12px 14px;
     border: 1px solid rgba(232, 237, 244, .86);
     border-radius: 12px;
     background: rgba(250, 252, 255, .62);
@@ -1140,7 +1150,7 @@ body.status-list-page.status-list-page::after {
     gap: 14px;
     height: 100%;
     margin-top: 0;
-    padding-left: 28px;
+    padding-left: 22px;
     border: 0;
     border-left: 1px solid #edf0f5;
     border-radius: 0;
@@ -1981,39 +1991,39 @@ body.submit-page.submit-page::after {
     position: relative;
     z-index: 1;
     display: block;
-    width: min(964px, calc(100% - 48px));
-    max-width: 964px;
+    width: min(860px, calc(100% - 48px));
+    max-width: 860px;
     min-height: 100vh;
-    padding: 34px 0 30px;
+    padding: 28px 0 26px;
 }
 .submit-page .status-list-header {
     display: flex;
     align-items: center;
     gap: 18px;
-    margin: 0 0 18px !important;
+    margin: 0 0 14px !important;
     padding: 0 !important;
     text-align: left !important;
 }
 .submit-page .status-list-logo {
-    width: 84px;
+    width: 72px;
     height: auto;
     flex: 0 0 auto;
 }
 .submit-page .status-list-header > div {
-    padding-left: 28px;
+    padding-left: 22px;
     border-left: 1px solid #d9dee8;
 }
 .submit-page .status-list-header h1 {
     margin: 0 0 8px;
     color: #07162d;
-    font-size: clamp(34px, 4vw, 45px);
+    font-size: clamp(28px, 3.4vw, 36px);
     font-weight: 700 !important;
     letter-spacing: -.06em;
     line-height: 1.05;
 }
 .submit-page .status-list-header p {
     color: #5d687d;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500 !important;
 }
 .submit-page .card {
@@ -2025,8 +2035,8 @@ body.submit-page.submit-page::after {
     -webkit-backdrop-filter: blur(16px);
 }
 .submit-page .submit-team-card {
-    margin-bottom: 14px;
-    padding: 24px 34px;
+    margin-bottom: 12px;
+    padding: 20px 28px;
 }
 .submit-page .detail-title {
     display: block;
@@ -2035,7 +2045,7 @@ body.submit-page.submit-page::after {
 .submit-page .detail-title h2 {
     margin: 0;
     color: #07162d;
-    font-size: 25px;
+    font-size: 22px;
     font-weight: 700 !important;
     letter-spacing: -.04em;
 }
@@ -2045,27 +2055,27 @@ body.submit-page.submit-page::after {
 .submit-page .detail-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 12px;
     margin: 0;
 }
 .submit-page .detail-grid div {
     position: relative;
-    padding: 14px 18px 14px 86px;
+    padding: 12px 16px 12px 78px;
     border: 1px solid #dfe5ee;
     border-radius: 10px;
     background: rgba(255, 255, 255, .66);
 }
 .submit-page .detail-grid div + div {
-    padding-left: 86px;
+    padding-left: 78px;
     border-left: 1px solid #dfe5ee;
 }
 .submit-page .detail-grid div::before {
     position: absolute;
     top: 50%;
-    left: 28px;
+    left: 24px;
     display: grid;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     place-items: center;
     border-radius: 9px;
     color: #ee2f78;
@@ -2086,7 +2096,7 @@ body.submit-page.submit-page::after {
 .submit-page .detail-grid dd {
     margin-top: 3px;
     color: #07162d;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700 !important;
 }
 .submit-page .submit-form {
@@ -2094,31 +2104,31 @@ body.submit-page.submit-page::after {
     gap: 12px;
 }
 .submit-page .submit-section {
-    padding: 20px 34px !important;
+    padding: 18px 28px !important;
     border-bottom: 1px solid rgba(220, 226, 236, .86) !important;
 }
 .submit-page .section-heading {
     align-items: center;
-    gap: 18px;
+    gap: 14px;
     margin-bottom: 12px;
 }
 .submit-page .section-heading > span {
     display: grid;
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     place-items: center;
     border: 1px solid #ff9dc2;
     border-radius: 50%;
     color: #ee2f78;
     background: #fff3f8;
     box-shadow: 0 8px 18px rgba(238, 47, 120, .10);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
 }
 .submit-page .section-heading h2 {
     margin: 0 0 4px;
     color: #07162d;
-    font-size: 24px;
+    font-size: 21px;
     font-weight: 700 !important;
     letter-spacing: -.04em;
 }
@@ -2132,7 +2142,7 @@ body.submit-page.submit-page::after {
     margin-bottom: 12px;
 }
 .submit-page .existing-file-item {
-    min-height: 48px;
+    min-height: 44px;
     padding: 8px 16px;
     border: 1px solid #dfe5ee;
     border-radius: 10px;
@@ -2148,8 +2158,8 @@ body.submit-page.submit-page::after {
     left: 0;
     top: 50%;
     display: grid;
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     place-items: center;
     border-radius: 9px;
     color: #fff;
@@ -2176,7 +2186,7 @@ body.submit-page.submit-page::after {
 }
 .submit-page .file-field {
     display: grid;
-    min-height: 128px;
+    min-height: 108px;
     place-items: center;
     align-content: center;
     gap: 9px;
@@ -2188,14 +2198,14 @@ body.submit-page.submit-page::after {
 }
 .submit-page .file-field::before {
     display: block;
-    width: 42px;
-    height: 34px;
+    width: 34px;
+    height: 28px;
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='38' viewBox='0 0 46 38' fill='none'%3E%3Cpath d='M15 31H12.5C6.7 31 2 26.9 2 21.8C2 17.1 6 13.2 11.1 12.7C12.8 6.6 18.1 2 24.6 2C31.7 2 37.6 7.5 38.3 14.6C41.7 15.6 44 18.5 44 22C44 26.9 39.6 31 34.2 31H31' stroke='%23ee2f78' stroke-width='2.7' stroke-linecap='round'/%3E%3Cpath d='M23 33V16M23 16L16.5 22.5M23 16L29.5 22.5' stroke='%23ee2f78' stroke-width='2.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
     content: "";
 }
 .submit-page .file-button {
-    min-width: 118px;
-    min-height: 38px;
+    min-width: 104px;
+    min-height: 34px;
     padding: 0 22px;
     border: 1px solid #ff75ab;
     border-radius: 8px;
@@ -2218,7 +2228,7 @@ body.submit-page.submit-page::after {
     font-weight: 700 !important;
 }
 .submit-page input {
-    height: 40px;
+    height: 36px;
     border-color: #d8e0ec;
     border-radius: 8px;
     background: rgba(255, 255, 255, .82);
@@ -2230,14 +2240,14 @@ body.submit-page.submit-page::after {
     padding: 0;
 }
 .submit-page .form-actions .button {
-    min-width: 150px;
-    min-height: 52px;
+    min-width: 132px;
+    min-height: 46px;
     border-radius: 10px;
     font-size: 16px;
     font-weight: 700 !important;
 }
 .submit-page .form-actions .button-primary {
-    min-width: 180px;
+    min-width: 160px;
     background: linear-gradient(135deg, #ff4a93, #f21772);
     box-shadow: 0 16px 30px rgba(242, 65, 145, .28);
 }

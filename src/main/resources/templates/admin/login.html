@@ -4,38 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>관리자 로그인 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-admin-login-polish')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
-<body class="workspace-page">
+<body class="workspace-page status-page admin-login-page">
 <main class="page-shell status-shell">
-    <header class="page-header">
-        <span class="eyebrow">관리자</span>
-        <h1>관리자 로그인</h1>
-        <p>관리자 페이지에 접근하려면 아이디와 비밀번호를 입력하세요.</p>
-    </header>
+    <section class="status-panel">
+        <header class="page-header">
+            <img class="status-panel-logo" th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <span class="eyebrow">관리자</span>
+            <div>
+                <h1>관리자 로그인</h1>
+                <p>관리자 페이지에 접근하려면 아이디와 비밀번호를 입력하세요.</p>
+            </div>
+        </header>
 
-    <form class="card form-card" th:action="@{/admin/login}" method="post">
-        <div class="global-errors" th:if="${param.error != null}">
-            <p>아이디 또는 비밀번호가 올바르지 않습니다.</p>
-        </div>
+        <form class="card form-card" th:action="@{/admin/login}" method="post">
+            <div class="global-errors" th:if="${param.error != null}">
+                <p>아이디 또는 비밀번호가 올바르지 않습니다.</p>
+            </div>
 
-        <section class="form-section">
-            <label class="field">
-                <span>아이디 <b>*</b></span>
-                <input type="text" name="username" autocomplete="username" autofocus required>
-            </label>
-            <label class="field">
-                <span>비밀번호 <b>*</b></span>
-                <input type="password" name="password" autocomplete="current-password" required>
-            </label>
-        </section>
+            <section class="form-section">
+                <label class="field">
+                    <span>아이디 <b>*</b></span>
+                    <div class="status-input-wrap">
+                        <span class="status-input-icon admin-input-icon-user" aria-hidden="true"></span>
+                        <input type="text" name="username" placeholder="관리자 아이디" autocomplete="username" autofocus required>
+                    </div>
+                </label>
+                <label class="field">
+                    <span>비밀번호 <b>*</b></span>
+                    <div class="status-input-wrap">
+                        <span class="status-input-icon status-input-icon-lock" aria-hidden="true"></span>
+                        <input type="password" name="password" placeholder="관리자 비밀번호" autocomplete="current-password" required>
+                    </div>
+                </label>
+            </section>
 
-        <div class="form-actions">
-            <a class="button button-ghost" th:href="@{/}">메인으로</a>
-            <button class="button button-primary" type="submit">로그인</button>
-        </div>
-    </form>
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/}">메인으로</a>
+                <button class="button button-primary" type="submit">로그인</button>
+            </div>
+        </form>
+        <footer class="site-footer">© 2026 HT AX. All rights reserved.</footer>
+    </section>
 </main>
 </body>
 </html>
