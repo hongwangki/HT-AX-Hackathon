@@ -10,3 +10,6 @@ spring:
 
 file:
   upload-dir: build/test-uploads
+
+ADMIN_USERNAME: test-admin
+ADMIN_PASSWORD: test-password

@@ -52,12 +52,19 @@ public class AdminApplicationController {
         model.addAttribute("applications", applications);
         model.addAttribute("applicationCount", applications.size());
         model.addAttribute("statusCheckOpen", statusAccessService.isStatusCheckOpen());
+        model.addAttribute("applyOpen", statusAccessService.isApplyOpen());
         return "admin/application-list";
     }
 
     @PostMapping("/status-access")
     public String updateStatusAccess(@RequestParam boolean open) {
         statusAccessService.setStatusCheckOpen(open);
+        return "redirect:/admin/applications";
+    }
+
+    @PostMapping("/apply-access")
+    public String updateApplyAccess(@RequestParam boolean open) {
+        statusAccessService.setApplyOpen(open);
         return "redirect:/admin/applications";
     }
 

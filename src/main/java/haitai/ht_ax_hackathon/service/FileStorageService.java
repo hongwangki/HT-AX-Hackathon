@@ -1,6 +1,7 @@
 package haitai.ht_ax_hackathon.service;
 
 import haitai.ht_ax_hackathon.domain.AttachmentFile;
+import haitai.ht_ax_hackathon.domain.TaskSubmissionFile;
 import haitai.ht_ax_hackathon.config.FileUploadProperties;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
 import haitai.ht_ax_hackathon.exception.AttachmentFileNotFoundException;
@@ -29,19 +30,36 @@ public class FileStorageService {
     /** Saves a browser upload with a UUID name and returns its database metadata. */
     public AttachmentFile store(MultipartFile multipartFile) {
         String originalFileName = getSafeOriginalFileName(multipartFile);
+        Path destination = storeToDisk(multipartFile, originalFileName);
+        return new AttachmentFile(
+                originalFileName,
+                destination.getFileName().toString(),
+                destination.toString(),
+                multipartFile.getSize(),
+                multipartFile.getContentType()
+        );
+    }
+
+    /** Same storage pipeline as {@link #store}, but for task submission files. */
+    public TaskSubmissionFile storeSubmissionFile(MultipartFile multipartFile) {
+        String originalFileName = getSafeOriginalFileName(multipartFile);
+        Path destination = storeToDisk(multipartFile, originalFileName);
+        return new TaskSubmissionFile(
+                originalFileName,
+                destination.getFileName().toString(),
+                destination.toString(),
+                multipartFile.getSize(),
+                multipartFile.getContentType()
+        );
+    }
+
+    private Path storeToDisk(MultipartFile multipartFile, String originalFileName) {
         String storedFileName = UUID.randomUUID() + getExtension(originalFileName);
         Path destination = uploadDirectory.resolve(storedFileName).normalize();
-
         try {
             Files.createDirectories(uploadDirectory);
             multipartFile.transferTo(destination);
-            return new AttachmentFile(
-                    originalFileName,
-                    storedFileName,
-                    destination.toString(),
-                    multipartFile.getSize(),
-                    multipartFile.getContentType()
-            );
+            return destination;
         } catch (IOException exception) {
             deleteQuietly(destination.toString());
             throw new FileStorageException("첨부파일 저장에 실패했습니다: " + originalFileName, exception);

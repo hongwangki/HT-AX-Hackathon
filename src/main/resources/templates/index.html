@@ -4,7 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>제1회 HT AX 해커톤 | 사내 AI 경연대회</title>
-  <link rel="stylesheet" href="/css/landing-v2/style.css?v=20260611-schedule-date-fit" />
+
+  <!-- 메신저 링크 미리보기 (카카오톡/팀즈 등) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="제1회 HT AX 해커톤 | 사내 AI 경연대회">
+  <meta property="og:description" content="AI로 혁신하고 성장하는 해태! 임직원의 아이디어를 기다립니다. 총 상금 1,000만원">
+  <meta property="og:image" th:content="${baseUrl} + '/images/ai_thumbnail.png'">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" th:content="${baseUrl} + '/'">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="stylesheet" href="/css/landing-v2/style.css?v=20260612-hero-balance" />
   <link rel="icon" type="image/png" href="/images/Logo.png">
 </head>
 <body>
@@ -42,7 +53,7 @@
       <div class="hero-divider"></div>
 
       <p class="hero-desc">
-        <strong>AI로 혁신하고, 아이디어로 성장하는 해태</strong><br />
+        <strong>AI로 혁신하고, 성장하는 해태</strong><br />
         우리의 아이디어가 일하는 방식을 바꿉니다!
       </p>
 
@@ -56,7 +67,9 @@
         <a href="#apply" class="btn-primary is-disabled js-apply-gate" aria-disabled="true"
            data-open-at="2026-06-17T08:30:00+09:00"
            data-open-text="공모전 참가접수"
-           data-closed-text="6월 17일 접수오픈 예정">6월 17일 접수오픈 예정</a>
+           data-closed-text="6월 17일 접수오픈 예정"
+           data-ended-text="참가접수 마감"
+           th:attr="data-force-closed=${!applyOpen}">6월 17일 접수오픈 예정</a>
       </div>
     </div>
   </div>
@@ -94,12 +107,22 @@
             </div>
           </div>
           <div class="info-row">
+            <div class="label">수행과제</div>
+            <div class="content">
+              <strong>아이디어 제안 및 AI를 접목한 프로세스 구현</strong>
+              <ul>
+                <li>AI 또는 AI 에이전트를 활용한 업무 자동화, 기능화 구현</li>
+                <li>실제 업무에 적용 가능한 기능 또는 프로토타입 제작</li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-row">
             <div class="label">조 편성</div>
             <div class="content">1인 이상 자율 편성
 				<small>- 소속 제한 없음</small></div>
           </div>
           <div class="info-row">
-            <div class="label">지원</div>
+            <div class="label">비용지원</div>
             <div class="content">참가 조당 AI툴 사용료 10만원 지원 <br>
              <small>- 과제 제출자에 한함</small>
             </div>
@@ -223,7 +246,9 @@
         <a href="#" class="apply-button is-disabled js-apply-gate" aria-disabled="true"
            data-open-at="2026-06-17T08:30:00+09:00"
            data-open-text="바로 참가신청 하기"
-           data-closed-text="참가신청 6월 17일 오픈예정">참가신청 6월 17일 오픈예정</a>
+           data-closed-text="참가신청 6월 17일 오픈예정"
+           data-ended-text="참가접수 마감"
+           th:attr="data-force-closed=${!applyOpen}">참가신청 6월 17일 오픈예정</a>
       </div>
     </section>
   </main>
@@ -235,14 +260,18 @@
     (() => {
       const applyButtons = document.querySelectorAll(".js-apply-gate");
       const closedMessage = "아직 신청기간이 아닙니다. 6월 17일 접수 오픈 예정입니다.";
+      const endedMessage = "참가 접수가 마감되었습니다.";
 
       const syncApplyButtons = () => {
         const now = Date.now();
         applyButtons.forEach((button) => {
+          const ended = button.dataset.forceClosed === "true";
           const openAt = new Date(button.dataset.openAt).getTime();
-          const isOpen = now >= openAt;
+          const isOpen = !ended && now >= openAt;
 
-          button.textContent = isOpen ? button.dataset.openText : button.dataset.closedText;
+          button.textContent = ended
+            ? button.dataset.endedText
+            : (isOpen ? button.dataset.openText : button.dataset.closedText);
           button.classList.toggle("is-disabled", !isOpen);
           button.setAttribute("aria-disabled", String(!isOpen));
           button.setAttribute("href", isOpen ? "/apply" : "#apply");
@@ -253,7 +282,7 @@
         button.addEventListener("click", (event) => {
           if (button.getAttribute("aria-disabled") === "true") {
             event.preventDefault();
-            alert(closedMessage);
+            alert(button.dataset.forceClosed === "true" ? endedMessage : closedMessage);
           }
         });
       });

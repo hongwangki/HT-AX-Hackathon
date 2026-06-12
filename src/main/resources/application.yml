@@ -26,8 +26,9 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 20MB
-      max-request-size: 30MB
+      # 발표자료(PPT)는 용량이 커질 수 있어 여유 있게 잡습니다.
+      max-file-size: 100MB
+      max-request-size: 200MB
 
 file:
   upload-dir: ${FILE_UPLOAD_DIR:uploads}

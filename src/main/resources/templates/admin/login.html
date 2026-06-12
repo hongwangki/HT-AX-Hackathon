@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 로그인 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page">
+<main class="page-shell status-shell">
+    <header class="page-header">
+        <span class="eyebrow">관리자</span>
+        <h1>관리자 로그인</h1>
+        <p>관리자 페이지에 접근하려면 아이디와 비밀번호를 입력하세요.</p>
+    </header>
+
+    <form class="card form-card" th:action="@{/admin/login}" method="post">
+        <div class="global-errors" th:if="${param.error != null}">
+            <p>아이디 또는 비밀번호가 올바르지 않습니다.</p>
+        </div>
+
+        <section class="form-section">
+            <label class="field">
+                <span>아이디 <b>*</b></span>
+                <input type="text" name="username" autocomplete="username" autofocus required>
+            </label>
+            <label class="field">
+                <span>비밀번호 <b>*</b></span>
+                <input type="password" name="password" autocomplete="current-password" required>
+            </label>
+        </section>
+
+        <div class="form-actions">
+            <a class="button button-ghost" th:href="@{/}">메인으로</a>
+            <button class="button button-primary" type="submit">로그인</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

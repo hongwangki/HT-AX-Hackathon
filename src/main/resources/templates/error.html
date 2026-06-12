@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오류 안내 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-task-submission')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page">
+<main class="center-shell">
+    <section class="card result-card">
+        <span class="eyebrow">오류 안내</span>
+        <h1>요청을 처리하지 못했습니다.</h1>
+        <p th:text="${message != null} ? ${message} : '잠시 후 다시 시도해 주세요. 문제가 계속되면 담당자에게 문의해 주세요.'">
+            잠시 후 다시 시도해 주세요.
+        </p>
+        <a class="button button-primary" th:href="@{/}">처음으로 돌아가기</a>
+    </section>
+</main>
+</body>
+</html>

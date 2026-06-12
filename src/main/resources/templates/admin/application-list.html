@@ -4,58 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신청 목록 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-admin-clean')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
-<body class="workspace-page">
-<main class="page-shell admin-shell">
+<body class="workspace-page admin-list-page">
+<main class="page-shell admin-shell"
+      th:with="approvedCount=${applications.?[status.name() == 'APPROVED'].size()},
+               rejectedCount=${applications.?[status.name() == 'REJECTED'].size()},
+               pendingCount=${applicationCount - applications.?[status.name() == 'APPROVED'].size() - applications.?[status.name() == 'REJECTED'].size()}">
     <header class="page-header admin-header">
         <div>
             <span class="eyebrow">관리자</span>
             <h1>신청 목록</h1>
             <p>HT AX 해커톤 참가 신청 현황을 확인합니다.</p>
         </div>
+        <form th:action="@{/admin/logout}" method="post">
+            <button class="logout-link" type="submit">로그아웃</button>
+        </form>
     </header>
+
+    <nav class="admin-tabs">
+        <a class="admin-tab is-active" th:href="@{/admin/applications}">신청 목록</a>
+        <a class="admin-tab" th:href="@{/admin/submissions}">과제 제출 현황</a>
+    </nav>
+
+    <section class="admin-stats-bar">
+        <div class="stat">
+            <span class="stat-label">전체 접수</span>
+            <strong class="stat-num" th:text="${applicationCount}">0</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">심사 대기</span>
+            <strong class="stat-num tone-pending" th:text="${pendingCount}">0</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">승인</span>
+            <strong class="stat-num tone-approved" th:text="${approvedCount}">0</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">반려</span>
+            <strong class="stat-num tone-rejected" th:text="${rejectedCount}">0</strong>
+        </div>
+    </section>
+
     <div class="admin-toolbar">
-        <div class="count-card"><span>전체 접수</span><strong th:text="${applicationCount}">0</strong><span>건</span></div>
-        <div class="toolbar-buttons">
-            <form th:if="${statusCheckOpen}" th:action="@{/admin/applications/status-access}" method="post">
-                <input type="hidden" name="open" value="false">
-                <button class="button button-ghost" type="submit">신청결과 확인 닫기</button>
-            </form>
-            <form th:unless="${statusCheckOpen}" th:action="@{/admin/applications/status-access}" method="post">
-                <input type="hidden" name="open" value="true">
-                <button class="button button-primary" type="submit">신청결과 확인 열기</button>
-            </form>
-            <a class="button button-secondary" th:href="@{/admin/applications/password-lookup}">비밀번호 조회</a>
-            <a class="button button-primary" th:href="@{/admin/applications/export}">전체 엑셀 다운로드</a>
+        <div class="admin-switches">
+            <div class="switch-item">
+                <form th:action="@{/admin/applications/apply-access}" method="post">
+                    <input type="hidden" name="open" th:value="${!applyOpen}">
+                    <button class="switch-button" th:classappend="${applyOpen} ? 'is-on'" type="submit">
+                        <span class="switch-name">참가 신청</span>
+                        <span class="switch-track"></span>
+                        <em class="switch-state" th:text="${applyOpen} ? 'ON' : 'OFF'">ON</em>
+                    </button>
+                </form>
+                <small class="switch-hint">끄면 참가 신청 접수가 마감됩니다</small>
+            </div>
+            <div class="switch-item">
+                <form th:action="@{/admin/applications/status-access}" method="post">
+                    <input type="hidden" name="open" th:value="${!statusCheckOpen}">
+                    <button class="switch-button" th:classappend="${statusCheckOpen} ? 'is-on'" type="submit">
+                        <span class="switch-name">결과 확인</span>
+                        <span class="switch-track"></span>
+                        <em class="switch-state" th:text="${statusCheckOpen} ? 'ON' : 'OFF'">OFF</em>
+                    </button>
+                </form>
+                <small class="switch-hint">켜면 신청자가 결과 확인·과제 제출을 할 수 있습니다</small>
+            </div>
+        </div>
+        <div class="quiet-actions">
+            <a class="quiet-link" th:href="@{/admin/applications/password-lookup}">비밀번호 조회</a>
+            <a class="button button-ghost button-small" th:href="@{/admin/applications/export}">엑셀 다운로드</a>
         </div>
     </div>
+
     <section class="card table-card">
+        <div class="table-card-head">
+            <h2>신청 내역 <small th:text="'총 ' + ${applicationCount} + '건'">총 0건</small></h2>
+            <label class="table-search" th:if="${!#lists.isEmpty(applications)}">
+                <input type="search" id="listSearch" placeholder="팀명·주제 검색" autocomplete="off">
+            </label>
+        </div>
         <div class="table-wrap">
             <table>
                 <thead>
-                <tr><th>ID</th><th>팀명</th><th>분류</th><th>주제</th><th>구성인원</th><th>상태</th><th>신청일시</th><th></th></tr>
+                <tr><th>No.</th><th>팀명</th><th>분류</th><th>주제</th><th>구성인원</th><th>상태</th><th>신청일시</th><th></th></tr>
                 </thead>
-                <tbody>
-                <tr th:each="item : ${applications}">
-                    <td th:text="${item.id}">1</td>
+                <tbody id="applicationRows">
+                <tr class="data-row" th:each="item : ${applications}"
+                    th:attr="data-href=@{/admin/applications/{id}(id=${item.id})}">
+                    <td class="cell-id" th:text="${item.id}">1</td>
                     <td class="strong-cell" th:text="${item.teamName}">팀명</td>
-                    <td th:text="${item.category?.label ?: '-'}">분류</td>
-                    <td th:text="${item.topic}">주제</td>
-                    <td th:text="${#lists.size(item.members)} + '명'">1명</td>
+                    <td class="category-cell"><span th:text="${item.category?.label ?: '-'}">분류</span></td>
+                    <td class="topic-cell" th:text="${item.topic}" th:title="${item.topic}">주제</td>
+                    <td class="member-cell" th:text="${#lists.size(item.members)} + '명'">1명</td>
                     <td><span class="badge" th:classappend="${'badge-' + item.status.name().toLowerCase()}"
                               th:text="${item.status.label}">접수</span></td>
-                    <td th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-01 12:00</td>
+                    <td class="date-cell" th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}">2026-06-01 12:00</td>
                     <td><a class="button button-secondary button-small" th:href="@{/admin/applications/{id}(id=${item.id})}">상세보기</a></td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(applications)}">
-                    <td class="empty-cell" colspan="8">아직 접수된 신청서가 없습니다.</td>
+                    <td class="empty-cell" colspan="8">
+                        <div class="empty-state">
+                            <strong>아직 접수된 신청서가 없습니다</strong>
+                            <span>참가 신청이 접수되면 이곳에 표시됩니다.</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="noSearchResult" hidden>
+                    <td class="empty-cell" colspan="8">
+                        <div class="empty-state">
+                            <strong>검색 결과가 없습니다</strong>
+                            <span>다른 팀명이나 주제로 검색해 보세요.</span>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </section>
 </main>
+<script>
+    document.querySelectorAll('tr.data-row').forEach(function (row) {
+        row.addEventListener('click', function (event) {
+            if (event.target.closest('a, button, form')) return;
+            window.location.href = row.dataset.href;
+        });
+    });
+
+    var searchInput = document.getElementById('listSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            var keyword = searchInput.value.trim().toLowerCase();
+            var visibleCount = 0;
+            document.querySelectorAll('tr.data-row').forEach(function (row) {
+                var teamName = row.children[1].textContent.toLowerCase();
+                var topic = row.children[3].textContent.toLowerCase();
+                var matched = keyword === '' || teamName.includes(keyword) || topic.includes(keyword);
+                row.hidden = !matched;
+                if (matched) visibleCount++;
+            });
+            document.getElementById('noSearchResult').hidden = visibleCount > 0;
+        });
+    }
+</script>
 </body>
 </html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 제출 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-submit-polish')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page status-list-page submit-page">
+<main class="page-shell status-shell submit-shell">
+    <header class="page-header status-list-header">
+        <img class="status-list-logo" th:src="@{/images/landing-v2/logo.png}" alt="해태">
+        <div>
+            <span class="eyebrow">HT AX HACKATHON</span>
+            <h1>과제 제출</h1>
+            <p>발표자료를 업로드해 주세요. 마감 전까지 자유롭게 수정할 수 있습니다.</p>
+        </div>
+    </header>
+
+    <section class="card detail-card submit-team-card">
+        <div class="detail-title">
+            <div><h2 th:text="${hackathonApplication.teamName}">팀명</h2></div>
+        </div>
+        <dl class="detail-grid">
+            <div><dt>주제</dt><dd th:text="${hackathonApplication.topic}">주제</dd></div>
+            <div><dt>제출 마감</dt><dd>8월 5일</dd></div>
+        </dl>
+    </section>
+
+    <div class="reset-success" th:if="${saved}">
+        과제가 제출되었습니다. 마감 전까지 이 화면에서 파일을 추가하거나 수정할 수 있습니다.
+    </div>
+
+    <div class="global-errors" th:unless="${submissionOpen}">
+        <p>과제 제출 기간이 아닙니다. 제출된 내용은 아래에서 확인만 할 수 있습니다.</p>
+    </div>
+
+    <form class="submit-form" th:action="@{/submit/save}" th:object="${submissionForm}"
+          method="post" enctype="multipart/form-data">
+        <div class="global-errors" th:if="${#fields.hasGlobalErrors()}">
+            <p th:each="error : ${#fields.globalErrors()}" th:text="${error}">오류 메시지</p>
+        </div>
+
+        <input type="hidden" th:field="*{representativePhone}">
+        <input type="hidden" th:field="*{password}">
+
+        <section class="card form-section submit-section submit-files-section">
+            <div class="section-heading"><span>01</span>
+                <div><h2>발표자료</h2><p>PPT 등 발표자료를 올려 주세요. 여러 개 첨부할 수 있습니다.</p></div>
+            </div>
+            <div class="existing-files" th:if="${submission != null and !#lists.isEmpty(submission.files)}">
+                <div class="existing-file-item" th:each="file : ${submission.files}">
+                    <span class="submitted-file-name">
+                        <span th:text="${file.originalFileName}">파일명</span>
+                        <small th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">크기</small>
+                    </span>
+                    <button class="text-button" th:if="${submissionOpen}" type="submit" formmethod="post" formnovalidate
+                            th:formaction="@{/submit/files/{fileId}/delete(fileId=${file.id})}">
+                        삭제
+                    </button>
+                </div>
+            </div>
+            <th:block th:if="${submissionOpen}">
+                <label class="file-field">
+                    <input type="file" th:field="*{attachments}" multiple>
+                    <span class="file-button">파일 선택</span>
+                    <span class="file-guide" id="submit-file-guide">추가할 파일을 선택해 주세요.</span>
+                </label>
+            </th:block>
+        </section>
+
+        <section class="card form-section submit-section submit-description-section" th:if="${submissionOpen}">
+            <div class="section-heading"><span>02</span>
+                <div><h2>설명 (선택)</h2><p>제출물에 대한 간단한 설명이나 데모 주소가 있으면 함께 남겨 주세요.</p></div>
+            </div>
+            <label class="field">
+                <span>한 줄 설명</span>
+                <input type="text" th:field="*{summary}" maxlength="500" placeholder="예: 발주서 자동 처리 에이전트 — 시연 영상 포함">
+                <small class="field-error" th:errors="*{summary}"></small>
+            </label>
+            <label class="field">
+                <span>데모 / 참고 URL</span>
+                <input type="text" th:field="*{demoUrl}" maxlength="500" placeholder="예: https://...">
+                <small class="field-error" th:errors="*{demoUrl}"></small>
+            </label>
+        </section>
+
+        <section class="card form-section submit-section submit-description-section" th:if="${!submissionOpen} and ${submission != null}">
+            <div class="section-heading"><span>02</span>
+                <div><h2>제출된 설명</h2></div>
+            </div>
+            <label class="field" th:if="${submission.summary != null}">
+                <span>한 줄 설명</span>
+                <input type="text" th:value="${submission.summary}" readonly>
+            </label>
+            <label class="field" th:if="${submission.demoUrl != null}">
+                <span>데모 / 참고 URL</span>
+                <input type="text" th:value="${submission.demoUrl}" readonly>
+            </label>
+        </section>
+
+        <div class="form-actions">
+            <a class="button button-ghost" th:href="@{/}">처음으로</a>
+            <button class="button button-primary" th:if="${submissionOpen}" type="submit"
+                    th:text="${submission == null} ? '과제 제출' : '저장하기'">과제 제출</button>
+        </div>
+    </form>
+    <footer class="site-footer">© 2026 HT AX. All rights reserved.</footer>
+</main>
+<script>
+    var fileInput = document.querySelector('.file-field input[type="file"]');
+    var fileGuide = document.getElementById('submit-file-guide');
+    if (fileInput && fileGuide) {
+        fileInput.addEventListener('change', function () {
+            if (fileInput.files.length === 0) {
+                fileGuide.textContent = '추가할 파일을 선택해 주세요.';
+            } else if (fileInput.files.length === 1) {
+                fileGuide.textContent = fileInput.files[0].name;
+            } else {
+                fileGuide.textContent = fileInput.files[0].name + ' 외 ' + (fileInput.files.length - 1) + '개';
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import haitai.ht_ax_hackathon.dto.TeamMemberForm;
 import haitai.ht_ax_hackathon.exception.AttachmentFileNotFoundException;
 import haitai.ht_ax_hackathon.exception.ApplicationNotFoundException;
 import haitai.ht_ax_hackathon.repository.HackathonApplicationRepository;
+import haitai.ht_ax_hackathon.repository.TaskSubmissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class HackathonApplicationService {
 
     private final HackathonApplicationRepository applicationRepository;
+    private final TaskSubmissionRepository submissionRepository;
     private final FileStorageService fileStorageService;
 
     /** Persists the application graph and cleans up already stored files if persistence fails. */
@@ -185,9 +187,15 @@ public class HackathonApplicationService {
     @Transactional
     public void deleteApplication(Long id) {
         HackathonApplication application = findApplication(id);
-        List<String> filePaths = application.getFiles().stream()
+        List<String> filePaths = new ArrayList<>(application.getFiles().stream()
                 .map(AttachmentFile::getFilePath)
-                .toList();
+                .toList());
+
+        // A task submission (if any) holds an FK to this application and must be removed first.
+        submissionRepository.findByApplicationId(id).ifPresent(submission -> {
+            submission.getFiles().forEach(file -> filePaths.add(file.getFilePath()));
+            submissionRepository.delete(submission);
+        });
 
         applicationRepository.delete(application);
         applicationRepository.flush();

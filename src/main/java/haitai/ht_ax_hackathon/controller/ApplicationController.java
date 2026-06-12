@@ -1,11 +1,14 @@
 package haitai.ht_ax_hackathon.controller;
 
 import haitai.ht_ax_hackathon.domain.ApplicationCategory;
+import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.ApplicationForm;
 import haitai.ht_ax_hackathon.dto.StatusCheckForm;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
+import haitai.ht_ax_hackathon.service.StatusAccessService;
+import haitai.ht_ax_hackathon.service.TaskSubmissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -22,6 +25,8 @@ import java.util.List;
 public class ApplicationController {
 
     private final HackathonApplicationService applicationService;
+    private final StatusAccessService statusAccessService;
+    private final TaskSubmissionService submissionService;
 
     /** Select-box options for the apply form, available on every render including validation errors. */
     @ModelAttribute("categories")
@@ -31,6 +36,9 @@ public class ApplicationController {
 
     @GetMapping("/apply")
     public String applicationForm(Model model) {
+        if (!statusAccessService.isApplyOpen()) {
+            return "apply/closed";
+        }
         model.addAttribute("applicationForm", new ApplicationForm());
         return "apply/form";
     }
@@ -40,6 +48,9 @@ public class ApplicationController {
             @Valid @ModelAttribute("applicationForm") ApplicationForm form,
             BindingResult bindingResult
     ) {
+        if (!statusAccessService.isApplyOpen()) {
+            return "apply/closed";
+        }
         // Checked here instead of via @NotBlank because the admin edit screen shares this form.
         if (form.getPassword() == null || form.getPassword().isBlank()) {
             bindingResult.rejectValue("password", "password.required", "신청현황 조회에 사용할 비밀번호를 입력해 주세요.");
@@ -96,6 +107,14 @@ public class ApplicationController {
         }
 
         model.addAttribute("applications", applications);
+        model.addAttribute("submissionOpen", statusAccessService.isSubmissionOpen());
+        model.addAttribute("applyOpen", statusAccessService.isApplyOpen());
+        // The newest approved application is the one a task submission attaches to.
+        applications.stream()
+                .filter(application -> application.getStatus() == ApplicationStatus.APPROVED)
+                .findFirst()
+                .ifPresent(approved -> model.addAttribute(
+                        "mySubmission", submissionService.findByApplication(approved.getId()).orElse(null)));
         return "status/list";
     }
 }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 제출 현황 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-admin-clean')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page admin-list-page">
+<main class="page-shell admin-shell">
+    <header class="page-header admin-header">
+        <div>
+            <span class="eyebrow">관리자</span>
+            <h1>과제 제출 현황</h1>
+            <p>승인된 팀의 과제 제출 내역을 확인합니다.</p>
+        </div>
+        <form th:action="@{/admin/logout}" method="post">
+            <button class="logout-link" type="submit">로그아웃</button>
+        </form>
+    </header>
+
+    <nav class="admin-tabs">
+        <a class="admin-tab" th:href="@{/admin/applications}">신청 목록</a>
+        <a class="admin-tab is-active" th:href="@{/admin/submissions}">과제 제출 현황</a>
+    </nav>
+
+    <section class="card table-card">
+        <div class="table-card-head">
+            <h2>제출 내역
+                <small th:text="'승인 ' + ${#lists.size(approvedApplications)} + '팀 중 ' + ${submittedCount} + '팀 제출'">승인 0팀 중 0팀 제출</small>
+            </h2>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>No.</th><th>팀명</th><th>주제</th><th>제출 상태</th><th>파일</th><th>최종 제출</th><th></th></tr>
+                </thead>
+                <tbody>
+                <th:block th:each="item : ${approvedApplications}" th:with="submission=${submissions.get(item.id)}">
+                    <tr class="data-row submission-row" th:classappend="${submission == null} ? 'no-detail'"
+                        th:attr="data-detail='detail-' + ${item.id}">
+                        <td class="cell-id" th:text="${item.id}">1</td>
+                        <td class="strong-cell" th:text="${item.teamName}">팀명</td>
+                        <td class="topic-cell" th:text="${item.topic}" th:title="${item.topic}">주제</td>
+                        <td>
+                            <span class="badge badge-approved" th:if="${submission != null}">제출완료</span>
+                            <span class="badge badge-reviewing" th:if="${submission == null}">미제출</span>
+                        </td>
+                        <td class="member-cell"
+                            th:text="${submission != null} ? ${#lists.size(submission.files)} + '개' : '-'">-</td>
+                        <td class="date-cell"
+                            th:text="${submission != null} ? ${#temporals.format(submission.updatedAt, 'yyyy-MM-dd HH:mm')} : '-'">-</td>
+                        <td>
+                            <button class="button button-secondary button-small toggle-detail"
+                                    th:if="${submission != null}" type="button">내용 보기</button>
+                        </td>
+                    </tr>
+                    <tr class="submission-detail" th:if="${submission != null}"
+                        th:id="'detail-' + ${item.id}" hidden>
+                        <td colspan="7">
+                            <div class="submission-detail-body">
+                                <dl class="submission-meta">
+                                    <div><dt>최초 제출</dt><dd th:text="${#temporals.format(submission.createdAt, 'yyyy-MM-dd HH:mm')}">일시</dd></div>
+                                    <div th:if="${submission.summary != null}"><dt>한 줄 설명</dt><dd th:text="${submission.summary}">설명</dd></div>
+                                    <div th:if="${submission.demoUrl != null}"><dt>데모 / 참고 URL</dt>
+                                        <dd><a class="file-link" th:href="${submission.demoUrl}" th:text="${submission.demoUrl}"
+                                               target="_blank" rel="noopener noreferrer">URL</a></dd></div>
+                                </dl>
+                                <div class="submission-file-list" th:if="${!#lists.isEmpty(submission.files)}">
+                                    <div class="submission-file" th:each="file : ${submission.files}">
+                                        <span class="submitted-file-name">
+                                            <span th:text="${file.originalFileName}">파일명</span>
+                                            <small th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">크기</small>
+                                        </span>
+                                        <a class="button button-secondary button-small"
+                                           th:href="@{/admin/submissions/{applicationId}/files/{fileId}/download(applicationId=${item.id},fileId=${file.id})}">다운로드</a>
+                                    </div>
+                                </div>
+                                <p class="submission-empty-files" th:if="${#lists.isEmpty(submission.files)}">제출된 파일이 없습니다.</p>
+                            </div>
+                        </td>
+                    </tr>
+                </th:block>
+                <tr th:if="${#lists.isEmpty(approvedApplications)}">
+                    <td class="empty-cell" colspan="7">
+                        <div class="empty-state">
+                            <strong>승인된 팀이 없습니다</strong>
+                            <span>신청 목록에서 팀을 승인하면 이곳에 표시됩니다.</span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script>
+    document.querySelectorAll('tr.submission-row').forEach(function (row) {
+        var detail = document.getElementById(row.dataset.detail);
+        if (!detail) return;
+        var button = row.querySelector('.toggle-detail');
+        var toggle = function () {
+            detail.hidden = !detail.hidden;
+            if (button) button.textContent = detail.hidden ? '내용 보기' : '접기';
+        };
+        row.addEventListener('click', function (event) {
+            if (event.target.closest('a')) return;
+            toggle();
+        });
+    });
+</script>
+</body>
+</html>
