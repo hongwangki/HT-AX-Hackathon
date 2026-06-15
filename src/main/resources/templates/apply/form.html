@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>참가 접수 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-apply-polish')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="apply-page">
@@ -90,7 +90,10 @@
                         </label>
                         <label class="field">
                             <span>비밀번호 <b>*</b></span>
-                            <input type="password" th:field="*{password}" placeholder="4자 이상" autocomplete="new-password">
+                            <div class="password-toggle-wrap">
+                                <input type="password" th:field="*{password}" placeholder="4자 이상" autocomplete="new-password">
+                                <button class="password-toggle" type="button" aria-label="비밀번호 보기" aria-pressed="false"></button>
+                            </div>
                             <small class="field-hint">신청현황 조회에 사용되며, 재신청 시에도 동일한 비밀번호를 사용합니다. 다른 곳에서 쓰는 개인 비밀번호는 사용하지 마세요.</small>
                             <small class="field-error" th:errors="*{password}"></small>
                         </label>
@@ -200,5 +203,6 @@
 </main>
 <script th:src="@{/js/application-form.js(v='20260611-schedule-date-fit')}"></script>
 <script th:src="@{/js/apply-progress.js(v='20260611-schedule-date-fit')}"></script>
+<script th:src="@{/js/password-toggle.js(v='20260615')}"></script>
 </body>
 </html>

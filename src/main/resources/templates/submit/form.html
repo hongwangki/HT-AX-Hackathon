@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>과제 제출 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-applicant-resize')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-submit-polish')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page status-list-page submit-page">
@@ -20,7 +20,10 @@
 
     <section class="card detail-card submit-team-card">
         <div class="detail-title">
-            <div><h2 th:text="${hackathonApplication.teamName}">팀명</h2></div>
+            <div>
+                <span class="submit-team-label">제출 대상</span>
+                <h2 th:text="${hackathonApplication.teamName}">팀명</h2>
+            </div>
         </div>
         <dl class="detail-grid">
             <div><dt>주제</dt><dd th:text="${hackathonApplication.topic}">주제</dd></div>
@@ -51,7 +54,10 @@
             </div>
             <div class="existing-files" th:if="${submission != null and !#lists.isEmpty(submission.files)}">
                 <div class="existing-file-item" th:each="file : ${submission.files}">
-                    <span class="submitted-file-name">
+                    <span class="submitted-file-name"
+                          th:classappend="${#strings.endsWith(#strings.toLowerCase(file.originalFileName), '.pdf') ? ' file-type-pdf' :
+                              (#strings.endsWith(#strings.toLowerCase(file.originalFileName), '.xls') or #strings.endsWith(#strings.toLowerCase(file.originalFileName), '.xlsx') ? ' file-type-excel' :
+                              (#strings.endsWith(#strings.toLowerCase(file.originalFileName), '.ppt') or #strings.endsWith(#strings.toLowerCase(file.originalFileName), '.pptx') ? ' file-type-ppt' : ' file-type-file'))}">
                         <span th:text="${file.originalFileName}">파일명</span>
                         <small th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">크기</small>
                     </span>
@@ -67,6 +73,7 @@
                     <span class="file-button">파일 선택</span>
                     <span class="file-guide" id="submit-file-guide">추가할 파일을 선택해 주세요.</span>
                 </label>
+                <div class="selected-file-preview" id="submit-file-preview" aria-live="polite"></div>
             </th:block>
         </section>
 
@@ -111,14 +118,50 @@
 <script>
     var fileInput = document.querySelector('.file-field input[type="file"]');
     var fileGuide = document.getElementById('submit-file-guide');
+    var filePreview = document.getElementById('submit-file-preview');
+    function formatFileSize(bytes) {
+        if (!bytes && bytes !== 0) {
+            return '';
+        }
+        return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+    function getFileTypeClass(fileName) {
+        var lowerName = fileName.toLowerCase();
+        if (lowerName.endsWith('.pdf')) {
+            return 'file-type-pdf';
+        }
+        if (lowerName.endsWith('.xls') || lowerName.endsWith('.xlsx')) {
+            return 'file-type-excel';
+        }
+        if (lowerName.endsWith('.ppt') || lowerName.endsWith('.pptx')) {
+            return 'file-type-ppt';
+        }
+        return 'file-type-file';
+    }
     if (fileInput && fileGuide) {
         fileInput.addEventListener('change', function () {
             if (fileInput.files.length === 0) {
                 fileGuide.textContent = '추가할 파일을 선택해 주세요.';
+                if (filePreview) {
+                    filePreview.innerHTML = '';
+                }
             } else if (fileInput.files.length === 1) {
                 fileGuide.textContent = fileInput.files[0].name;
             } else {
                 fileGuide.textContent = fileInput.files[0].name + ' 외 ' + (fileInput.files.length - 1) + '개';
+            }
+            if (filePreview && fileInput.files.length > 0) {
+                filePreview.innerHTML = Array.prototype.map.call(fileInput.files, function (file) {
+                    return '<div class="existing-file-item selected-file-preview-item">'
+                        + '<span class="submitted-file-name ' + getFileTypeClass(file.name) + '">'
+                        + '<span>' + file.name.replace(/[&<>"']/g, function (char) {
+                            return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char];
+                        }) + '</span>'
+                        + '<small>' + formatFileSize(file.size) + '</small>'
+                        + '</span>'
+                        + '<span class="selected-file-state">추가 예정</span>'
+                        + '</div>';
+                }).join('');
             }
         });
     }

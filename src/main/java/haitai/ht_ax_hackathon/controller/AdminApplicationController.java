@@ -124,8 +124,11 @@ public class AdminApplicationController {
     }
 
     @PostMapping("/{id}/reject")
-    public String rejectApplication(@PathVariable Long id) {
-        applicationService.changeStatus(id, ApplicationStatus.REJECTED);
+    public String rejectApplication(
+            @PathVariable Long id,
+            @RequestParam(required = false) String rejectionReason
+    ) {
+        applicationService.rejectApplication(id, rejectionReason);
         return "redirect:/admin/applications/" + id;
     }
 

@@ -4,15 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신청 수정 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-admin-edit-polish')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
-<body class="workspace-page">
-<main class="page-shell form-shell">
-    <header class="page-header">
-        <span class="eyebrow">신청 수정</span>
-        <h1>신청서 수정</h1>
-        <p>신청 정보와 팀원을 수정하고 필요한 첨부파일을 추가합니다.</p>
+<body class="workspace-page admin-edit-page">
+<main class="page-shell form-shell admin-edit-shell">
+    <header class="page-header admin-edit-header">
+        <div class="admin-detail-brand">
+            <img th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <div>
+                <h1>신청서 수정</h1>
+                <p>신청 정보와 팀원을 수정하고 필요한 첨부파일을 추가합니다.</p>
+            </div>
+        </div>
     </header>
     <form class="card form-card" th:action="@{/admin/applications/{id}/edit(id=${applicationId})}"
           th:object="${applicationForm}" method="post" enctype="multipart/form-data">

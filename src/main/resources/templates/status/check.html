@@ -41,6 +41,7 @@
                     <div class="status-input-wrap">
                         <span class="status-input-icon status-input-icon-lock" aria-hidden="true"></span>
                         <input type="password" th:field="*{password}" placeholder="신청 시 입력한 비밀번호" autocomplete="current-password">
+                        <button class="password-toggle" type="button" aria-label="비밀번호 보기" aria-pressed="false"></button>
                     </div>
                     <small class="field-error" th:errors="*{password}"></small>
                 </label>
@@ -54,5 +55,6 @@
     </section>
     <footer class="site-footer">© 2026 HT AX. All rights reserved.</footer>
 </main>
+<script th:src="@{/js/password-toggle.js(v='20260615')}"></script>
 </body>
 </html>

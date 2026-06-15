@@ -152,6 +152,11 @@ public class HackathonApplicationService {
         findById(id).changeStatus(status);
     }
 
+    @Transactional
+    public void rejectApplication(Long id, String rejectionReason) {
+        findById(id).reject(rejectionReason);
+    }
+
     /**
      * Admin recovery path for applicants who forgot their password: looks the stored
      * password up by phone number so the admin can relay it. Blank passwords

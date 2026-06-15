@@ -68,6 +68,10 @@ public class HackathonApplication {
     @Nationalized
     private ApplicationStatus status;
 
+    @Column(name = "rejection_reason", length = 1000)
+    @Nationalized
+    private String rejectionReason;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -99,6 +103,14 @@ public class HackathonApplication {
 
     public void changeStatus(ApplicationStatus status) {
         this.status = status;
+        if (status != ApplicationStatus.REJECTED) {
+            this.rejectionReason = null;
+        }
+    }
+
+    public void reject(String rejectionReason) {
+        this.status = ApplicationStatus.REJECTED;
+        this.rejectionReason = normalizeRejectionReason(rejectionReason);
     }
 
     /** Keeps both sides of the application-member relationship synchronized. */
@@ -130,6 +142,13 @@ public class HackathonApplication {
     public void replaceMembers(List<TeamMember> newMembers) {
         members.clear();
         newMembers.forEach(this::addMember);
+    }
+
+    private String normalizeRejectionReason(String rejectionReason) {
+        if (rejectionReason == null || rejectionReason.isBlank()) {
+            return null;
+        }
+        return rejectionReason.strip();
     }
 
     @PrePersist

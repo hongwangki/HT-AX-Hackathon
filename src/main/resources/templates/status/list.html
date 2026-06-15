@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>내 신청현황 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260612-applicant-resize')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-status-polish')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page status-list-page">
@@ -17,6 +17,28 @@
             <p th:text="'총 ' + ${#lists.size(applications)} + '건의 신청 내역이 있습니다.'">총 1건의 신청 내역이 있습니다.</p>
         </div>
     </header>
+
+    <nav class="status-summary" aria-label="신청 상태 요약">
+        <span class="status-summary-item status-summary-total">
+            <span>전체</span>
+            <strong th:text="${#lists.size(applications)}">3</strong>
+        </span>
+        <span class="status-summary-item status-summary-approved">
+            <i aria-hidden="true"></i>
+            <span>승인</span>
+            <strong th:text="${#lists.size(applications.?[status.name() == 'APPROVED'])}">1</strong>
+        </span>
+        <span class="status-summary-item status-summary-pending">
+            <i aria-hidden="true"></i>
+            <span>접수</span>
+            <strong th:text="${#lists.size(applications.?[status.name() == 'SUBMITTED' or status.name() == 'REVIEWING'])}">1</strong>
+        </span>
+        <span class="status-summary-item status-summary-rejected">
+            <i aria-hidden="true"></i>
+            <span>반려</span>
+            <strong th:text="${#lists.size(applications.?[status.name() == 'REJECTED'])}">1</strong>
+        </span>
+    </nav>
 
     <section class="card submit-banner"
              th:if="${submissionOpen} and ${!applications.?[status.name() == 'APPROVED'].isEmpty()}">
@@ -35,7 +57,8 @@
         </form>
     </section>
 
-    <section class="card detail-card status-item" th:each="item, stat : ${applications}">
+    <section class="card detail-card status-item" th:each="item, stat : ${applications}"
+             th:classappend="${'status-item-' + item.status.name().toLowerCase()}">
         <span class="status-item-index" th:text="${#numbers.formatInteger(stat.count, 2)}">01</span>
         <div class="detail-title">
             <div>
@@ -57,6 +80,10 @@
         <div class="status-message status-message-rejected" th:if="${item.status.name() == 'REJECTED'}">
             <span class="status-pill"><span class="status-pill-icon">×</span>반려</span>
             <span>이번 신청은 반려되었습니다. 아이디어를 보완해 다시 도전해 보세요.</span>
+            <p class="rejection-reason" th:if="${item.rejectionReason != null}">
+                <strong>사유</strong>
+                <span th:text="${item.rejectionReason}">반려 사유</span>
+            </p>
             <a class="button button-primary button-small status-reapply" th:if="${applyOpen}"
                th:href="@{/apply}">다시 신청하기</a>
             <span class="button button-small status-reapply button-closed" th:unless="${applyOpen}"

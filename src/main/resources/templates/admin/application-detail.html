@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신청 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260611-schedule-date-fit')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-admin-detail-polish')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page admin-detail-page">
@@ -98,21 +98,43 @@
         </div>
 
         <section class="admin-review-panel">
-            <div>
+            <div class="admin-review-copy">
                 <h3>심사 처리</h3>
-                <p>승인 또는 거절 결과는 신청자가 신청현황 조회 페이지에서 바로 확인합니다.</p>
+                <p>승인 또는 반려 결과는 신청자가 신청현황 조회 페이지에서 바로 확인합니다.</p>
+                <div class="admin-rejection-note"
+                     th:if="${hackathonApplication.status.name() == 'REJECTED' and hackathonApplication.rejectionReason != null}">
+                    <strong>반려 사유</strong>
+                    <p th:text="${hackathonApplication.rejectionReason}">반려 사유</p>
+                </div>
             </div>
             <div class="review-actions">
-                <form th:action="@{/admin/applications/{id}/approve(id=${hackathonApplication.id})}" method="post"
-                      th:if="${hackathonApplication.status.name() != 'APPROVED'}">
-                    <button class="button button-approve" type="submit">✓ 승인</button>
-                </form>
-                <form th:action="@{/admin/applications/{id}/reject(id=${hackathonApplication.id})}" method="post"
-                      th:if="${hackathonApplication.status.name() != 'REJECTED'}">
-                    <button class="button button-danger" type="submit">× 거절</button>
-                </form>
-                <span class="review-done" th:if="${hackathonApplication.status.name() == 'APPROVED'}">현재 승인된 신청입니다.</span>
-                <span class="review-done" th:if="${hackathonApplication.status.name() == 'REJECTED'}">현재 거절된 신청입니다.</span>
+                <div class="review-decision-form" th:if="${hackathonApplication.status.name() != 'REJECTED'}">
+                    <div class="review-state-guide" th:if="${hackathonApplication.status.name() == 'APPROVED'}">
+                        <strong>현재 승인된 신청입니다.</strong>
+                        <span>반려로 변경할 때만 아래 사유를 입력한 뒤 반려로 변경해 주세요.</span>
+                    </div>
+                    <label class="reject-reason-field">
+                        <span th:text="${hackathonApplication.status.name() == 'APPROVED'} ? '반려로 변경할 사유 (선택)' : '반려 사유 (선택)'">반려 사유 (선택)</span>
+                        <textarea name="rejectionReason" form="reject-application-form" maxlength="1000" rows="3"
+                                  placeholder="예: 아이디어 범위가 모호합니다. 구체적인 활용 시나리오를 보완해 주세요."></textarea>
+                    </label>
+                    <div class="review-button-row">
+                        <form th:action="@{/admin/applications/{id}/approve(id=${hackathonApplication.id})}" method="post"
+                              th:if="${hackathonApplication.status.name() != 'APPROVED'}">
+                            <button class="button button-approve" type="submit">✓ 승인</button>
+                        </form>
+                        <form id="reject-application-form" th:action="@{/admin/applications/{id}/reject(id=${hackathonApplication.id})}" method="post">
+                            <button class="button button-danger" type="submit"
+                                    th:text="${hackathonApplication.status.name() == 'APPROVED'} ? '× 반려로 변경' : '× 반려'">× 반려</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="review-button-row" th:if="${hackathonApplication.status.name() == 'REJECTED'}">
+                    <span class="review-done">현재 반려된 신청입니다.</span>
+                    <form th:action="@{/admin/applications/{id}/approve(id=${hackathonApplication.id})}" method="post">
+                        <button class="button button-approve" type="submit">✓ 승인으로 변경</button>
+                    </form>
+                </div>
             </div>
         </section>
     </section>
