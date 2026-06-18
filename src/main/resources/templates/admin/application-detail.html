@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신청 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-admin-detail-polish')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260618-admin-detail-readability')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page admin-detail-page">
@@ -78,18 +78,24 @@
                 <div class="admin-sub-heading">
                     <h3>첨부 파일 <small th:text="${#lists.size(hackathonApplication.files)} + '개'">0개</small></h3>
                 </div>
-                <div class="table-wrap" th:if="${!#lists.isEmpty(hackathonApplication.files)}">
-                    <table>
-                        <thead><tr><th>파일명</th><th>크기</th><th>형식</th></tr></thead>
-                        <tbody>
-                        <tr th:each="file : ${hackathonApplication.files}">
-                            <td><a class="file-link" th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${hackathonApplication.id},fileId=${file.id})}" th:text="${file.originalFileName}">파일명</a></td>
-                            <td th:text="${#numbers.formatInteger(file.fileSize, 1, 'COMMA')} + ' bytes'">0 bytes</td>
-                            <td th:text="${file.contentType ?: '-'}">-</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <ul class="admin-file-list" th:if="${!#lists.isEmpty(hackathonApplication.files)}">
+                    <li th:each="file : ${hackathonApplication.files}">
+                        <a class="admin-file-link"
+                           th:href="@{/admin/applications/{id}/files/{fileId}/download(id=${hackathonApplication.id},fileId=${file.id})}"
+                           th:title="${file.originalFileName}">
+                            <span class="admin-file-icon" aria-hidden="true"></span>
+                            <span class="admin-file-name" th:text="${file.originalFileName}">파일명</span>
+                        </a>
+                        <span class="admin-file-size">
+                            <span th:if="${file.fileSize >= 1048576}"
+                                  th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">1.0 MB</span>
+                            <span th:if="${file.fileSize >= 1024 and file.fileSize < 1048576}"
+                                  th:text="${#numbers.formatDecimal(file.fileSize / 1024.0, 1, 1)} + ' KB'">1.0 KB</span>
+                            <span th:if="${file.fileSize < 1024}"
+                                  th:text="${file.fileSize} + ' B'">0 B</span>
+                        </span>
+                    </li>
+                </ul>
                 <div class="admin-empty-file" th:if="${#lists.isEmpty(hackathonApplication.files)}">
                     <strong>첨부 파일이 없습니다.</strong>
                     <span>파일을 제출한 경우 이곳에서 다운로드할 수 있습니다.</span>

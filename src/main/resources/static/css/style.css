@@ -3060,6 +3060,7 @@ body.admin-detail-page.admin-detail-page::after {
 }
 .admin-detail-hero p {
     font-size: 13px;
+    font-weight: 400;
 }
 .admin-detail-date {
     padding-left: 16px;
@@ -3071,6 +3072,7 @@ body.admin-detail-page.admin-detail-page::after {
 .admin-detail-date dd {
     margin-top: 5px;
     font-size: 12px;
+    font-weight: 400;
 }
 .admin-detail-section {
     padding: 20px;
@@ -3111,6 +3113,10 @@ body.admin-detail-page.admin-detail-page::after {
 .admin-info-grid dd {
     margin: 6px 0 0 22px;
     font-size: 13px;
+    font-weight: 400;
+    line-height: 1.65;
+}
+.admin-info-grid div:nth-child(-n+3) dd {
     font-weight: 600;
 }
 .admin-detail-columns {
@@ -3136,6 +3142,76 @@ body.admin-detail-page.admin-detail-page::after {
     padding: 10px 12px;
     font-size: 12px;
 }
+.admin-detail-page td {
+    font-weight: 400;
+}
+.admin-file-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.admin-file-list li {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 12px;
+    border: 1px solid #e3e8f0;
+    border-radius: 10px;
+    background: #fbfcfe;
+}
+.admin-file-link {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    gap: 9px;
+    color: #26344a;
+    font-size: 12px;
+    font-weight: 400;
+}
+.admin-file-link:hover .admin-file-name {
+    color: #e0337c;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.admin-file-icon {
+    position: relative;
+    width: 16px;
+    height: 19px;
+    flex: 0 0 auto;
+    border: 1.5px solid #f06a9f;
+    border-radius: 3px;
+    background: #fff;
+}
+.admin-file-icon::after {
+    position: absolute;
+    right: -1.5px;
+    top: -1.5px;
+    width: 6px;
+    height: 6px;
+    border-bottom: 1.5px solid #f06a9f;
+    border-left: 1.5px solid #f06a9f;
+    border-radius: 0 2px 0 2px;
+    background: #fff2f7;
+    content: "";
+}
+.admin-file-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.admin-file-size {
+    flex: 0 0 auto;
+    color: #8993a3;
+    font-size: 11px;
+    font-weight: 400;
+    white-space: nowrap;
+}
 .admin-empty-file {
     min-height: 116px;
     border-radius: 10px;
@@ -3150,6 +3226,7 @@ body.admin-detail-page.admin-detail-page::after {
 .admin-review-panel p {
     margin-top: -8px;
     font-size: 12px;
+    font-weight: 400;
 }
 .admin-detail-page .review-actions .button,
 .admin-detail-page .detail-actions .button {
@@ -3316,6 +3393,9 @@ body.admin-detail-page.admin-detail-page::after {
     }
     .admin-detail-columns {
         padding: 0 12px 14px;
+    }
+    .admin-file-list li {
+        padding: 10px;
     }
     .admin-review-panel {
         margin: 0 12px;

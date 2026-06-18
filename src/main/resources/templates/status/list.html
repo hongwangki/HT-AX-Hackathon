@@ -45,7 +45,7 @@
         <div class="submit-banner-copy">
             <strong th:if="${mySubmission == null}">🎉 과제 제출이 시작되었습니다.</strong>
             <strong th:unless="${mySubmission == null}">✅ 과제가 제출되었습니다.</strong>
-            <span th:if="${mySubmission == null}">8월 5일까지 발표자료를 제출해 주세요.</span>
+            <span th:if="${mySubmission == null}">8월 5일까지 심사할 자료를 제출해 주세요.</span>
             <span th:unless="${mySubmission == null}"
                   th:text="'최종 제출 ' + ${#temporals.format(mySubmission.updatedAt, 'yyyy-MM-dd HH:mm')} + ' · 마감 전까지 수정할 수 있습니다.'">최종 제출 일시</span>
         </div>

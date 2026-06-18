@@ -14,7 +14,7 @@
         <div>
             <span class="eyebrow">HT AX HACKATHON</span>
             <h1>과제 제출</h1>
-            <p>발표자료를 업로드해 주세요. 마감 전까지 자유롭게 수정할 수 있습니다.</p>
+            <p>심사자료를 업로드해 주세요. 마감 전까지 자유롭게 수정할 수 있습니다.</p>
         </div>
     </header>
 
@@ -50,7 +50,7 @@
 
         <section class="card form-section submit-section submit-files-section">
             <div class="section-heading"><span>01</span>
-                <div><h2>발표자료</h2><p>PPT 등 발표자료를 올려 주세요. 여러 개 첨부할 수 있습니다.</p></div>
+                <div><h2>자료</h2><p>PPT 등 심사할 자료를 올려 주세요. 여러 개 첨부할 수 있습니다.</p></div>
             </div>
             <div class="existing-files" th:if="${submission != null and !#lists.isEmpty(submission.files)}">
                 <div class="existing-file-item" th:each="file : ${submission.files}">
