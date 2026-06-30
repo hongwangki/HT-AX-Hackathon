@@ -131,10 +131,10 @@ tbody tr:last-child td { border-bottom: 0; }
 .strong-cell { font-weight: 800; }
 .empty-cell { padding: 42px; color: var(--muted); text-align: center; }
 .badge { display: inline-block; padding: 5px 8px; border-radius: 20px; font-size: 11px; font-weight: 900; }
-.badge-submitted { color: #4438a8; background: #eeecff; }
+.badge-submitted { color: #1f5ea8; background: #e8f2ff; }
 .badge-reviewing { color: #946217; background: #fff4d8; }
 .badge-approved { color: #16704b; background: #def7eb; }
-.badge-rejected { color: #b33948; background: #ffe5e8; }
+.badge-rejected { color: #b42336; background: #ffe4e8; }
 .detail-card { margin-bottom: 18px; padding: 26px; box-shadow: 0 9px 30px rgba(44, 50, 88, .06); }
 .detail-title { display: flex; justify-content: space-between; }
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; margin: 22px 0 0; }
@@ -280,10 +280,10 @@ input:focus, textarea:focus { border-color: #ff8099; box-shadow: 0 0 0 3px rgba(
 .table-card, .detail-card { background: rgba(255, 255, 255, .96); }
 th { color: #6e7480; background: #f6f7f9; }
 th, td { border-bottom-color: #e7eaef; }
-.badge-submitted { color: #d92b57; background: #ffe8ee; }
+.badge-submitted { color: #1f5ea8; background: #e8f2ff; }
 .badge-reviewing { color: #9b6518; background: #fff2cc; }
 .badge-approved { color: #16704b; background: #def7eb; }
-.badge-rejected { color: #b33948; background: #ffe5e8; }
+.badge-rejected { color: #b42336; background: #ffe4e8; }
 .detail-grid div { border-top-color: #e6e9ef; }
 .detail-card small, .file-link { color: var(--primary-dark); }
 
@@ -1109,10 +1109,10 @@ body.status-list-page.status-list-page::after {
     font-size: 11px;
     line-height: 1;
 }
-.status-list-page .badge-submitted { color: #d73380; background: #fff0f6; }
+.status-list-page .badge-submitted { color: #1f5ea8; background: #e8f2ff; }
 .status-list-page .badge-reviewing { color: #8b5b12; background: #fff4d7; }
 .status-list-page .badge-approved { color: #126742; background: #e8f8ef; }
-.status-list-page .badge-rejected { color: #a92f44; background: #fff0f3; }
+.status-list-page .badge-rejected { color: #b42336; background: #ffe4e8; }
 .status-list-page .detail-grid {
     display: grid;
     grid-column: 2;

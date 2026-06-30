@@ -99,9 +99,9 @@
                 <tr><th>No.</th><th>팀명</th><th>분류</th><th>주제</th><th>구성인원</th><th>상태</th><th>신청일시</th><th></th></tr>
                 </thead>
                 <tbody id="applicationRows">
-                <tr class="data-row" th:each="item : ${applications}"
+                <tr class="data-row" th:each="item, stat : ${applications}"
                     th:attr="data-href=@{/admin/applications/{id}(id=${item.id})}">
-                    <td class="cell-id" th:text="${item.id}">1</td>
+                    <td class="cell-id" th:text="${filteredApplicationCount - stat.index}">1</td>
                     <td class="strong-cell" th:text="${item.teamName}">팀명</td>
                     <td class="category-cell"><span th:text="${item.category?.label ?: '-'}">분류</span></td>
                     <td class="topic-cell" th:text="${item.topic}" th:title="${item.topic}">주제</td>
