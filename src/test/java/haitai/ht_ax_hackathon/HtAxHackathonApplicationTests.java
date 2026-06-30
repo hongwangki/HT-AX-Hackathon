@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -137,6 +138,13 @@ class HtAxHackathonApplicationTests {
                 .andExpect(redirectedUrl("/admin/applications/" + id));
         assertThat(applicationService.findApplication(id).getStatus()).isEqualTo(ApplicationStatus.APPROVED);
 
+        mockMvc.perform(get("/admin/applications").param("status", "APPROVED"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/application-list"))
+                .andExpect(model().attribute("selectedStatus", ApplicationStatus.APPROVED))
+                .andExpect(model().attribute("applications", hasSize(1)))
+                .andExpect(model().attribute("filteredApplicationCount", 1));
+
         byte[] approvedExcel = mockMvc.perform(get("/admin/applications/export"))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -157,6 +165,17 @@ class HtAxHackathonApplicationTests {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/applications/" + id));
         assertThat(applicationService.findApplication(id).getStatus()).isEqualTo(ApplicationStatus.REJECTED);
+
+        mockMvc.perform(get("/admin/applications").param("status", "APPROVED"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("applications", hasSize(0)))
+                .andExpect(model().attribute("filteredApplicationCount", 0));
+
+        mockMvc.perform(get("/admin/applications").param("status", "REJECTED"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("selectedStatus", ApplicationStatus.REJECTED))
+                .andExpect(model().attribute("applications", hasSize(1)))
+                .andExpect(model().attribute("filteredApplicationCount", 1));
 
         mockMvc.perform(get("/status"))
                 .andExpect(status().isOk())

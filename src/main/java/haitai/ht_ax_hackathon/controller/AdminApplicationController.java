@@ -47,10 +47,18 @@ public class AdminApplicationController {
     }
 
     @GetMapping
-    public String applicationList(Model model) {
-        List<HackathonApplication> applications = applicationService.findAllApplications();
+    public String applicationList(@RequestParam(required = false) String status, Model model) {
+        ApplicationStatus selectedStatus = parseListFilter(status);
+        List<HackathonApplication> allApplications = applicationService.findAllApplications();
+        List<HackathonApplication> applications = selectedStatus == null
+                ? allApplications
+                : applicationService.findApplicationsByStatus(selectedStatus);
         model.addAttribute("applications", applications);
-        model.addAttribute("applicationCount", applications.size());
+        model.addAttribute("applicationCount", allApplications.size());
+        model.addAttribute("filteredApplicationCount", applications.size());
+        model.addAttribute("selectedStatus", selectedStatus);
+        model.addAttribute("approvedCount", countByStatus(allApplications, ApplicationStatus.APPROVED));
+        model.addAttribute("rejectedCount", countByStatus(allApplications, ApplicationStatus.REJECTED));
         model.addAttribute("statusCheckOpen", statusAccessService.isStatusCheckOpen());
         model.addAttribute("applyOpen", statusAccessService.isApplyOpen());
         return "admin/application-list";
@@ -203,5 +211,25 @@ public class AdminApplicationController {
         } catch (IllegalArgumentException exception) {
             return MediaType.APPLICATION_OCTET_STREAM;
         }
+    }
+
+    private ApplicationStatus parseListFilter(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        try {
+            ApplicationStatus parsedStatus = ApplicationStatus.valueOf(status);
+            return parsedStatus == ApplicationStatus.APPROVED || parsedStatus == ApplicationStatus.REJECTED
+                    ? parsedStatus
+                    : null;
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    private long countByStatus(List<HackathonApplication> applications, ApplicationStatus status) {
+        return applications.stream()
+                .filter(application -> application.getStatus() == status)
+                .count();
     }
 }

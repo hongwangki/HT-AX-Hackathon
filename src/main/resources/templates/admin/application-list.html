@@ -9,9 +9,7 @@
 </head>
 <body class="workspace-page admin-list-page">
 <main class="page-shell admin-shell"
-      th:with="approvedCount=${applications.?[status.name() == 'APPROVED'].size()},
-               rejectedCount=${applications.?[status.name() == 'REJECTED'].size()},
-               pendingCount=${applicationCount - applications.?[status.name() == 'APPROVED'].size() - applications.?[status.name() == 'REJECTED'].size()}">
+      th:with="pendingCount=${applicationCount - approvedCount - rejectedCount}">
     <header class="page-header admin-header">
         <div>
             <span class="eyebrow">관리자</span>
@@ -80,7 +78,17 @@
 
     <section class="card table-card">
         <div class="table-card-head">
-            <h2>신청 내역 <small th:text="'총 ' + ${applicationCount} + '건'">총 0건</small></h2>
+            <div class="table-title-group">
+                <h2>신청 내역 <small th:text="'표시 ' + ${filteredApplicationCount} + '건 / 전체 ' + ${applicationCount} + '건'">표시 0건 / 전체 0건</small></h2>
+                <nav class="status-filter-tabs" aria-label="신청 상태 필터">
+                    <a th:href="@{/admin/applications}"
+                       th:classappend="${selectedStatus == null} ? 'is-active'">전체</a>
+                    <a th:href="@{/admin/applications(status='APPROVED')}"
+                       th:classappend="${selectedStatus?.name() == 'APPROVED'} ? 'is-active'">승인</a>
+                    <a th:href="@{/admin/applications(status='REJECTED')}"
+                       th:classappend="${selectedStatus?.name() == 'REJECTED'} ? 'is-active'">반려</a>
+                </nav>
+            </div>
             <label class="table-search" th:if="${!#lists.isEmpty(applications)}">
                 <input type="search" id="listSearch" placeholder="팀명·주제 검색" autocomplete="off">
             </label>
@@ -106,8 +114,8 @@
                 <tr th:if="${#lists.isEmpty(applications)}">
                     <td class="empty-cell" colspan="8">
                         <div class="empty-state">
-                            <strong>아직 접수된 신청서가 없습니다</strong>
-                            <span>참가 신청이 접수되면 이곳에 표시됩니다.</span>
+                            <strong th:text="${selectedStatus == null} ? '아직 접수된 신청서가 없습니다' : ${selectedStatus.label + '된 신청서가 없습니다'}">아직 접수된 신청서가 없습니다</strong>
+                            <span th:text="${selectedStatus == null} ? '참가 신청이 접수되면 이곳에 표시됩니다.' : '다른 상태 필터를 선택해 신청 내역을 확인할 수 있습니다.'">참가 신청이 접수되면 이곳에 표시됩니다.</span>
                         </div>
                     </td>
                 </tr>

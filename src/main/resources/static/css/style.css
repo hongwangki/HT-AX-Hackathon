@@ -3807,6 +3807,38 @@ body.admin-list-page.admin-list-page::after {
 .admin-list-page .table-card-head h2 {
     font-size: 16px;
 }
+.admin-list-page .table-title-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+.admin-list-page .status-filter-tabs {
+    display: inline-flex;
+    overflow: hidden;
+    border: 1px solid #d8e0ec;
+    border-radius: 999px;
+    background: #f8fafc;
+}
+.admin-list-page .status-filter-tabs a {
+    min-width: 54px;
+    padding: 7px 13px;
+    color: #687386;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+.admin-list-page .status-filter-tabs a + a {
+    border-left: 1px solid #d8e0ec;
+}
+.admin-list-page .status-filter-tabs a:hover {
+    background: #fff;
+    color: #323847;
+}
+.admin-list-page .status-filter-tabs a.is-active {
+    background: #323847;
+    color: #fff;
+}
 .admin-list-page .table-search input {
     height: 34px;
     border-color: #d8e0ec;

@@ -114,6 +114,11 @@ public class HackathonApplicationService {
         return applicationRepository.findAllByOrderByCreatedAtDesc();
     }
 
+    @Transactional(readOnly = true)
+    public List<HackathonApplication> findApplicationsByStatus(ApplicationStatus status) {
+        return applicationRepository.findByStatusOrderByCreatedAtDesc(status);
+    }
+
     /**
      * Returns the applicant's full submission history for the status page, newest first.
      * One matching password unlocks every row for the phone number, because re-submissions
