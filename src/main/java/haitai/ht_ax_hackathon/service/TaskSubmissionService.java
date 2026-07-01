@@ -31,14 +31,23 @@ public class TaskSubmissionService {
 
     /**
      * Re-verifies the applicant's phone+password on every request (the submission flow is
-     * stateless) and returns the newest approved application, if any. Empty means wrong
-     * credentials or nothing approved — indistinguishable on purpose, like the status page.
+     * stateless) and returns the selected approved application, if any. Empty means wrong
+     * credentials, nothing approved, or a mismatched application id — indistinguishable on
+     * purpose, like the status page.
      */
     @Transactional(readOnly = true)
-    public Optional<HackathonApplication> findApprovedApplication(String representativePhone, String rawPassword) {
+    public Optional<HackathonApplication> findApprovedApplication(
+            Long applicationId, String representativePhone, String rawPassword) {
+        return findApprovedApplications(representativePhone, rawPassword).stream()
+                .filter(application -> application.getId().equals(applicationId))
+                .findFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public List<HackathonApplication> findApprovedApplications(String representativePhone, String rawPassword) {
         return applicationService.findMyApplications(representativePhone, rawPassword).stream()
                 .filter(application -> application.getStatus() == ApplicationStatus.APPROVED)
-                .findFirst();
+                .toList();
     }
 
     /** Returns the submission with its files initialized for rendering. */

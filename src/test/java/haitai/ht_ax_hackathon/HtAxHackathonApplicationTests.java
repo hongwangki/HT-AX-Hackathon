@@ -184,8 +184,8 @@ class HtAxHackathonApplicationTests {
         mockMvc.perform(post("/status").with(csrf())
                         .param("representativePhone", "010-1234-5678")
                         .param("password", "test1234"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("status/list"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/status/result"));
 
         mockMvc.perform(post("/status").with(csrf())
                         .param("representativePhone", "010-1234-5678")
@@ -320,6 +320,7 @@ class HtAxHackathonApplicationTests {
 
         // Not approved yet: the submission entry point bounces back to the status page.
         mockMvc.perform(post("/submit").with(csrf())
+                        .param("applicationId", id.toString())
                         .param("representativePhone", "010-7777-8888")
                         .param("password", "submit123"))
                 .andExpect(status().is3xxRedirection())
@@ -332,16 +333,33 @@ class HtAxHackathonApplicationTests {
         mockMvc.perform(post("/admin/applications/status-access").with(csrf()).param("open", "true"))
                 .andExpect(redirectedUrl("/admin/applications"));
 
-        // Approved + window open: the status page renders the submission banner.
+        mockMvc.perform(get("/submit"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("submit/check"));
+
+        mockMvc.perform(post("/submit/lookup").with(csrf())
+                        .param("representativePhone", "010-0000-0000")
+                        .param("password", "submit123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("submit/check"));
+
+        // Result check stays view-only and redirects after POST to avoid browser resubmit prompts.
         mockMvc.perform(post("/status").with(csrf())
                         .param("representativePhone", "010-7777-8888")
                         .param("password", "submit123"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("status/list"))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("과제 제출하기")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/status/result"));
+
+        // Submission lookup is a separate approved-only flow.
+        mockMvc.perform(post("/submit/lookup").with(csrf())
+                        .param("representativePhone", "010-7777-8888")
+                        .param("password", "submit123"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/submit/list"));
 
         // Approved + window open: the form renders with the team context filled in.
         mockMvc.perform(post("/submit").with(csrf())
+                        .param("applicationId", id.toString())
                         .param("representativePhone", "010-7777-8888")
                         .param("password", "submit123"))
                 .andExpect(status().isOk())
@@ -352,6 +370,7 @@ class HtAxHackathonApplicationTests {
                 "attachments", "deck.pptx", "application/vnd.ms-powerpoint", "slides".getBytes());
         mockMvc.perform(multipart("/submit/save")
                         .file(deck)
+                        .param("applicationId", id.toString())
                         .param("representativePhone", "010-7777-8888")
                         .param("password", "submit123")
                         .param("summary", "Demo agent")
@@ -377,6 +396,7 @@ class HtAxHackathonApplicationTests {
                 .andExpect(content().bytes("slides".getBytes()));
 
         mockMvc.perform(post("/submit/files/{fileId}/delete", fileId).with(csrf())
+                        .param("applicationId", id.toString())
                         .param("representativePhone", "010-7777-8888")
                         .param("password", "submit123"))
                 .andExpect(status().isOk())
@@ -388,6 +408,7 @@ class HtAxHackathonApplicationTests {
         mockMvc.perform(post("/admin/applications/status-access").with(csrf()).param("open", "false"))
                 .andExpect(status().is3xxRedirection());
         mockMvc.perform(multipart("/submit/save")
+                        .param("applicationId", id.toString())
                         .param("representativePhone", "010-7777-8888")
                         .param("password", "submit123")
                         .param("summary", "Changed after close")
@@ -402,6 +423,93 @@ class HtAxHackathonApplicationTests {
                 .andExpect(redirectedUrl("/admin/applications"));
         assertThat(submissionRepository.findByApplicationId(id)).isEmpty();
         assertThat(applicationRepository.count()).isZero();
+    }
+
+    @Test
+    void taskSubmissionCanTargetEachApprovedApplicationForTheSamePhone() throws Exception {
+        mockMvc.perform(post("/admin/applications/apply-access").with(csrf()).param("open", "true"))
+                .andExpect(redirectedUrl("/admin/applications"));
+        mockMvc.perform(post("/admin/applications/status-access").with(csrf()).param("open", "true"))
+                .andExpect(redirectedUrl("/admin/applications"));
+
+        mockMvc.perform(multipart("/apply")
+                        .param("teamName", "First Approved Team")
+                        .param("representativePhone", "010-2222-3333")
+                        .param("password", "same1234")
+                        .param("members[0].department", "AX Team")
+                        .param("members[0].employeeNo", "6000006")
+                        .param("members[0].name", "Tester")
+                        .param("category", "MARKETING")
+                        .param("topic", "First Topic")
+                        .param("content", "First content")
+                        .with(csrf()))
+                .andExpect(redirectedUrl("/apply/complete"));
+        mockMvc.perform(multipart("/apply")
+                        .param("teamName", "Second Approved Team")
+                        .param("representativePhone", "010-2222-3333")
+                        .param("password", "same1234")
+                        .param("members[0].department", "AX Team")
+                        .param("members[0].employeeNo", "6000006")
+                        .param("members[0].name", "Tester")
+                        .param("category", "MARKETING")
+                        .param("topic", "Second Topic")
+                        .param("content", "Second content")
+                        .with(csrf()))
+                .andExpect(redirectedUrl("/apply/complete"));
+
+        var applications = applicationService.findMyApplications("010-2222-3333", "same1234");
+        Long firstId = applications.stream()
+                .filter(application -> application.getTeamName().equals("First Approved Team"))
+                .findFirst()
+                .orElseThrow()
+                .getId();
+        Long secondId = applications.stream()
+                .filter(application -> application.getTeamName().equals("Second Approved Team"))
+                .findFirst()
+                .orElseThrow()
+                .getId();
+
+        mockMvc.perform(post("/admin/applications/{id}/approve", firstId).with(csrf()))
+                .andExpect(status().is3xxRedirection());
+        mockMvc.perform(post("/admin/applications/{id}/approve", secondId).with(csrf()))
+                .andExpect(status().is3xxRedirection());
+
+        mockMvc.perform(post("/status").with(csrf())
+                        .param("representativePhone", "010-2222-3333")
+                        .param("password", "same1234"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/status/result"));
+
+        mockMvc.perform(post("/submit/lookup").with(csrf())
+                        .param("representativePhone", "010-2222-3333")
+                        .param("password", "same1234"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/submit/list"));
+
+        mockMvc.perform(multipart("/submit/save")
+                        .param("applicationId", firstId.toString())
+                        .param("representativePhone", "010-2222-3333")
+                        .param("password", "same1234")
+                        .param("summary", "First submission")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("saved", true));
+        mockMvc.perform(multipart("/submit/save")
+                        .param("applicationId", secondId.toString())
+                        .param("representativePhone", "010-2222-3333")
+                        .param("password", "same1234")
+                        .param("summary", "Second submission")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("saved", true));
+
+        assertThat(submissionService.findByApplication(firstId).orElseThrow().getSummary())
+                .isEqualTo("First submission");
+        assertThat(submissionService.findByApplication(secondId).orElseThrow().getSummary())
+                .isEqualTo("Second submission");
+
+        submissionRepository.deleteAll();
+        applicationRepository.deleteAll();
     }
 
     @Test

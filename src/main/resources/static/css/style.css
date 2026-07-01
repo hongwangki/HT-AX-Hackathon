@@ -818,6 +818,9 @@ body.status-page.status-page::after {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
+.status-page .submit-check-error {
+    margin: 0 0 16px;
+}
 .status-page .form-section {
     padding: 0 !important;
     border: 0 !important;

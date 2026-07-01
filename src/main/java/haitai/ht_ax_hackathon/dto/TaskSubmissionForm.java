@@ -1,6 +1,7 @@
 package haitai.ht_ax_hackathon.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,9 @@ import java.util.List;
 @Getter
 @Setter
 public class TaskSubmissionForm {
+
+    @NotNull(message = "제출할 신청 정보가 비어 있습니다. 신청현황에서 다시 들어와 주세요.")
+    private Long applicationId;
 
     @NotBlank(message = "대표 전화번호가 비어 있습니다. 신청현황에서 다시 들어와 주세요.")
     private String representativePhone;

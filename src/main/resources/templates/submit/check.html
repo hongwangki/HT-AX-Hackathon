@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 제출 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260615-submit-check')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page status-page">
+<main class="page-shell status-shell">
+    <section class="status-panel">
+        <header class="page-header">
+            <img class="status-panel-logo" th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <span class="eyebrow">HT AX HACKATHON</span>
+            <div>
+                <h1>과제 제출</h1>
+                <p>승인된 신청 내역을 확인한 뒤 과제를 제출합니다.</p>
+            </div>
+        </header>
+
+        <form class="card form-card submit-check-form" th:action="@{/submit/lookup}" th:object="${statusCheckForm}" method="post">
+            <div class="global-errors submit-check-error" th:if="${flashError != null}">
+                <p th:text="${flashError}">오류 메시지</p>
+            </div>
+            <div class="global-errors submit-check-error" th:if="${#fields.hasGlobalErrors()}">
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}">오류 메시지</p>
+            </div>
+
+            <section class="form-section">
+                <label class="field">
+                    <span>대표 전화번호 <b>*</b></span>
+                    <div class="status-input-wrap">
+                        <span class="status-input-icon status-input-icon-phone" aria-hidden="true"></span>
+                        <input type="tel" th:field="*{representativePhone}" placeholder="예: 01012345678" inputmode="numeric" maxlength="11" pattern="[0-9]*">
+                    </div>
+                    <small class="field-error" th:errors="*{representativePhone}"></small>
+                </label>
+                <label class="field">
+                    <span>비밀번호 <b>*</b></span>
+                    <div class="status-input-wrap">
+                        <span class="status-input-icon status-input-icon-lock" aria-hidden="true"></span>
+                        <input type="password" th:field="*{password}" placeholder="신청 시 입력한 비밀번호" autocomplete="current-password">
+                        <button class="password-toggle" type="button" aria-label="비밀번호 보기" aria-pressed="false"></button>
+                    </div>
+                    <small class="field-error" th:errors="*{password}"></small>
+                </label>
+            </section>
+
+            <div class="form-actions">
+                <a class="button button-ghost" th:href="@{/}">처음으로</a>
+                <button class="button button-primary" type="submit">승인 내역 확인</button>
+            </div>
+        </form>
+    </section>
+    <footer class="site-footer">© 2026 HT AX. All rights reserved.</footer>
+</main>
+<script th:src="@{/js/password-toggle.js(v='20260615')}"></script>
+</body>
+</html>

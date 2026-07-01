@@ -1,14 +1,12 @@
 package haitai.ht_ax_hackathon.controller;
 
 import haitai.ht_ax_hackathon.domain.ApplicationCategory;
-import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.ApplicationForm;
 import haitai.ht_ax_hackathon.dto.StatusCheckForm;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
 import haitai.ht_ax_hackathon.service.StatusAccessService;
-import haitai.ht_ax_hackathon.service.TaskSubmissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -26,7 +25,6 @@ public class ApplicationController {
 
     private final HackathonApplicationService applicationService;
     private final StatusAccessService statusAccessService;
-    private final TaskSubmissionService submissionService;
 
     /** Select-box options for the apply form, available on every render including validation errors. */
     @ModelAttribute("categories")
@@ -87,12 +85,21 @@ public class ApplicationController {
         return "status/check";
     }
 
-    /** Renders the result directly (no redirect) so credentials never appear in the URL. */
+    @GetMapping("/status/result")
+    public String statusResult(Model model) {
+        if (!model.containsAttribute("applications") || !model.containsAttribute("statusCheckForm")) {
+            return "redirect:/status";
+        }
+        model.addAttribute("applyOpen", statusAccessService.isApplyOpen());
+        return "status/list";
+    }
+
+    /** Redirects after a successful lookup so browser back/refresh never resubmits the form. */
     @PostMapping("/status")
     public String checkStatus(
             @Valid @ModelAttribute("statusCheckForm") StatusCheckForm form,
             BindingResult bindingResult,
-            Model model
+            RedirectAttributes redirectAttributes
     ) {
         if (bindingResult.hasErrors()) {
             return "status/check";
@@ -106,15 +113,8 @@ public class ApplicationController {
             return "status/check";
         }
 
-        model.addAttribute("applications", applications);
-        model.addAttribute("submissionOpen", statusAccessService.isSubmissionOpen());
-        model.addAttribute("applyOpen", statusAccessService.isApplyOpen());
-        // The newest approved application is the one a task submission attaches to.
-        applications.stream()
-                .filter(application -> application.getStatus() == ApplicationStatus.APPROVED)
-                .findFirst()
-                .ifPresent(approved -> model.addAttribute(
-                        "mySubmission", submissionService.findByApplication(approved.getId()).orElse(null)));
-        return "status/list";
+        redirectAttributes.addFlashAttribute("statusCheckForm", form);
+        redirectAttributes.addFlashAttribute("applications", applications);
+        return "redirect:/status/result";
     }
 }
