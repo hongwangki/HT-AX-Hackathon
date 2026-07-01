@@ -39,3 +39,4 @@ out/
 ### Local environment and uploaded files ###
 .env
 uploads/
+.claude/
