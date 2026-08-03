@@ -3,6 +3,7 @@ package haitai.ht_ax_hackathon.controller;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.domain.TaskSubmission;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
+import haitai.ht_ax_hackathon.service.HackathonApplicationService;
 import haitai.ht_ax_hackathon.service.StatusAccessService;
 import haitai.ht_ax_hackathon.service.TaskSubmissionService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class AdminSubmissionController {
 
     private final TaskSubmissionService submissionService;
+    private final HackathonApplicationService applicationService;
     private final StatusAccessService statusAccessService;
 
     /** Approved teams only, each with its submission (or lack of one). */
@@ -39,6 +41,16 @@ public class AdminSubmissionController {
         model.addAttribute("submittedCount", submissions.size());
         model.addAttribute("submissionOpen", statusAccessService.isSubmissionOpen());
         return "admin/submission-list";
+    }
+
+    /** Shows the original approved task and the submitted result together. */
+    @GetMapping("/{applicationId}")
+    public String submissionDetail(@PathVariable Long applicationId, Model model) {
+        HackathonApplication application = applicationService.findApplication(applicationId);
+        TaskSubmission submission = submissionService.findByApplication(applicationId).orElse(null);
+        model.addAttribute("hackathonApplication", application);
+        model.addAttribute("submission", submission);
+        return "admin/submission-detail";
     }
 
     @GetMapping("/{applicationId}/files/{fileId}/download")

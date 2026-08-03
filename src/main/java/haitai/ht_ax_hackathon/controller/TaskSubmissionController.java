@@ -4,6 +4,7 @@ import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.dto.StatusCheckForm;
 import haitai.ht_ax_hackathon.dto.TaskSubmissionForm;
 import haitai.ht_ax_hackathon.exception.FileStorageException;
+import haitai.ht_ax_hackathon.exception.TaskSubmissionSizeExceededException;
 import haitai.ht_ax_hackathon.service.StatusAccessService;
 import haitai.ht_ax_hackathon.service.TaskSubmissionService;
 import jakarta.validation.Valid;
@@ -124,6 +125,8 @@ public class TaskSubmissionController {
             model.addAttribute("saved", true);
         } catch (FileStorageException exception) {
             bindingResult.reject("file.upload.failed", exception.getMessage());
+        } catch (TaskSubmissionSizeExceededException exception) {
+            bindingResult.reject("file.upload.tooLarge", exception.getMessage());
         }
 
         addFormModel(model, application.get(), form);

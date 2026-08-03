@@ -389,7 +389,21 @@ class HtAxHackathonApplicationTests {
 
         mockMvc.perform(get("/admin/submissions"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("admin/submission-list"));
+                .andExpect(view().name("admin/submission-list"))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "/admin/submissions/" + id)));
+
+        mockMvc.perform(get("/admin/submissions/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/submission-detail"))
+                .andExpect(model().attribute("hackathonApplication",
+                        org.hamcrest.Matchers.hasProperty("topic",
+                                org.hamcrest.Matchers.is("Submission Topic"))))
+                .andExpect(model().attribute("submission",
+                        org.hamcrest.Matchers.hasProperty("summary",
+                                org.hamcrest.Matchers.is("Demo agent"))))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Submission content")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("deck.pptx")));
 
         mockMvc.perform(get("/admin/submissions/{id}/files/{fileId}/download", id, fileId))
                 .andExpect(status().isOk())

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 제출 상세 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260729-submission-detail')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page admin-detail-page admin-submission-detail-page">
+<main class="page-shell admin-shell admin-detail-shell">
+    <header class="page-header admin-detail-header">
+        <div class="admin-detail-brand">
+            <img th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <div>
+                <h1>과제 제출 상세</h1>
+                <p>선정된 과제와 제출 결과를 함께 확인합니다.</p>
+            </div>
+        </div>
+        <a class="button button-secondary admin-detail-back" th:href="@{/admin/submissions}">← 목록으로 돌아가기</a>
+    </header>
+
+    <section class="card admin-detail-panel">
+        <div class="admin-detail-hero">
+            <span class="admin-status-chip"
+                  th:classappend="${submission != null} ? ' admin-status-approved' : ' admin-status-reviewing'"
+                  th:text="${submission != null} ? '제출' : '미제출'">제출</span>
+            <div>
+                <h2 th:text="${hackathonApplication.teamName}">팀명</h2>
+                <p th:text="${hackathonApplication.topic}">과제 제목</p>
+            </div>
+            <dl class="admin-detail-date">
+                <dt th:text="${submission != null} ? '최종 제출일시' : '신청일시'">최종 제출일시</dt>
+                <dd th:if="${submission != null}"
+                    th:text="${#temporals.format(submission.updatedAt, 'yyyy-MM-dd HH:mm')}">2026-07-29 12:00</dd>
+                <dd th:if="${submission == null}"
+                    th:text="${#temporals.format(hackathonApplication.createdAt, 'yyyy-MM-dd HH:mm')}">2026-07-29 12:00</dd>
+            </dl>
+        </div>
+
+        <section class="admin-detail-section">
+            <h3>선정된 과제</h3>
+            <dl class="admin-info-grid">
+                <div>
+                    <dt><span class="admin-info-icon"></span> 분류</dt>
+                    <dd th:text="${hackathonApplication.category?.label ?: '-'}">분류</dd>
+                </div>
+                <div>
+                    <dt><span class="admin-info-icon"></span> 팀명</dt>
+                    <dd th:text="${hackathonApplication.teamName}">팀명</dd>
+                </div>
+                <div class="admin-info-full">
+                    <dt><span class="admin-info-icon"></span> 제목</dt>
+                    <dd th:text="${hackathonApplication.topic}">과제 제목</dd>
+                </div>
+                <div class="admin-info-full">
+                    <dt><span class="admin-info-icon"></span> 내용</dt>
+                    <dd class="pre-line" th:text="${hackathonApplication.content}">과제 내용</dd>
+                </div>
+            </dl>
+        </section>
+
+        <section class="admin-detail-section submission-result-section">
+            <h3>과제 제출 내용</h3>
+
+            <div class="admin-empty-file submission-empty-state" th:if="${submission == null}">
+                <strong>아직 제출된 과제가 없습니다.</strong>
+                <span>제출이 완료되면 설명과 첨부 파일이 이곳에 표시됩니다.</span>
+            </div>
+
+            <th:block th:if="${submission != null}">
+                <dl class="admin-info-grid submission-info-grid">
+                    <div class="admin-info-full">
+                        <dt><span class="admin-info-icon"></span> 한 줄 설명</dt>
+                        <dd class="pre-line" th:text="${submission.summary ?: '작성된 설명이 없습니다.'}">한 줄 설명</dd>
+                    </div>
+                    <div class="admin-info-full">
+                        <dt><span class="admin-info-icon"></span> 데모 / 참고 URL</dt>
+                        <dd th:if="${submission.demoUrl != null}">
+                            <a class="file-link" th:href="${submission.demoUrl}" th:text="${submission.demoUrl}"
+                               target="_blank" rel="noopener noreferrer">URL</a>
+                        </dd>
+                        <dd th:if="${submission.demoUrl == null}">등록된 URL이 없습니다.</dd>
+                    </div>
+                    <div>
+                        <dt><span class="admin-info-icon"></span> 최초 제출</dt>
+                        <dd th:text="${#temporals.format(submission.createdAt, 'yyyy-MM-dd HH:mm')}">일시</dd>
+                    </div>
+                    <div>
+                        <dt><span class="admin-info-icon"></span> 최종 수정</dt>
+                        <dd th:text="${#temporals.format(submission.updatedAt, 'yyyy-MM-dd HH:mm')}">일시</dd>
+                    </div>
+                </dl>
+
+                <div class="submission-files-panel">
+                    <div class="admin-sub-heading">
+                        <h3>제출 파일 <small th:text="${#lists.size(submission.files)} + '개'">0개</small></h3>
+                    </div>
+                    <ul class="admin-file-list" th:if="${!#lists.isEmpty(submission.files)}">
+                        <li th:each="file : ${submission.files}">
+                            <a class="admin-file-link"
+                               th:href="@{/admin/submissions/{applicationId}/files/{fileId}/download(applicationId=${hackathonApplication.id},fileId=${file.id})}"
+                               th:title="${file.originalFileName}">
+                                <span class="admin-file-icon" aria-hidden="true"></span>
+                                <span class="admin-file-name" th:text="${file.originalFileName}">파일명</span>
+                            </a>
+                            <span class="admin-file-size">
+                                <span th:if="${file.fileSize >= 1048576}"
+                                      th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">1.0 MB</span>
+                                <span th:if="${file.fileSize >= 1024 and file.fileSize < 1048576}"
+                                      th:text="${#numbers.formatDecimal(file.fileSize / 1024.0, 1, 1)} + ' KB'">1.0 KB</span>
+                                <span th:if="${file.fileSize < 1024}"
+                                      th:text="${file.fileSize} + ' B'">0 B</span>
+                            </span>
+                        </li>
+                    </ul>
+                    <div class="admin-empty-file" th:if="${#lists.isEmpty(submission.files)}">
+                        <strong>제출된 파일이 없습니다.</strong>
+                        <span>파일이 제출되면 이곳에서 다운로드할 수 있습니다.</span>
+                    </div>
+                </div>
+            </th:block>
+        </section>
+    </section>
+
+    <div class="detail-actions">
+        <a class="button button-secondary" th:href="@{/admin/submissions}">목록으로 돌아가기</a>
+    </div>
+</main>
+</body>
+</html>

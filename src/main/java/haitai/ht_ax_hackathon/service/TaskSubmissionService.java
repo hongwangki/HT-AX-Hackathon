@@ -6,6 +6,7 @@ import haitai.ht_ax_hackathon.domain.TaskSubmission;
 import haitai.ht_ax_hackathon.domain.TaskSubmissionFile;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
 import haitai.ht_ax_hackathon.exception.AttachmentFileNotFoundException;
+import haitai.ht_ax_hackathon.exception.TaskSubmissionSizeExceededException;
 import haitai.ht_ax_hackathon.repository.HackathonApplicationRepository;
 import haitai.ht_ax_hackathon.repository.TaskSubmissionRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TaskSubmissionService {
+
+    private static final long MAX_SUBMISSION_SIZE = 500L * 1024 * 1024;
 
     private final TaskSubmissionRepository submissionRepository;
     private final HackathonApplicationRepository applicationRepository;
@@ -68,6 +71,16 @@ public class TaskSubmissionService {
         HackathonApplication application = applicationRepository.getReferenceById(applicationId);
         TaskSubmission submission = submissionRepository.findByApplicationId(applicationId)
                 .orElseGet(() -> new TaskSubmission(application, null, null));
+        long existingFileSize = submission.getFiles().stream()
+                .mapToLong(TaskSubmissionFile::getFileSize)
+                .sum();
+        long newFileSize = attachments.stream()
+                .filter(file -> file != null && !file.isEmpty())
+                .mapToLong(MultipartFile::getSize)
+                .sum();
+        if (existingFileSize + newFileSize > MAX_SUBMISSION_SIZE) {
+            throw new TaskSubmissionSizeExceededException();
+        }
         submission.updateDetails(blankToNull(summary), blankToNull(demoUrl));
 
         List<TaskSubmissionFile> storedFiles = new ArrayList<>();

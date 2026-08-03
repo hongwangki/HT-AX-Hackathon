@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MaxUploadSizeExceededException.class, MultipartException.class})
     public String handleUploadTooLarge(Exception exception, Model model) {
         model.addAttribute("message",
-                "첨부파일 용량이 허용 범위를 초과했습니다. 파일당 100MB, 전체 200MB 이하로 올려 주세요.");
+                "첨부파일 총합은 최대 500MB까지 가능합니다.");
         return "error";
     }
 }
