@@ -421,7 +421,7 @@ class HtAxHackathonApplicationTests {
                 .andReturn();
         assertThat(ContentDisposition.parse(fileDownloadResult.getResponse()
                         .getHeader(HttpHeaders.CONTENT_DISPOSITION)).getFilename())
-                .isEqualTo("홍길동_홍길길_deck.pptx");
+                .isEqualTo("Submission Team_홍길동_홍길길_deck.pptx");
 
         MvcResult asyncArchiveResult = mockMvc.perform(
                         get("/admin/submissions/{id}/files/download-all", id))
@@ -433,7 +433,7 @@ class HtAxHackathonApplicationTests {
                 .andReturn();
         assertThat(ContentDisposition.parse(archiveDownloadResult.getResponse()
                         .getHeader(HttpHeaders.CONTENT_DISPOSITION)).getFilename())
-                .isEqualTo("홍길동_홍길길_과제제출파일.zip");
+                .isEqualTo("Submission Team_과제제출파일.zip");
         try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(
                 archiveDownloadResult.getResponse().getContentAsByteArray()))) {
             assertThat(zipInputStream.getNextEntry().getName()).isEqualTo("홍길동_홍길길_deck.pptx");

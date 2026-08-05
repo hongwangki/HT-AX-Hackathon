@@ -155,7 +155,10 @@ public class TaskSubmissionService {
                         file.getContentType()
                 ))
                 .toList();
-        return new SubmissionArchiveDownload(files, memberPrefix + "_과제제출파일.zip");
+        return new SubmissionArchiveDownload(
+                files,
+                sanitizeFileName(submission.getApplication().getTeamName()) + "_과제제출파일.zip"
+        );
     }
 
     private TaskSubmissionFile findFile(TaskSubmission submission, Long fileId) {
@@ -166,7 +169,10 @@ public class TaskSubmissionService {
     }
 
     private String createDownloadFileName(HackathonApplication application, String originalFileName) {
-        return createMemberPrefix(application) + "_" + sanitizeFileName(originalFileName);
+        String teamName = sanitizeFileName(application.getTeamName());
+        String memberPrefix = createMemberPrefix(application);
+        String prefix = teamName.equals(memberPrefix) ? teamName : teamName + "_" + memberPrefix;
+        return prefix + "_" + sanitizeFileName(originalFileName);
     }
 
     private String createMemberPrefix(HackathonApplication application) {
