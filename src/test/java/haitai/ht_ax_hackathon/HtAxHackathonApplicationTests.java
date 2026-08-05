@@ -412,6 +412,11 @@ class HtAxHackathonApplicationTests {
                         org.hamcrest.Matchers.hasProperty("summary",
                                 org.hamcrest.Matchers.is("Demo agent"))))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Submission content")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("구성 인원")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("4000004")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("홍길동")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("4000005")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("홍길길")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("deck.pptx")));
 
         MvcResult fileDownloadResult = mockMvc.perform(

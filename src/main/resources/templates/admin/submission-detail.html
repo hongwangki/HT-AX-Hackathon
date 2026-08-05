@@ -58,6 +58,26 @@
                     <dd class="pre-line" th:text="${hackathonApplication.content}">과제 내용</dd>
                 </div>
             </dl>
+
+            <div class="admin-sub-panel submission-members-panel">
+                <div class="admin-sub-heading">
+                    <h3>구성 인원 <small th:text="${#lists.size(hackathonApplication.members)} + '명'">1명</small></h3>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr><th>소속</th><th>사번</th><th>이름</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="member : ${hackathonApplication.members}">
+                            <td th:text="${member.department}">소속</td>
+                            <td th:text="${member.employeeNo}">사번</td>
+                            <td th:text="${member.name}">이름</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </section>
 
         <section class="admin-detail-section submission-result-section">
