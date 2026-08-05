@@ -8,24 +8,30 @@ import haitai.ht_ax_hackathon.service.HackathonApplicationService;
 import haitai.ht_ax_hackathon.service.TaskSubmissionService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.zip.ZipInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -310,7 +316,10 @@ class HtAxHackathonApplicationTests {
                         .param("password", "submit123")
                         .param("members[0].department", "AX Team")
                         .param("members[0].employeeNo", "4000004")
-                        .param("members[0].name", "Tester")
+                        .param("members[0].name", "홍길동")
+                        .param("members[1].department", "AX Team")
+                        .param("members[1].employeeNo", "4000005")
+                        .param("members[1].name", "홍길길")
                         .param("category", "MARKETING")
                         .param("topic", "Submission Topic")
                         .param("content", "Submission content")
@@ -405,9 +414,32 @@ class HtAxHackathonApplicationTests {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Submission content")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("deck.pptx")));
 
-        mockMvc.perform(get("/admin/submissions/{id}/files/{fileId}/download", id, fileId))
+        MvcResult fileDownloadResult = mockMvc.perform(
+                        get("/admin/submissions/{id}/files/{fileId}/download", id, fileId))
                 .andExpect(status().isOk())
-                .andExpect(content().bytes("slides".getBytes()));
+                .andExpect(content().bytes("slides".getBytes()))
+                .andReturn();
+        assertThat(ContentDisposition.parse(fileDownloadResult.getResponse()
+                        .getHeader(HttpHeaders.CONTENT_DISPOSITION)).getFilename())
+                .isEqualTo("홍길동_홍길길_deck.pptx");
+
+        MvcResult asyncArchiveResult = mockMvc.perform(
+                        get("/admin/submissions/{id}/files/download-all", id))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+        MvcResult archiveDownloadResult = mockMvc.perform(asyncDispatch(asyncArchiveResult))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/zip"))
+                .andReturn();
+        assertThat(ContentDisposition.parse(archiveDownloadResult.getResponse()
+                        .getHeader(HttpHeaders.CONTENT_DISPOSITION)).getFilename())
+                .isEqualTo("홍길동_홍길길_과제제출파일.zip");
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(
+                archiveDownloadResult.getResponse().getContentAsByteArray()))) {
+            assertThat(zipInputStream.getNextEntry().getName()).isEqualTo("홍길동_홍길길_deck.pptx");
+            assertThat(zipInputStream.readAllBytes()).isEqualTo("slides".getBytes());
+            assertThat(zipInputStream.getNextEntry()).isNull();
+        }
 
         mockMvc.perform(post("/submit/files/{fileId}/delete", fileId).with(csrf())
                         .param("applicationId", id.toString())

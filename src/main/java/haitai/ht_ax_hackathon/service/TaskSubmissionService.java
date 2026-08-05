@@ -4,7 +4,9 @@ import haitai.ht_ax_hackathon.domain.ApplicationStatus;
 import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.domain.TaskSubmission;
 import haitai.ht_ax_hackathon.domain.TaskSubmissionFile;
+import haitai.ht_ax_hackathon.domain.TeamMember;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
+import haitai.ht_ax_hackathon.dto.SubmissionArchiveDownload;
 import haitai.ht_ax_hackathon.exception.AttachmentFileNotFoundException;
 import haitai.ht_ax_hackathon.exception.TaskSubmissionSizeExceededException;
 import haitai.ht_ax_hackathon.repository.HackathonApplicationRepository;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -135,9 +138,24 @@ public class TaskSubmissionService {
         TaskSubmissionFile file = findFile(submission, fileId);
         return new AttachmentDownload(
                 fileStorageService.loadAsResource(file.getFilePath()),
-                file.getOriginalFileName(),
+                createDownloadFileName(submission.getApplication(), file.getOriginalFileName()),
                 file.getContentType()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public SubmissionArchiveDownload getAllFilesDownload(Long applicationId) {
+        TaskSubmission submission = submissionRepository.findByApplicationId(applicationId)
+                .orElseThrow(() -> new AttachmentFileNotFoundException("제출된 과제를 찾을 수 없습니다."));
+        String memberPrefix = createMemberPrefix(submission.getApplication());
+        List<AttachmentDownload> files = submission.getFiles().stream()
+                .map(file -> new AttachmentDownload(
+                        fileStorageService.loadAsResource(file.getFilePath()),
+                        memberPrefix + "_" + sanitizeFileName(file.getOriginalFileName()),
+                        file.getContentType()
+                ))
+                .toList();
+        return new SubmissionArchiveDownload(files, memberPrefix + "_과제제출파일.zip");
     }
 
     private TaskSubmissionFile findFile(TaskSubmission submission, Long fileId) {
@@ -145,6 +163,30 @@ public class TaskSubmissionService {
                 .filter(item -> item.getId().equals(fileId))
                 .findFirst()
                 .orElseThrow(() -> new AttachmentFileNotFoundException(fileId));
+    }
+
+    private String createDownloadFileName(HackathonApplication application, String originalFileName) {
+        return createMemberPrefix(application) + "_" + sanitizeFileName(originalFileName);
+    }
+
+    private String createMemberPrefix(HackathonApplication application) {
+        String memberNames = application.getMembers().stream()
+                .sorted(Comparator.comparing(TeamMember::getId, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(TeamMember::getName)
+                .map(this::sanitizeFileName)
+                .filter(name -> !name.isBlank())
+                .collect(Collectors.joining("_"));
+        return memberNames.isBlank() ? sanitizeFileName(application.getTeamName()) : memberNames;
+    }
+
+    private String sanitizeFileName(String fileName) {
+        if (fileName == null) {
+            return "attachment";
+        }
+        String sanitized = fileName
+                .replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_")
+                .strip();
+        return sanitized.isBlank() ? "attachment" : sanitized;
     }
 
     private String blankToNull(String value) {

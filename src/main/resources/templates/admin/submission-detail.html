@@ -95,6 +95,9 @@
                 <div class="submission-files-panel">
                     <div class="admin-sub-heading">
                         <h3>제출 파일 <small th:text="${#lists.size(submission.files)} + '개'">0개</small></h3>
+                        <a class="button button-secondary button-small"
+                           th:if="${!#lists.isEmpty(submission.files)}"
+                           th:href="@{/admin/submissions/{applicationId}/files/download-all(applicationId=${hackathonApplication.id})}">모두 받기</a>
                     </div>
                     <ul class="admin-file-list" th:if="${!#lists.isEmpty(submission.files)}">
                         <li th:each="file : ${submission.files}">
