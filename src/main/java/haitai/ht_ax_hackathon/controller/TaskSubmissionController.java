@@ -112,7 +112,7 @@ public class TaskSubmissionController {
         }
 
         if (!statusAccessService.isSubmissionOpen()) {
-            bindingResult.reject("submission.closed", "과제 제출 기간이 아닙니다.");
+            bindingResult.reject("submission.closed", "과제 제출이 마감되었습니다.");
         }
         if (bindingResult.hasErrors()) {
             addFormModel(model, application.get(), form);

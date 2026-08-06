@@ -79,6 +79,16 @@ a { text-decoration: none; }
 .button-secondary { color: var(--primary); border-color: #dcd9fa; background: var(--primary-soft); }
 .button-ghost { color: #626a81; border-color: var(--line); background: #fff; }
 .button-danger { color: #fff; background: var(--danger); }
+.button:disabled,
+.button:disabled:hover {
+    color: #98a0b0 !important;
+    border-color: #e3e6ec !important;
+    background: #f4f5f8 !important;
+    box-shadow: none !important;
+    cursor: not-allowed;
+    opacity: 1;
+    transform: none;
+}
 .text-button { padding: 3px 0; border: 0; color: var(--danger); background: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 700; }
 
 .form-card { padding: 5px 34px; }
