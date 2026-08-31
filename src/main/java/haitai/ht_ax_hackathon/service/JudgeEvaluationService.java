@@ -123,9 +123,8 @@ public class JudgeEvaluationService {
 
     @Transactional
     public JudgeEvaluation saveEvaluation(String username, Long applicationId,
-                                          JudgeEvaluationForm form,
-                                          JudgeEvaluationStatus requestedStatus) {
-        validateScores(form, requestedStatus);
+                                          JudgeEvaluationForm form) {
+        validateScores(form);
         Judge judge = findJudge(username);
         requireEvaluationTarget(applicationId);
         TaskSubmission submission = submissionRepository.findDetailByApplicationId(applicationId)
@@ -138,8 +137,7 @@ public class JudgeEvaluationService {
                 form.getManagementEffectScore(),
                 form.getFieldUsabilityScore(),
                 form.getExpandabilityScore(),
-                form.getInnovationScore(),
-                requestedStatus
+                form.getInnovationScore()
         );
         return evaluationRepository.save(evaluation);
     }
@@ -160,14 +158,11 @@ public class JudgeEvaluationService {
         );
     }
 
-    private void validateScores(JudgeEvaluationForm form, JudgeEvaluationStatus requestedStatus) {
+    private void validateScores(JudgeEvaluationForm form) {
         requireRange(form.getManagementEffectScore(), 30, "경영효과");
         requireRange(form.getFieldUsabilityScore(), 30, "현업 활용 가능성");
         requireRange(form.getExpandabilityScore(), 20, "타부서 적용 가능성");
         requireRange(form.getInnovationScore(), 20, "혁신·창의성");
-        if (requestedStatus == JudgeEvaluationStatus.SUBMITTED && !form.isComplete()) {
-            throw new IllegalArgumentException("평가 완료 전 모든 항목의 점수를 입력해 주세요.");
-        }
     }
 
     private void requireRange(Integer value, int maximum, String fieldName) {

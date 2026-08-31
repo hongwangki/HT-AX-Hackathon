@@ -72,20 +72,21 @@ public class JudgeEvaluation {
         this.application = application;
     }
 
+    /**
+     * 심사자는 언제든 점수를 고칠 수 있습니다. 네 항목이 모두 채워지면 평가 완료로 보고,
+     * 하나라도 비어 있으면 임시 저장 상태로 되돌립니다. 별도의 완료 버튼은 없습니다.
+     */
     public void saveScores(Integer managementEffectScore, Integer fieldUsabilityScore,
-                           Integer expandabilityScore, Integer innovationScore,
-                           JudgeEvaluationStatus requestedStatus) {
-        if (status == JudgeEvaluationStatus.SUBMITTED) {
-            throw new IllegalStateException("완료된 평가는 수정할 수 없습니다.");
-        }
+                           Integer expandabilityScore, Integer innovationScore) {
         this.managementEffectScore = managementEffectScore;
         this.fieldUsabilityScore = fieldUsabilityScore;
         this.expandabilityScore = expandabilityScore;
         this.innovationScore = innovationScore;
-        this.status = requestedStatus;
-        this.submittedAt = requestedStatus == JudgeEvaluationStatus.SUBMITTED
-                ? LocalDateTime.now()
-                : null;
+
+        boolean complete = managementEffectScore != null && fieldUsabilityScore != null
+                && expandabilityScore != null && innovationScore != null;
+        this.status = complete ? JudgeEvaluationStatus.SUBMITTED : JudgeEvaluationStatus.DRAFT;
+        this.submittedAt = complete ? LocalDateTime.now() : null;
     }
 
     public int getTotalScore() {

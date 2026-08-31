@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -78,27 +77,16 @@ public class JudgeController {
     @PostMapping("/judge/evaluations/{applicationId}")
     public String saveEvaluation(
             @PathVariable Long applicationId,
-            @RequestParam(defaultValue = "DRAFT") String action,
             @Valid @ModelAttribute("evaluationForm") JudgeEvaluationForm form,
             BindingResult bindingResult,
             Principal principal,
             Model model
     ) {
-        JudgeEvaluationStatus requestedStatus = parseStatus(action, bindingResult);
-        if (requestedStatus == JudgeEvaluationStatus.SUBMITTED && !form.isComplete()) {
-            bindingResult.reject("scores.required", "평가 완료 전 모든 항목의 점수를 입력해 주세요.");
-        }
-
         if (!bindingResult.hasErrors()) {
             try {
-                evaluationService.saveEvaluation(
-                        principal.getName(), applicationId, form, requestedStatus
-                );
-                String result = requestedStatus == JudgeEvaluationStatus.SUBMITTED
-                        ? "submitted"
-                        : "saved";
-                return "redirect:/judge/evaluations?applicationId=" + applicationId + "&" + result;
-            } catch (IllegalArgumentException | IllegalStateException exception) {
+                evaluationService.saveEvaluation(principal.getName(), applicationId, form);
+                return "redirect:/judge/evaluations?applicationId=" + applicationId + "&saved";
+            } catch (IllegalArgumentException exception) {
                 bindingResult.reject("evaluation.save", exception.getMessage());
             }
         }
@@ -133,19 +121,8 @@ public class JudgeController {
         model.addAttribute("evaluation", detail.evaluation().orElse(null));
         model.addAttribute("guideOverview", detail.guideOverview().orElse(null));
         model.addAttribute("guideItems", detail.guideItems());
-        model.addAttribute("evaluationLocked", detail.evaluation()
-                .map(item -> item.getStatus() == JudgeEvaluationStatus.SUBMITTED)
-                .orElse(false));
     }
 
-    private JudgeEvaluationStatus parseStatus(String action, BindingResult bindingResult) {
-        try {
-            return JudgeEvaluationStatus.valueOf(action);
-        } catch (IllegalArgumentException exception) {
-            bindingResult.reject("evaluation.action", "올바르지 않은 저장 요청입니다.");
-            return JudgeEvaluationStatus.DRAFT;
-        }
-    }
 
     private MediaType resolveContentType(String contentType) {
         try {

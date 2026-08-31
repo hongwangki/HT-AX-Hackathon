@@ -125,9 +125,9 @@ class JudgeFeatureTests {
                 .andExpect(content().string(containsString("번호가 있는 과제")))
                 .andExpect(content().string(not(containsString("번호 대상팀"))))
                 .andExpect(content().string(not(containsString("번호가 없는 과제"))))
-                .andExpect(content().string(containsString("실무자 의견")))
-                .andExpect(content().string(containsString("80점")))
-                .andExpect(content().string(containsString("미부여")));
+                // 목록은 한 줄로 압축되어 점수를 짧은 라벨과 숫자만으로 보여줍니다.
+                .andExpect(content().string(containsString("실무자 의견 점수")))
+                .andExpect(content().string(containsString(">80<")));
 
         mockMvc.perform(get("/judge/evaluations/{id}", numberedApplicationId)
                         .with(user("judge-test").roles("JUDGE")))
@@ -141,15 +141,16 @@ class JudgeFeatureTests {
                 .andExpect(content().string(containsString("번호가 있는 과제")))
                 .andExpect(content().string(containsString("가이드 요약")))
                 .andExpect(content().string(containsString("실무자 검토의견")))
-                .andExpect(content().string(containsString("data-judge-tab=\"content\"")))
-                .andExpect(content().string(containsString("data-judge-tab=\"evaluation\"")))
-                .andExpect(content().string(containsString("data-judge-tab-panel=\"content\"")))
-                .andExpect(content().string(containsString("data-judge-tab-panel=\"evaluation\"")))
-                .andExpect(content().string(containsString("data-evaluation-action-field")))
-                .andExpect(content().string(containsString("data-evaluation-action=\"DRAFT\"")))
+                // 과제 내용과 평가는 한 화면으로 합쳤으므로 탭 마크업은 더 이상 없습니다.
+                .andExpect(content().string(not(containsString("data-judge-tab"))))
+                .andExpect(content().string(containsString("<dt>한 줄 요약</dt>")))
+                // 임시 저장과 잠금을 없앴으므로 저장 버튼 하나만 있습니다.
+                .andExpect(content().string(not(containsString("data-evaluation-action"))))
+                .andExpect(content().string(not(containsString("임시 저장"))))
                 .andExpect(content().string(containsString("judge-review-layout")))
                 .andExpect(content().string(containsString("judge-score-list")))
                 .andExpect(content().string(containsString("judge-practitioner-list")))
+                .andExpect(content().string(containsString(" / 20점")))
                 .andExpect(content().string(not(containsString("번호 대상팀"))))
                 .andExpect(content().string(not(containsString("<dt>분류</dt>"))));
 
@@ -182,51 +183,48 @@ class JudgeFeatureTests {
     }
 
     @Test
-    void judgeCanSaveDraftAndSubmitEvaluation() throws Exception {
+    void partialScoresStayEditableAndCompleteOnesCountTowardTheRanking() throws Exception {
+        // 일부만 입력하면 작성 중으로 남고 순위에는 들어가지 않습니다.
         mockMvc.perform(post("/judge/evaluations/{id}", numberedApplicationId)
                         .with(user("judge-test").roles("JUDGE"))
                         .with(csrf())
                         .param("managementEffectScore", "24")
-                        .param("fieldUsabilityScore", "25")
-                        .param("expandabilityScore", "16")
-                        .param("innovationScore", "17")
-                        .param("action", "DRAFT"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/judge/evaluations?applicationId=" + numberedApplicationId + "&saved"));
-
-        mockMvc.perform(post("/judge/evaluations/{id}", numberedApplicationId)
-                        .with(user("judge-test").roles("JUDGE"))
-                        .with(csrf())
-                        .param("managementEffectScore", "25")
-                        .param("fieldUsabilityScore", "26")
-                        .param("expandabilityScore", "17")
-                        .param("innovationScore", "18")
-                        .param("action", "DRAFT"))
+                        .param("fieldUsabilityScore", "25"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/judge/evaluations?applicationId=" + numberedApplicationId + "&saved"));
 
         var draft = evaluationRepository.findAll().get(0);
         assertThat(draft.getStatus()).isEqualTo(JudgeEvaluationStatus.DRAFT);
-        assertThat(draft.getTotalScore()).isEqualTo(86);
         assertThat(judgeEvaluationService.findEvaluationTargets("judge-test").get(0).totalScore())
                 .isNull();
 
+        // 네 항목을 모두 채우면 평가 완료가 됩니다.
         mockMvc.perform(post("/judge/evaluations/{id}", numberedApplicationId)
                         .with(user("judge-test").roles("JUDGE"))
                         .with(csrf())
                         .param("managementEffectScore", "25")
                         .param("fieldUsabilityScore", "26")
                         .param("expandabilityScore", "17")
-                        .param("innovationScore", "18")
-                        .param("action", "SUBMITTED"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/judge/evaluations?applicationId=" + numberedApplicationId + "&submitted"));
+                        .param("innovationScore", "18"))
+                .andExpect(status().is3xxRedirection());
 
-        var submitted = evaluationRepository.findAll().get(0);
-        assertThat(submitted.getStatus()).isEqualTo(JudgeEvaluationStatus.SUBMITTED);
-        assertThat(submitted.getSubmittedAt()).isNotNull();
+        var completed = evaluationRepository.findAll().get(0);
+        assertThat(completed.getStatus()).isEqualTo(JudgeEvaluationStatus.SUBMITTED);
+        assertThat(completed.getSubmittedAt()).isNotNull();
         assertThat(judgeEvaluationService.findEvaluationTargets("judge-test").get(0).totalScore())
                 .isEqualTo(86);
+
+        // 완료된 평가도 계속 고칠 수 있습니다.
+        mockMvc.perform(post("/judge/evaluations/{id}", numberedApplicationId)
+                        .with(user("judge-test").roles("JUDGE"))
+                        .with(csrf())
+                        .param("managementEffectScore", "20")
+                        .param("fieldUsabilityScore", "20")
+                        .param("expandabilityScore", "10")
+                        .param("innovationScore", "10"))
+                .andExpect(status().is3xxRedirection());
+
+        assertThat(evaluationRepository.findAll().get(0).getTotalScore()).isEqualTo(60);
     }
 
     @Test

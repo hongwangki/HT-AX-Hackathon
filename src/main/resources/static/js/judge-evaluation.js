@@ -1,6 +1,5 @@
 (() => {
     const detailPane = document.getElementById('judgeDetailPane');
-    const searchInput = document.getElementById('judgeSearch');
     const statusFilter = document.getElementById('judgeStatusFilter');
     const targetRows = Array.from(document.querySelectorAll('.judge-target-row'));
     const filterEmpty = document.getElementById('judgeFilterEmpty');
@@ -27,27 +26,6 @@
     };
 
     const initializeScorePanel = root => {
-        const tabButtons = Array.from(root.querySelectorAll('.judge-detail-tabs [data-judge-tab]'));
-        const tabPanels = Array.from(root.querySelectorAll('[data-judge-tab-panel]'));
-        const selectTab = tabName => {
-            tabButtons.forEach(button => {
-                const active = button.dataset.judgeTab === tabName;
-                button.classList.toggle('is-active', active);
-                button.setAttribute('aria-selected', String(active));
-            });
-            tabPanels.forEach(panel => {
-                const active = panel.dataset.judgeTabPanel === tabName;
-                panel.classList.toggle('is-active', active);
-                panel.hidden = !active;
-            });
-        };
-        tabButtons.forEach(button => button.addEventListener('click', () => selectTab(button.dataset.judgeTab)));
-        root.querySelectorAll('[data-judge-tab-link]').forEach(link => link.addEventListener('click', () => {
-            selectTab(link.dataset.judgeTabLink);
-            root.querySelector('.judge-detail-tabs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }));
-        if (root.querySelector('.judge-flash, .judge-form-errors')) selectTab('evaluation');
-
         const scoreInputs = Array.from(root.querySelectorAll('.judge-score-input'));
         const totalScore = root.querySelector('#judgeTotalScore');
         const tableTotal = root.querySelector('#judgeTableTotal');
@@ -62,22 +40,6 @@
         };
 
         scoreInputs.forEach(input => input.addEventListener('input', updateTotal));
-
-        const submitButton = root.querySelector('[data-submit-evaluation]');
-        submitButton?.addEventListener('click', event => {
-            const hasEmptyScore = scoreInputs.some(input => input.value.trim() === '');
-            if (hasEmptyScore) return;
-            if (!window.confirm('평가를 완료하면 더 이상 수정할 수 없습니다. 완료하시겠습니까?')) {
-                event.preventDefault();
-            }
-        });
-
-        const form = root.querySelector('#judgeEvaluationForm');
-        const actionField = form?.querySelector('[data-evaluation-action-field]');
-        const actionButtons = Array.from(form?.querySelectorAll('[data-evaluation-action]') || []);
-        actionButtons.forEach(button => button.addEventListener('click', () => {
-            if (actionField) actionField.value = button.dataset.evaluationAction;
-        }));
     };
 
     const setActiveRow = applicationId => {
@@ -133,7 +95,6 @@
             const panelUrl = new URL(row.dataset.panelUrl, window.location.origin);
             if (current.searchParams.get('applicationId') === row.dataset.applicationId) {
                 if (current.searchParams.has('saved')) panelUrl.searchParams.set('saved', '');
-                if (current.searchParams.has('submitted')) panelUrl.searchParams.set('submitted', '');
             }
             const response = await fetch(panelUrl, {
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -161,15 +122,11 @@
     };
 
     const filterTargets = () => {
-        const keyword = (searchInput?.value || '').trim().toLocaleLowerCase('ko-KR');
         const status = statusFilter?.value || 'ALL';
         let visibleCount = 0;
 
         targetRows.forEach(row => {
-            const matchesKeyword = !keyword
-                || (row.dataset.search || '').toLocaleLowerCase('ko-KR').includes(keyword);
-            const matchesStatus = status === 'ALL' || row.dataset.status === status;
-            const visible = matchesKeyword && matchesStatus;
+            const visible = status === 'ALL' || row.dataset.status === status;
             row.hidden = !visible;
             if (visible) visibleCount += 1;
         });
@@ -183,7 +140,6 @@
             loadPanel(row);
         });
     });
-    searchInput?.addEventListener('input', filterTargets);
     statusFilter?.addEventListener('change', filterTargets);
     filterTargets();
     refreshProgress();
