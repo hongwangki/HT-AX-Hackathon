@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 평가 상세 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260831-judge-ranking-v21')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page judge-page judge-detail-page">
+<main class="page-shell judge-shell judge-detail-shell">
+    <header class="judge-header judge-detail-header">
+        <div class="judge-brand">
+            <img th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <div>
+                <span class="eyebrow">HT AX HACKATHON</span>
+                <h1>과제 평가</h1>
+                <p th:text="${hackathonApplication.topic}">과제 제목</p>
+            </div>
+        </div>
+        <div class="judge-header-actions">
+            <a class="button button-ghost" th:href="@{/judge/evaluations}">← 목록으로</a>
+            <form th:action="@{/judge/logout}" method="post">
+                <button class="logout-link" type="submit">로그아웃</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="judge-evaluation-panel" th:fragment="evaluationPanel">
+    <div class="judge-flash judge-flash-success"
+         th:if="${savedMessage != null or param.saved != null}">
+        평가 내용이 임시 저장되었습니다.
+    </div>
+    <div class="judge-flash judge-flash-success"
+         th:if="${submittedMessage != null or param.submitted != null}">
+        평가가 완료되었습니다. 완료된 평가는 수정할 수 없습니다.
+    </div>
+
+    <nav class="judge-detail-tabs" aria-label="과제 상세 화면">
+        <button class="is-active" type="button" data-judge-tab="content" aria-selected="true">과제 내용</button>
+        <button type="button" data-judge-tab="evaluation" aria-selected="false">평가하기</button>
+    </nav>
+
+    <div class="judge-tab-panel is-active" data-judge-tab-panel="content">
+
+    <section class="card judge-detail-card">
+        <div class="judge-section-heading">
+            <div>
+                <h2>선정된 과제</h2>
+            </div>
+            <span class="badge badge-approved" data-panel-status="SUBMITTED"
+                  th:if="${evaluationLocked}">평가 완료</span>
+            <span class="badge badge-submitted"
+                  data-panel-status="DRAFT"
+                  th:if="${!evaluationLocked and evaluation != null}">임시 저장</span>
+            <span class="badge badge-reviewing" data-panel-status="NONE"
+                  th:if="${evaluation == null}">평가 전</span>
+        </div>
+
+        <dl class="judge-task-grid">
+            <div class="judge-grid-full">
+                <dt>제목</dt>
+                <dd class="judge-task-title" th:text="${hackathonApplication.topic}">제목</dd>
+            </div>
+            <div class="judge-grid-full">
+                <dt>과제 내용</dt>
+                <dd class="pre-line" th:text="${hackathonApplication.content}">과제 내용</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="card judge-detail-card">
+        <div class="judge-section-heading">
+            <div>
+                <h2>최종 제출 내용</h2>
+            </div>
+            <time th:text="${'최종 제출 ' + #temporals.format(submission.updatedAt, 'yyyy-MM-dd HH:mm')}">최종 제출</time>
+        </div>
+
+        <dl class="judge-task-grid judge-submission-grid">
+            <div class="judge-grid-full">
+                <dt>한 줄 설명</dt>
+                <dd class="pre-line" th:text="${submission.summary ?: '작성된 설명이 없습니다.'}">설명</dd>
+            </div>
+            <div class="judge-grid-full">
+                <dt>데모 · 참고 URL</dt>
+                <dd th:if="${submission.demoUrl != null}">
+                    <a class="file-link" th:href="${submission.demoUrl}" th:text="${submission.demoUrl}"
+                       target="_blank" rel="noopener noreferrer">URL</a>
+                </dd>
+                <dd th:if="${submission.demoUrl == null}">등록된 URL이 없습니다.</dd>
+            </div>
+        </dl>
+
+        <div class="judge-file-panel">
+            <h3>첨부파일 <small th:text="${#lists.size(submission.files) + '개'}">0개</small></h3>
+            <ul class="judge-file-list" th:if="${!#lists.isEmpty(submission.files)}">
+                <li th:each="file : ${submission.files}">
+                    <a class="judge-file-link"
+                       th:href="@{/judge/evaluations/{applicationId}/files/{fileId}/download(applicationId=${hackathonApplication.id},fileId=${file.id})}">
+                        <span class="judge-document-icon" aria-hidden="true"></span>
+                        <span class="judge-file-info">
+                            <strong th:text="${file.originalFileName}">파일명</strong>
+                            <small>
+                                <span th:if="${file.fileSize >= 1048576}"
+                                      th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1) + ' MB'}">1 MB</span>
+                                <span th:if="${file.fileSize >= 1024 and file.fileSize < 1048576}"
+                                      th:text="${#numbers.formatDecimal(file.fileSize / 1024.0, 1, 1) + ' KB'}">1 KB</span>
+                                <span th:if="${file.fileSize < 1024}" th:text="${file.fileSize + ' B'}">0 B</span>
+                            </small>
+                        </span>
+                        <span class="judge-download-label">다운로드</span>
+                    </a>
+                </li>
+            </ul>
+            <p class="judge-muted" th:if="${#lists.isEmpty(submission.files)}">제출된 첨부파일이 없습니다.</p>
+        </div>
+    </section>
+
+    <div class="judge-panel-cta">
+        <span>자료 확인이 끝나면 점수를 입력해 주세요.</span>
+        <button class="button button-primary" type="button" data-judge-tab-link="evaluation">평가 입력하기 →</button>
+    </div>
+    </div>
+
+    <div class="judge-tab-panel" data-judge-tab-panel="evaluation" hidden>
+    <div class="judge-review-layout">
+    <form class="card judge-detail-card judge-score-card"
+          th:action="@{/judge/evaluations/{id}(id=${hackathonApplication.id})}"
+          th:object="${evaluationForm}" method="post" id="judgeEvaluationForm">
+        <input type="hidden" name="action" value="DRAFT" data-evaluation-action-field>
+        <div class="judge-section-heading">
+            <div>
+                <h2>최종 평가</h2>
+            </div>
+            <div class="judge-total-score">
+                <span>평가 총점</span>
+                <strong><b id="judgeTotalScore" th:text="${evaluationForm.totalScore()}">0</b>점</strong>
+                <small>/ 100점</small>
+            </div>
+        </div>
+
+        <div class="global-errors judge-form-errors" th:if="${#fields.hasAnyErrors()}">
+            <p th:each="error : ${#fields.allErrors()}" th:text="${error}">입력 오류</p>
+        </div>
+
+        <div class="judge-score-list">
+            <div class="judge-score-row">
+                <div>
+                    <strong>경영효과</strong>
+                    <span>업무시간과 비용 등에 미치는 효과</span>
+                </div>
+                <label>
+                    <input class="judge-score-input" type="number" min="0" max="30"
+                           th:field="*{managementEffectScore}" th:disabled="${evaluationLocked}"
+                           aria-label="경영효과 점수">
+                    <span>/ 30</span>
+                </label>
+            </div>
+            <div class="judge-score-row">
+                <div>
+                    <strong>현업 활용 가능성</strong>
+                    <span>실제 업무에서 지속적으로 활용할 가치</span>
+                </div>
+                <label>
+                    <input class="judge-score-input" type="number" min="0" max="30"
+                           th:field="*{fieldUsabilityScore}" th:disabled="${evaluationLocked}"
+                           aria-label="현업 활용 가능성 점수">
+                    <span>/ 30</span>
+                </label>
+            </div>
+            <div class="judge-score-row">
+                <div>
+                    <strong>타부서 적용 가능성</strong>
+                    <span>다른 조직과 전사로 확대할 가능성</span>
+                </div>
+                <label>
+                    <input class="judge-score-input" type="number" min="0" max="20"
+                           th:field="*{expandabilityScore}" th:disabled="${evaluationLocked}"
+                           aria-label="타부서 적용 가능성 점수">
+                    <span>/ 20</span>
+                </label>
+            </div>
+            <div class="judge-score-row">
+                <div>
+                    <strong>혁신·창의성</strong>
+                    <span>기존 업무 방식과 비교한 혁신 수준</span>
+                </div>
+                <label>
+                    <input class="judge-score-input" type="number" min="0" max="20"
+                           th:field="*{innovationScore}" th:disabled="${evaluationLocked}"
+                           aria-label="혁신 창의성 점수">
+                    <span>/ 20</span>
+                </label>
+            </div>
+            <div class="judge-score-list-total">
+                <span>합계</span>
+                <strong><b id="judgeTableTotal" th:text="${evaluationForm.totalScore()}">0</b> / 100점</strong>
+            </div>
+        </div>
+
+        <div class="judge-score-actions" th:if="${!evaluationLocked}">
+            <p>임시 저장 후 다시 수정할 수 있습니다. 평가 완료 후에는 수정할 수 없습니다.</p>
+            <div>
+                <button class="button button-ghost" type="submit" data-evaluation-action="DRAFT">임시 저장</button>
+                <button class="button button-primary" type="submit" data-evaluation-action="SUBMITTED"
+                        data-submit-evaluation>평가 완료</button>
+            </div>
+        </div>
+        <div class="judge-locked-notice" th:if="${evaluationLocked}">
+            이 평가는 완료되어 점수가 확정되었습니다.
+        </div>
+    </form>
+
+    <section class="card judge-detail-card judge-guide-card">
+        <div class="judge-section-heading judge-guide-heading">
+            <div>
+                <h2>실무자 검토의견</h2>
+            </div>
+            <span class="judge-practitioner-total"
+                  th:if="${guideOverview != null and guideOverview.sourceTotalScore != null}">
+                <small>실무자 총점</small>
+                <strong th:text="${guideOverview.sourceTotalScore + '점'}">0점</strong>
+            </span>
+        </div>
+        <p class="judge-guide-note">
+            ※ 임원, 부서장 평가에 참고할 수 있도록 실무자 및 팀장이 항목별로 검토한 의견입니다.
+            <span class="judge-guide-note-caution">※ 실무자 검토의견 점수는 실제 심사에 반영되지 않습니다.</span>
+        </p>
+
+        <p class="judge-guide-summary"
+           th:if="${guideOverview != null and guideOverview.oneLineSummary != null}"
+           th:text="${guideOverview.oneLineSummary}">한 줄 요약</p>
+
+        <div class="judge-practitioner-list" th:if="${!#lists.isEmpty(guideItems)}">
+            <article class="judge-practitioner-item" th:each="item : ${guideItems}">
+                <header>
+                    <span th:text="${item.displayOrder}">1</span>
+                    <strong th:text="${item.criterionName}">항목</strong>
+                    <b th:text="${item.weightedScore == null ? '-' : item.weightedScore + '점'}">-</b>
+                </header>
+                <div>
+                    <strong class="judge-guide-criterion" th:if="${item.criterionText != null}"
+                            th:text="${item.criterionText}">평가 기준</strong>
+                    <p class="pre-line"
+                       th:text="${item.detailComment ?: '등록된 상세 코멘트가 없습니다.'}">코멘트</p>
+                </div>
+            </article>
+        </div>
+        <div class="empty-state judge-guide-empty" th:if="${#lists.isEmpty(guideItems)}">
+            <strong>실무자 검토의견 준비 중입니다.</strong>
+            <span>팀별 내부 평가 자료가 등록되면 이곳에 표시됩니다.</span>
+        </div>
+    </section>
+    </div>
+    </div>
+    </div>
+</main>
+<script th:src="@{/js/judge-evaluation.js(v='20260831-workspace-v21')}"></script>
+</body>
+</html>

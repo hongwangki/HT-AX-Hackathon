@@ -4451,3 +4451,1141 @@ body.admin-delete-page.admin-delete-page::after {
         width: 100%;
     }
 }
+
+/* ==========================================================================
+   Judge workspace — single source of truth.
+   Every colour, radius, spacing and type size comes from the tokens below.
+   Change a token here instead of appending an override block at the bottom.
+   ========================================================================== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Login reuses the shared status-page shell, so it only needs its width. */
+.judge-login-page .judge-login-shell { width: min(620px, calc(100% - 40px)); }
+
+.judge-page {
+    /* Brand — one pink, four roles. */
+    --j-brand: #d81f5f;
+    --j-brand-hover: #b6194f;
+    --j-brand-soft: #fdeff4;
+    --j-brand-line: #f3c6d6;
+    --j-ring: rgba(216, 31, 95, .13);
+
+    /* Text — four steps, dark to light. */
+    --j-ink: #131c2e;
+    --j-text: #3b475a;
+    --j-muted: #6c7788;
+    --j-faint: #98a1af;
+
+    /* Surfaces and lines — two greys, no more. */
+    --j-line: #e3e7ee;
+    --j-line-soft: #edf0f5;
+    --j-surface: #fff;
+    --j-sunken: #f7f8fb;
+    --j-canvas: #f2f4f8;
+
+    /* Status */
+    --j-ok: #0f7a55;
+    --j-ok-soft: #e9f7f1;
+    --j-ok-line: #b7e2cf;
+    --j-warn: #96600d;
+    --j-warn-soft: #fdf6e9;
+    --j-warn-line: #ebd7ab;
+
+    /* Radius */
+    --j-r-sm: 8px;
+    --j-r-md: 12px;
+    --j-r-lg: 16px;
+
+    /* Elevation */
+    --j-shadow: 0 1px 2px rgba(19, 28, 46, .05), 0 8px 24px rgba(19, 28, 46, .05);
+}
+
+/* --- Page frame ---------------------------------------------------------- */
+body.judge-page {
+    color: var(--j-text);
+    background: var(--j-canvas);
+}
+body.judge-page::before,
+body.judge-page::after {
+    display: none;
+    content: none;
+}
+.judge-page .judge-shell {
+    width: min(1320px, calc(100% - 40px));
+    max-width: none;
+    padding: 26px 0 56px;
+}
+.judge-page .judge-detail-shell { width: min(1160px, calc(100% - 40px)); }
+.judge-page .card {
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-lg);
+    background: var(--j-surface);
+    box-shadow: var(--j-shadow);
+}
+
+/* --- Header -------------------------------------------------------------- */
+.judge-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+    padding: 16px 20px;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-lg);
+    background: var(--j-surface);
+    box-shadow: var(--j-shadow);
+}
+.judge-header form { margin: 0; }
+.judge-brand {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 18px;
+}
+.judge-brand img {
+    width: 66px;
+    height: auto;
+}
+.judge-brand > div {
+    min-width: 0;
+    padding-left: 18px;
+    border-left: 1px solid var(--j-line);
+}
+.judge-page .eyebrow {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--j-brand);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+.judge-brand h1 {
+    margin: 0 0 5px;
+    color: var(--j-ink);
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -.035em;
+    line-height: 1.2;
+}
+.judge-brand p {
+    max-width: 720px;
+    overflow: hidden;
+    margin: 0;
+    color: var(--j-muted);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.judge-brand p strong {
+    color: var(--j-ink);
+    font-weight: 700;
+}
+.judge-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.judge-page .logout-link,
+.judge-page .judge-header-actions .button {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    padding: 0 14px;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-sm);
+    color: var(--j-muted);
+    background: var(--j-surface);
+    font-size: 13px;
+    font-weight: 700;
+    transition: .16s ease;
+}
+.judge-page .logout-link:hover,
+.judge-page .judge-header-actions .button:hover {
+    border-color: var(--j-brand-line);
+    color: var(--j-brand);
+    background: var(--j-brand-soft);
+    text-decoration: none;
+    transform: none;
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+.judge-page .button-primary {
+    background: var(--j-brand);
+    box-shadow: none;
+}
+.judge-page .button-primary:hover {
+    background: var(--j-brand-hover);
+    transform: none;
+}
+.judge-page .button-ghost {
+    border-color: var(--j-line);
+    color: var(--j-text);
+    background: var(--j-surface);
+}
+.judge-page .button-ghost:hover {
+    border-color: var(--j-brand-line);
+    color: var(--j-brand);
+    background: var(--j-brand-soft);
+    transform: none;
+}
+
+/* --- Workspace layout (list page) ---------------------------------------- */
+.judge-workspace-layout {
+    display: grid;
+    grid-template-columns: 324px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+.judge-page .judge-list-card {
+    position: sticky;
+    top: 16px;
+    display: flex;
+    max-height: calc(100vh - 32px);
+    flex-direction: column;
+    overflow: hidden;
+}
+.judge-list-toolbar {
+    flex: 0 0 auto;
+    padding: 15px 16px;
+    border-bottom: 1px solid var(--j-line);
+    background: var(--j-sunken);
+}
+.judge-list-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+}
+.judge-list-toolbar h2 {
+    margin: 0;
+    color: var(--j-ink);
+    font-size: 15px;
+    font-weight: 800;
+}
+.judge-list-title-row > span {
+    color: var(--j-faint);
+    font-size: 11px;
+    white-space: nowrap;
+}
+.judge-list-status-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 10px 0 13px;
+    color: var(--j-muted);
+    font-size: 12px;
+}
+.judge-list-status-summary span {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+}
+.judge-list-status-summary strong {
+    color: var(--j-brand);
+    font-size: 14px;
+    font-weight: 800;
+}
+.judge-list-status-summary strong b,
+.judge-list-status-summary span > b { font: inherit; }
+.judge-list-status-summary span > b {
+    color: var(--j-text);
+    font-weight: 700;
+}
+.judge-list-controls {
+    display: grid;
+    gap: 8px;
+}
+.judge-page .judge-search input,
+.judge-page .judge-list-controls select {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-sm);
+    outline: 0;
+    color: var(--j-text);
+    background: var(--j-surface);
+    font: inherit;
+    font-size: 13px;
+}
+.judge-page .judge-search input::placeholder { color: var(--j-faint); }
+.judge-page .judge-list-controls select {
+    padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath fill='%2398a1af' d='M0 0h10L5 6z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 9px 6px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.judge-page .judge-search input:focus,
+.judge-page .judge-list-controls select:focus {
+    border-color: var(--j-brand);
+    box-shadow: 0 0 0 3px var(--j-ring);
+}
+
+/* --- Team list ----------------------------------------------------------- */
+.judge-target-list {
+    display: grid;
+    min-height: 0;
+    flex: 1;
+    align-content: start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.judge-target-row {
+    display: grid;
+    grid-template-columns: 26px minmax(0, 1fr);
+    column-gap: 11px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--j-line-soft);
+    color: inherit;
+    background: var(--j-surface);
+    transition: background .16s ease;
+}
+.judge-target-row:last-of-type { border-bottom: 0; }
+.judge-target-row[hidden] { display: none; }
+.judge-target-row:hover { background: var(--j-sunken); }
+.judge-target-row.is-active {
+    background: var(--j-brand-soft);
+    box-shadow: inset 3px 0 var(--j-brand);
+}
+.judge-target-row.is-active .judge-target-main strong { color: var(--j-brand-hover); }
+
+/* The badge doubles as the status light: grey = 평가 전, amber = 임시 저장, green = 완료. */
+.judge-target-number {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    grid-row: 1 / span 2;
+    place-items: center;
+    border: 1px solid var(--j-line);
+    border-radius: 7px;
+    color: var(--j-faint);
+    background: var(--j-sunken);
+    font-size: 11px;
+    font-weight: 800;
+}
+.judge-target-row[data-status="DRAFT"] .judge-target-number {
+    border-color: var(--j-warn-line);
+    color: var(--j-warn);
+    background: var(--j-warn-soft);
+}
+.judge-target-row[data-status="SUBMITTED"] .judge-target-number {
+    border-color: var(--j-ok-line);
+    color: var(--j-ok);
+    background: var(--j-ok-soft);
+}
+.judge-target-main { min-width: 0; }
+.judge-target-main strong {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--j-ink);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+.judge-target-scores {
+    display: grid;
+    grid-template-columns: 1fr 1fr 14px;
+    align-items: end;
+    gap: 8px;
+    margin-top: 9px;
+}
+.judge-target-scores > span:not(.judge-row-arrow) {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+}
+.judge-target-scores small {
+    color: var(--j-faint);
+    font-size: 11px;
+    font-weight: 600;
+}
+.judge-target-scores b {
+    font-size: 13px;
+    font-weight: 800;
+}
+.judge-assigned-score b { color: var(--j-brand); }
+.judge-practitioner-score b { color: var(--j-muted); }
+.judge-row-arrow {
+    align-self: center;
+    color: var(--j-faint);
+    font-size: 14px;
+}
+
+/* --- My ranking ---------------------------------------------------------- */
+.judge-ranking-link {
+    display: block;
+    width: 100%;
+    padding: 11px 14px;
+    border: 0;
+    border-bottom: 1px solid var(--j-line);
+    color: var(--j-muted);
+    background: var(--j-surface);
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    transition: .16s ease;
+}
+.judge-ranking-link:hover {
+    color: var(--j-brand);
+    background: var(--j-brand-soft);
+}
+.judge-ranking-progress {
+    color: var(--j-muted);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.judge-ranking-progress b {
+    color: var(--j-ink);
+    font-size: 14px;
+    font-weight: 800;
+}
+.judge-ranking-card .judge-guide-note { margin-bottom: 14px; }
+.judge-ranking-list {
+    display: grid;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-md);
+    list-style: none;
+}
+.judge-ranking-list li + li { border-top: 1px solid var(--j-line-soft); }
+.judge-ranking-row {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 13px 16px;
+    color: inherit;
+    transition: background .16s ease;
+}
+.judge-ranking-row:hover { background: var(--j-brand-soft); }
+.judge-ranking-rank {
+    color: var(--j-brand);
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+}
+.judge-ranking-row strong {
+    overflow: hidden;
+    color: var(--j-ink);
+    font-size: 13px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.judge-ranking-row > b {
+    color: var(--j-brand);
+    font-size: 14px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.judge-ranking-empty {
+    margin: 0;
+    padding: 28px 16px;
+    border: 1px dashed var(--j-line);
+    border-radius: var(--j-r-md);
+    color: var(--j-muted);
+    font-size: 13px;
+    text-align: center;
+}
+.judge-ranking-pending { margin-top: 20px; }
+.judge-ranking-pending h3 {
+    margin: 0 0 9px;
+    color: var(--j-faint);
+    font-size: 12px;
+    font-weight: 700;
+}
+.judge-ranking-pending h3 small {
+    margin-left: 4px;
+    font-size: 12px;
+    font-weight: 800;
+}
+.judge-ranking-pending ul {
+    display: grid;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-md);
+    list-style: none;
+}
+.judge-ranking-pending li + li { border-top: 1px solid var(--j-line-soft); }
+.judge-ranking-row.is-pending { background: var(--j-sunken); }
+.judge-ranking-row.is-pending:hover { background: var(--j-brand-soft); }
+.judge-ranking-row.is-pending .judge-ranking-rank { color: var(--j-faint); }
+.judge-ranking-row.is-pending strong {
+    color: var(--j-muted);
+    font-weight: 600;
+}
+.judge-ranking-row.is-pending > b {
+    color: var(--j-faint);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* --- Empty states -------------------------------------------------------- */
+.judge-page .empty-state[hidden] { display: none; }
+.judge-empty,
+.judge-guide-empty {
+    padding: 44px 20px;
+    text-align: center;
+}
+.judge-empty strong,
+.judge-guide-empty strong {
+    display: block;
+    color: var(--j-ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+.judge-empty span,
+.judge-guide-empty span {
+    display: block;
+    margin-top: 6px;
+    color: var(--j-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* --- Detail pane placeholder --------------------------------------------- */
+.judge-workspace-detail {
+    min-width: 0;
+    transition: opacity .15s ease;
+}
+.judge-workspace-detail.is-loading {
+    opacity: .5;
+    pointer-events: none;
+}
+.judge-workspace-placeholder {
+    display: grid;
+    min-height: 440px;
+    place-items: center;
+    align-content: center;
+    padding: 40px;
+    text-align: center;
+}
+.judge-placeholder-mark {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 16px;
+    place-items: center;
+    border-radius: var(--j-r-md);
+    color: var(--j-brand);
+    background: var(--j-brand-soft);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: .04em;
+}
+.judge-workspace-placeholder strong {
+    color: var(--j-ink);
+    font-size: 16px;
+    font-weight: 700;
+}
+.judge-workspace-placeholder p {
+    margin: 6px 0 0;
+    color: var(--j-muted);
+    font-size: 13px;
+}
+.judge-workspace-error { min-height: 280px; }
+
+/* --- Flash messages ------------------------------------------------------ */
+.judge-flash {
+    margin: 0 0 14px;
+    padding: 12px 16px;
+    border-radius: var(--j-r-sm);
+    font-size: 13px;
+    font-weight: 700;
+}
+.judge-flash-success {
+    border: 1px solid var(--j-ok-line);
+    color: var(--j-ok);
+    background: var(--j-ok-soft);
+}
+
+/* --- Detail tabs --------------------------------------------------------- */
+.judge-detail-tabs {
+    display: flex;
+    gap: 26px;
+    margin: 0 0 16px;
+    padding: 0 2px;
+    border-bottom: 1px solid var(--j-line);
+}
+.judge-detail-tabs button {
+    position: relative;
+    padding: 0 2px 12px;
+    border: 0;
+    color: var(--j-muted);
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+}
+.judge-detail-tabs button:hover { color: var(--j-ink); }
+.judge-detail-tabs button.is-active { color: var(--j-brand); }
+.judge-detail-tabs button.is-active::after {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: var(--j-brand);
+    content: "";
+}
+.judge-tab-panel[hidden] { display: none; }
+.judge-tab-panel.is-active { animation: judge-panel-in .18s ease-out; }
+@keyframes judge-panel-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* --- Detail cards -------------------------------------------------------- */
+.judge-page .judge-detail-card {
+    margin-bottom: 14px;
+    padding: 22px 24px;
+}
+.judge-page .judge-detail-card:last-child { margin-bottom: 0; }
+.judge-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--j-line);
+}
+.judge-section-heading > div:first-child { min-width: 0; }
+.judge-section-heading h2 {
+    margin: 0;
+    color: var(--j-ink);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -.015em;
+}
+.judge-section-heading time {
+    color: var(--j-faint);
+    font-size: 12px;
+    white-space: nowrap;
+}
+.judge-page .badge {
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* --- Task / submission detail -------------------------------------------- */
+.judge-task-grid {
+    display: grid;
+    overflow: hidden;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: 0;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-md);
+}
+.judge-task-grid > div {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--j-line-soft);
+}
+.judge-task-grid > div:last-child { border-bottom: 0; }
+.judge-task-grid dt {
+    margin-bottom: 6px;
+    color: var(--j-faint);
+    font-size: 12px;
+    font-weight: 700;
+}
+.judge-task-grid dd {
+    margin: 0;
+    color: var(--j-text);
+    font-size: 13px;
+    line-height: 1.75;
+}
+.judge-task-grid .judge-task-title {
+    color: var(--j-ink);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+.judge-page .file-link {
+    color: var(--j-brand);
+    font-weight: 700;
+    word-break: break-all;
+}
+
+/* --- Attachments --------------------------------------------------------- */
+.judge-file-panel {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--j-line);
+}
+.judge-file-panel h3 {
+    margin: 0 0 10px;
+    color: var(--j-ink);
+    font-size: 13px;
+    font-weight: 800;
+}
+.judge-file-panel h3 small {
+    margin-left: 5px;
+    color: var(--j-brand);
+    font-size: 12px;
+    font-weight: 700;
+}
+.judge-file-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.judge-file-list li {
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-sm);
+    background: var(--j-surface);
+    transition: .16s ease;
+}
+.judge-file-list li:hover {
+    border-color: var(--j-brand-line);
+    background: var(--j-brand-soft);
+}
+.judge-file-link {
+    display: grid;
+    min-height: 52px;
+    grid-template-columns: 18px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    color: inherit;
+}
+.judge-document-icon {
+    position: relative;
+    width: 16px;
+    height: 20px;
+    border: 1.5px solid var(--j-brand);
+    border-radius: 3px;
+    background: var(--j-surface);
+}
+.judge-document-icon::before {
+    position: absolute;
+    right: -1.5px;
+    top: -1.5px;
+    width: 6px;
+    height: 6px;
+    border-bottom: 1.5px solid var(--j-brand);
+    border-left: 1.5px solid var(--j-brand);
+    border-radius: 0 2px 0 2px;
+    background: var(--j-brand-soft);
+    content: "";
+}
+.judge-file-info {
+    display: grid;
+    min-width: 0;
+    gap: 3px;
+}
+.judge-file-info strong {
+    overflow: hidden;
+    color: var(--j-ink);
+    font-size: 13px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.judge-file-info small {
+    color: var(--j-faint);
+    font-size: 11px;
+}
+.judge-download-label {
+    min-width: 68px;
+    padding: 7px 12px;
+    border: 1px solid var(--j-line);
+    border-radius: 7px;
+    color: var(--j-muted);
+    background: var(--j-surface);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+.judge-file-link:hover .judge-download-label {
+    border-color: var(--j-brand);
+    color: var(--j-brand);
+}
+.judge-muted {
+    margin: 0;
+    color: var(--j-muted);
+    font-size: 13px;
+}
+/* Hands the judge off from reading the submission to actually scoring it. */
+.judge-panel-cta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+    margin-top: 14px;
+}
+.judge-panel-cta > span {
+    color: var(--j-muted);
+    font-size: 13px;
+}
+.judge-page .judge-panel-cta .button {
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: var(--j-r-sm);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+/* --- Evaluation tab layout -----------------------------------------------
+   Reading order matches the task: the practitioner review sits left (read it
+   first), the score form right. Both columns stretch to the same height and
+   their inner lists absorb the slack, so neither ends in dead space. */
+.judge-review-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.26fr) minmax(340px, .74fr);
+    gap: 14px;
+    align-items: stretch;
+}
+.judge-page .judge-review-layout .judge-detail-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    margin-bottom: 0;
+}
+.judge-review-layout .judge-guide-card { order: 1; }
+.judge-review-layout .judge-score-card { order: 2; }
+
+/* --- Score form ---------------------------------------------------------- */
+.judge-total-score {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    white-space: nowrap;
+}
+.judge-total-score > span {
+    color: var(--j-muted);
+    font-size: 12px;
+    font-weight: 600;
+}
+.judge-total-score strong {
+    color: var(--j-brand);
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.025em;
+}
+.judge-total-score strong b { font: inherit; }
+.judge-total-score small {
+    color: var(--j-faint);
+    font-size: 12px;
+}
+.judge-form-errors {
+    margin: 0 0 14px;
+    padding: 12px 14px;
+    border-radius: var(--j-r-sm);
+    font-size: 13px;
+}
+.judge-form-errors p + p { margin-top: 4px; }
+.judge-score-list {
+    display: grid;
+    overflow: hidden;
+    min-height: 0;
+    flex: 1;
+    grid-template-rows: repeat(4, minmax(74px, 1fr)) auto;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-md);
+}
+.judge-score-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: center;
+    align-content: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--j-line-soft);
+}
+.judge-score-row > div {
+    display: grid;
+    gap: 3px;
+}
+.judge-score-row > div strong {
+    color: var(--j-ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+.judge-score-row > div span {
+    color: var(--j-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.judge-score-row label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.judge-score-row label > span {
+    color: var(--j-faint);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.judge-page .judge-score-input {
+    width: 62px;
+    height: 40px;
+    padding: 0 8px;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-sm);
+    outline: 0;
+    color: var(--j-ink);
+    background: var(--j-surface);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    text-align: center;
+}
+.judge-page .judge-score-input:focus {
+    border-color: var(--j-brand);
+    box-shadow: 0 0 0 3px var(--j-ring);
+}
+.judge-page .judge-score-input:disabled {
+    color: var(--j-muted);
+    background: var(--j-sunken);
+}
+.judge-score-list-total {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    color: var(--j-muted);
+    background: var(--j-sunken);
+    font-size: 13px;
+    font-weight: 700;
+}
+.judge-score-list-total strong {
+    color: var(--j-brand);
+    font-size: 15px;
+    font-weight: 800;
+}
+.judge-score-list-total b { font: inherit; }
+.judge-score-actions {
+    display: grid;
+    gap: 11px;
+    margin-top: 16px;
+}
+.judge-score-actions p {
+    margin: 0;
+    color: var(--j-muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+.judge-score-actions > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.judge-page .judge-score-actions .button {
+    min-height: 42px;
+    border-radius: var(--j-r-sm);
+    font-size: 13px;
+    font-weight: 800;
+}
+.judge-locked-notice {
+    margin-top: 16px;
+    padding: 13px 16px;
+    border: 1px solid var(--j-ok-line);
+    border-radius: var(--j-r-sm);
+    color: var(--j-ok);
+    background: var(--j-ok-soft);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* --- Practitioner review (reference only, never scored) ------------------- */
+.judge-guide-heading { margin-bottom: 13px; }
+.judge-practitioner-total {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+}
+.judge-practitioner-total small {
+    color: var(--j-faint);
+    font-size: 12px;
+    font-weight: 600;
+}
+/* Deliberately neutral, not brand pink: this score carries no weight. */
+.judge-practitioner-total strong {
+    color: var(--j-muted);
+    font-size: 18px;
+    font-weight: 800;
+}
+.judge-guide-note {
+    margin: 0 0 13px;
+    padding: 0;
+    color: var(--j-muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+.judge-guide-note-caution {
+    display: block;
+    margin-top: 4px;
+    color: var(--j-brand);
+    font-weight: 700;
+}
+.judge-guide-summary {
+    margin: 0 0 14px;
+    padding: 12px 15px;
+    border: 1px solid var(--j-line);
+    border-left: 3px solid var(--j-brand);
+    border-radius: 0 var(--j-r-sm) var(--j-r-sm) 0;
+    color: var(--j-text);
+    background: var(--j-sunken);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.7;
+}
+.judge-practitioner-list {
+    display: grid;
+    min-height: 0;
+    flex: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+/* One light box per criterion — no header band, no badge; the text is the content. */
+.judge-practitioner-item {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding: 13px 15px 15px;
+    border: 1px solid var(--j-line);
+    border-radius: var(--j-r-md);
+    background: var(--j-surface);
+}
+.judge-practitioner-item header {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: baseline;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--j-line-soft);
+}
+.judge-practitioner-item header > span {
+    color: var(--j-faint);
+    font-size: 12px;
+    font-weight: 800;
+}
+.judge-practitioner-item header strong {
+    color: var(--j-ink);
+    font-size: 14px;
+    font-weight: 700;
+}
+.judge-practitioner-item header b {
+    color: var(--j-muted);
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.judge-practitioner-item > div { flex: 1; }
+.judge-guide-criterion {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--j-text);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6;
+}
+.judge-practitioner-item p {
+    margin: 0;
+    color: var(--j-muted);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+@media (max-width: 1240px) {
+    .judge-review-layout { grid-template-columns: minmax(0, 1.18fr) minmax(320px, .82fr); }
+}
+
+@media (max-width: 1080px) {
+    .judge-workspace-layout { grid-template-columns: 284px minmax(0, 1fr); }
+    .judge-review-layout {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    /* Stacked: nothing to equalise, so let both cards size to their content. */
+    .judge-score-list,
+    .judge-practitioner-list {
+        flex: none;
+        grid-template-rows: none;
+    }
+}
+
+@media (max-width: 860px) {
+    .judge-workspace-layout { grid-template-columns: 1fr; }
+    .judge-page .judge-list-card {
+        position: static;
+        max-height: none;
+    }
+    .judge-target-list { max-height: 340px; }
+    .judge-practitioner-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+    .judge-page .judge-shell,
+    .judge-page .judge-detail-shell {
+        width: calc(100% - 20px);
+        padding: 16px 0 40px;
+    }
+    .judge-header {
+        align-items: flex-start;
+        gap: 14px;
+        padding: 15px 16px;
+    }
+    .judge-brand { gap: 13px; }
+    .judge-brand img { width: 54px; }
+    .judge-brand > div { padding-left: 13px; }
+    .judge-brand h1 { font-size: 21px; }
+    .judge-brand p { white-space: normal; }
+    .judge-header-actions {
+        align-items: flex-end;
+        flex-direction: column-reverse;
+    }
+    .judge-page .judge-detail-card { padding: 18px 16px; }
+    .judge-detail-tabs { gap: 20px; }
+    .judge-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+    .judge-score-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .judge-score-row label { justify-content: flex-start; }
+    .judge-file-link { grid-template-columns: 18px minmax(0, 1fr); }
+    .judge-download-label {
+        grid-column: 2;
+        justify-self: start;
+    }
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>과제 평가 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260831-judge-ranking-v21')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page judge-page judge-list-page">
+<main class="page-shell judge-shell">
+    <header class="judge-header">
+        <div class="judge-brand">
+            <img th:src="@{/images/landing-v2/logo.png}" alt="해태">
+            <div>
+                <span class="eyebrow">HT AX HACKATHON</span>
+                <h1>과제 평가</h1>
+                <p><strong th:text="${judge.name}">심사자</strong>님, 제출 과제를 검토하고 최종 평가를 진행해 주세요.</p>
+            </div>
+        </div>
+        <form th:action="@{/judge/logout}" method="post">
+            <button class="logout-link" type="submit">로그아웃</button>
+        </form>
+    </header>
+
+    <div class="judge-workspace-layout">
+        <aside class="card judge-list-card">
+            <div class="judge-list-toolbar">
+                <div>
+                    <div class="judge-list-title-row">
+                        <h2>제출 팀 목록</h2>
+                        <span>심사점수 · 실무자 의견</span>
+                    </div>
+                    <div class="judge-list-status-summary" aria-label="평가 진행 현황">
+                        <span><strong><b id="judgeSubmittedCount" th:text="${submittedCount}">0</b>/<b id="judgeTotalCount" th:text="${#lists.size(targets)}">0</b></strong> 완료</span>
+                        <span>임시 저장 <b id="judgeDraftCount" th:text="${draftCount}">0</b></span>
+                        <span>남음 <b id="judgeRemainingCount" th:text="${#lists.size(targets) - submittedCount}">0</b></span>
+                    </div>
+                </div>
+                <div class="judge-list-controls">
+                    <label class="judge-search">
+                        <span class="sr-only">팀 또는 과제 검색</span>
+                        <input id="judgeSearch" type="search" placeholder="과제 제목 검색">
+                    </label>
+                    <select id="judgeStatusFilter" aria-label="평가 상태 필터">
+                        <option value="ALL">전체 상태</option>
+                        <option value="NONE">평가 전</option>
+                        <option value="DRAFT">임시 저장</option>
+                        <option value="SUBMITTED">평가 완료</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="judge-ranking-link" type="button" id="judgeRankingLink">
+                <span aria-hidden="true">←</span> 내 순위 보기
+            </button>
+
+            <div class="judge-target-list" id="judgeTargetList">
+                <a class="judge-target-row"
+                   th:each="target, targetStat : ${targets}"
+                   th:href="@{/judge/evaluations/{id}(id=${target.applicationId})}"
+                   th:attr="data-panel-url=@{/judge/evaluations/{id}/panel(id=${target.applicationId})},data-application-id=${target.applicationId},data-search=${target.topic},data-status=${target.evaluationStatus == null ? 'NONE' : target.evaluationStatus.name()}">
+                    <span class="judge-target-number" th:text="${targetStat.count}">1</span>
+                    <div class="judge-target-main">
+                        <strong th:text="${target.topic}">과제명</strong>
+                    </div>
+                    <div class="judge-target-scores">
+                        <span class="judge-assigned-score">
+                            <small>심사자 점수</small>
+                            <b th:text="${target.totalScore == null ? '미부여' : target.totalScore + '점'}">미부여</b>
+                        </span>
+                        <span class="judge-practitioner-score">
+                            <small>실무자 의견</small>
+                            <b th:text="${target.practitionerTotalScore == null ? '-' : target.practitionerTotalScore + '점'}">-</b>
+                        </span>
+                        <span class="judge-row-arrow" aria-hidden="true">→</span>
+                    </div>
+                </a>
+
+                <div class="empty-state judge-empty" th:if="${#lists.isEmpty(targets)}">
+                    <strong>평가 대상 과제가 없습니다.</strong>
+                    <span>엑셀 내부평가가 완료되고 과제를 제출한 팀만 표시됩니다.</span>
+                </div>
+                <div class="empty-state judge-empty" id="judgeFilterEmpty" hidden>
+                    <strong>검색 결과가 없습니다.</strong>
+                    <span>검색어나 평가 상태를 변경해 주세요.</span>
+                </div>
+            </div>
+        </aside>
+
+        <section class="judge-workspace-detail" id="judgeDetailPane" aria-live="polite">
+            <div class="card judge-detail-card judge-ranking-card" th:if="${!#lists.isEmpty(targets)}">
+                <div class="judge-section-heading">
+                    <div><h2>내가 매긴 순위</h2></div>
+                    <span class="judge-ranking-progress">
+                        평가 완료 <b th:text="${submittedCount}">0</b> / <b th:text="${#lists.size(targets)}">0</b>
+                    </span>
+                </div>
+                <p class="judge-guide-note">
+                    <span class="judge-guide-note-caution"
+                          th:text="'※ ' + ${judge.name} + ' 심사자님이 매긴 점수 기준이며, 전체 심사 결과와 다릅니다.'">
+                        ※ 심사자님이 매긴 점수 기준이며, 전체 심사 결과와 다릅니다.
+                    </span>
+                </p>
+
+                <ol class="judge-ranking-list" th:if="${submittedCount > 0}">
+                    <li th:each="row : ${ranking}" th:if="${row.ranked}">
+                        <a class="judge-ranking-row"
+                           th:href="@{/judge/evaluations/{id}(id=${row.applicationId})}"
+                           th:attr="data-ranking-application-id=${row.applicationId}">
+                            <span class="judge-ranking-rank" th:text="${row.rank}">1</span>
+                            <strong th:text="${row.topic}">과제명</strong>
+                            <b th:text="${row.totalScore + '점'}">0점</b>
+                        </a>
+                    </li>
+                </ol>
+                <p class="judge-ranking-empty" th:if="${submittedCount == 0}">
+                    아직 평가를 완료한 과제가 없습니다. 평가를 완료하면 이곳에 순위가 표시됩니다.
+                </p>
+
+                <div class="judge-ranking-pending"
+                     th:if="${#lists.size(targets) - submittedCount > 0}">
+                    <h3>아직 순위에 반영되지 않음
+                        <small th:text="${#lists.size(targets) - submittedCount}">0</small>
+                    </h3>
+                    <ul>
+                        <li th:each="row : ${ranking}" th:if="${!row.ranked}">
+                            <a class="judge-ranking-row is-pending"
+                               th:href="@{/judge/evaluations/{id}(id=${row.applicationId})}"
+                               th:attr="data-ranking-application-id=${row.applicationId}">
+                                <span class="judge-ranking-rank" aria-hidden="true">·</span>
+                                <strong th:text="${row.topic}">과제명</strong>
+                                <b th:text="${row.statusLabel}">평가 전</b>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card judge-workspace-placeholder" th:if="${#lists.isEmpty(targets)}">
+                <span class="judge-placeholder-mark">HT</span>
+                <strong>평가 대상이 없습니다.</strong>
+            </div>
+        </section>
+    </div>
+</main>
+<script th:src="@{/js/judge-evaluation.js(v='20260831-workspace-v21')}"></script>
+</body>
+</html>

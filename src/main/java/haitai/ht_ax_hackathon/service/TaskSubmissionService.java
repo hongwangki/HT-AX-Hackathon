@@ -143,6 +143,19 @@ public class TaskSubmissionService {
         );
     }
 
+    /** Judge downloads stay anonymous and do not prepend team or member names. */
+    @Transactional(readOnly = true)
+    public AttachmentDownload getJudgeFileDownload(Long applicationId, Long fileId) {
+        TaskSubmission submission = submissionRepository.findByApplicationId(applicationId)
+                .orElseThrow(() -> new AttachmentFileNotFoundException(fileId));
+        TaskSubmissionFile file = findFile(submission, fileId);
+        return new AttachmentDownload(
+                fileStorageService.loadAsResource(file.getFilePath()),
+                sanitizeFileName(file.getOriginalFileName()),
+                file.getContentType()
+        );
+    }
+
     @Transactional(readOnly = true)
     public SubmissionArchiveDownload getAllFilesDownload(Long applicationId) {
         TaskSubmission submission = submissionRepository.findByApplicationId(applicationId)
