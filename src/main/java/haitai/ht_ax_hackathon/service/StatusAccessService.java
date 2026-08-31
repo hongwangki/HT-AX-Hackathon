@@ -24,11 +24,7 @@ public class StatusAccessService {
     /** Applications are accepted until an admin closes the window. Resets to open on restart. */
     private final AtomicBoolean applyOpen = new AtomicBoolean(true);
 
-    public StatusAccessService() {
-        this(Clock.system(SUBMISSION_ZONE));
-    }
-
-    StatusAccessService(Clock clock) {
+    public StatusAccessService(Clock clock) {
         this.clock = clock;
     }
 

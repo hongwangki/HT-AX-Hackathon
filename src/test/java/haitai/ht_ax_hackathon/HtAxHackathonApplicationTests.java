@@ -13,6 +13,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -21,6 +24,9 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.zip.ZipInputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,6 +47,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @WithMockUser(roles = "ADMIN")
 class HtAxHackathonApplicationTests {
+
+    @TestConfiguration
+    static class FixedClockConfig {
+
+        /**
+         * 제출 마감 이전으로 시각을 고정합니다. 실제 날짜가 마감을 지나도
+         * 제출 흐름 테스트가 마감 안내에 막히지 않습니다.
+         */
+        @Bean
+        @Primary
+        Clock fixedSubmissionClock() {
+            ZoneId zone = ZoneId.of("Asia/Seoul");
+            return Clock.fixed(
+                    ZonedDateTime.of(2026, 8, 1, 10, 0, 0, 0, zone).toInstant(),
+                    zone
+            );
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
