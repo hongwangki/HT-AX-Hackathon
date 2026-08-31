@@ -4510,25 +4510,32 @@ body.admin-delete-page.admin-delete-page::after {
 }
 
 /* --- Page frame ---------------------------------------------------------- */
-body.judge-page {
+body.workspace-page.judge-page {
+    position: relative;
+    overflow-x: hidden;
     color: var(--j-text);
-    background: var(--j-canvas);
+    background:
+        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, .96) 0%, transparent 32%),
+        radial-gradient(circle at 88% 16%, rgba(215, 222, 233, .52) 0%, transparent 30%),
+        linear-gradient(135deg, #f6f7f9 0%, #edf0f4 52%, #f6f7fa 100%) !important;
     font-family: "Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif;
     letter-spacing: -.01em;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
 }
-body.judge-page::before,
-body.judge-page::after {
-    display: none;
-    content: none;
+body.workspace-page.judge-page::before,
+body.workspace-page.judge-page::after {
+    display: none !important;
+    content: none !important;
 }
 .judge-page .judge-shell {
-    width: min(1520px, calc(100% - 40px));
+    position: relative;
+    z-index: 1;
+    width: min(1400px, calc(100% - 64px));
     max-width: none;
-    padding: 18px 0 56px;
+    padding: 16px 0 50px;
 }
-.judge-page .judge-detail-shell { width: min(1160px, calc(100% - 40px)); }
+.judge-page .judge-detail-shell { width: min(1060px, calc(100% - 64px)); }
 .judge-page .card {
     border: 1px solid var(--j-line);
     border-radius: var(--j-r-lg);
@@ -4537,43 +4544,43 @@ body.judge-page::after {
 }
 
 /* --- Header -------------------------------------------------------------- */
-/* 본문 폭에 맞춘 독립형 헤더 카드입니다. */
+/* 화면 상단에 붙는 전체 폭 바이며, 내부 콘텐츠만 본문 정렬선에 맞춥니다. */
 .judge-header {
     position: relative;
     z-index: 1;
-    width: min(1520px, calc(100% - 40px));
-    margin: 22px auto 0;
-    border: 1px solid var(--j-line);
-    border-radius: var(--j-r-lg);
+    width: 100%;
+    margin: 0;
+    border: 0;
+    border-bottom: 1px solid var(--j-line);
+    border-radius: 0;
     background: var(--j-surface);
-    box-shadow: var(--j-shadow);
+    box-shadow: 0 1px 5px rgba(19, 28, 46, .035);
 }
-.judge-detail-page .judge-header { width: min(1160px, calc(100% - 40px)); }
 .judge-header-inner {
     display: flex;
-    width: 100%;
+    width: min(1400px, calc(100% - 64px));
     align-items: center;
     justify-content: space-between;
     gap: 24px;
     margin: 0 auto;
-    min-height: 84px;
-    padding: 15px 20px;
+    min-height: 80px;
+    padding: 12px 0;
 }
-.judge-detail-page .judge-header-inner { width: 100%; }
+.judge-detail-page .judge-header-inner { width: min(1060px, calc(100% - 64px)); }
 .judge-header form { margin: 0; }
 .judge-brand {
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: 18px;
+    gap: 16px;
 }
 .judge-brand img {
-    width: 64px;
+    width: 58px;
     height: auto;
 }
 .judge-brand > div {
     min-width: 0;
-    padding-left: 18px;
+    padding-left: 16px;
     border-left: 1px solid var(--j-line);
 }
 .judge-page .eyebrow {
@@ -4590,7 +4597,7 @@ body.judge-page::after {
 .judge-brand h1 {
     margin: 0 0 3px;
     color: var(--j-ink);
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 650;
     letter-spacing: -.035em;
     line-height: 1.2;
@@ -4600,7 +4607,7 @@ body.judge-page::after {
     overflow: hidden;
     margin: 0;
     color: var(--j-muted);
-    font-size: 14px;
+    font-size: 13px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -4616,9 +4623,9 @@ body.judge-page::after {
 .judge-page .logout-link,
 .judge-page .judge-header-actions .button {
     display: inline-flex;
-    min-height: 38px;
+    min-height: 36px;
     align-items: center;
-    padding: 0 14px;
+    padding: 0 13px;
     border: 1px solid var(--j-line);
     border-radius: var(--j-r-sm);
     color: var(--j-muted);
@@ -4660,8 +4667,8 @@ body.judge-page::after {
 /* --- Workspace layout (list page) ---------------------------------------- */
 .judge-workspace-layout {
     display: grid;
-    grid-template-columns: 380px minmax(0, 1fr);
-    gap: 16px;
+    grid-template-columns: 344px minmax(0, 1fr);
+    gap: 14px;
     align-items: start;
 }
 .judge-page .judge-list-card {
@@ -4674,7 +4681,7 @@ body.judge-page::after {
 }
 .judge-list-toolbar {
     flex: 0 0 auto;
-    padding: 15px 16px;
+    padding: 14px;
     border-bottom: 1px solid var(--j-line);
     background: var(--j-sunken);
 }
@@ -4714,7 +4721,7 @@ body.judge-page::after {
 }
 .judge-page .judge-list-controls select {
     width: 100%;
-    height: 38px;
+    height: 36px;
     padding: 0 12px;
     border: 1px solid var(--j-line);
     border-radius: var(--j-r-sm);
@@ -4749,10 +4756,10 @@ body.judge-page::after {
 }
 .judge-target-row {
     display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) auto;
-    column-gap: 10px;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    column-gap: 9px;
     align-items: center;
-    padding: 9px 13px;
+    padding: 8px 12px;
     border-bottom: 1px solid var(--j-line-soft);
     color: inherit;
     background: var(--j-surface);
@@ -4770,8 +4777,8 @@ body.judge-page::after {
 /* The badge doubles as the status light: grey = 평가 전, amber = 임시 저장, green = 완료. */
 .judge-target-number {
     display: grid;
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     place-items: center;
     border: 1px solid var(--j-line);
     border-radius: 7px;
@@ -5032,7 +5039,7 @@ body.judge-page::after {
 /* --- Detail cards -------------------------------------------------------- */
 .judge-page .judge-detail-card {
     margin-bottom: 14px;
-    padding: 22px 24px;
+    padding: 20px 22px;
 }
 .judge-page .judge-detail-card:last-child { margin-bottom: 0; }
 .judge-section-heading {
@@ -5040,8 +5047,8 @@ body.judge-page::after {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 11px;
     border-bottom: 1px solid var(--j-line);
 }
 .judge-section-heading > div:first-child {
@@ -5074,7 +5081,7 @@ body.judge-page::after {
 .judge-section-heading h2 {
     margin: 0;
     color: var(--j-ink);
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: -.015em;
 }
@@ -5174,11 +5181,11 @@ body.judge-page::after {
 }
 .judge-file-link {
     display: grid;
-    min-height: 52px;
+    min-height: 48px;
     grid-template-columns: 30px minmax(0, 1fr) auto;
     gap: 12px;
     align-items: center;
-    padding: 10px 14px;
+    padding: 9px 13px;
     color: inherit;
 }
 .judge-document-icon {
@@ -5256,7 +5263,7 @@ body.judge-page::after {
 .judge-review-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
     align-items: start;
 }
 .judge-page .judge-review-layout .judge-detail-card {
@@ -5308,7 +5315,7 @@ body.judge-page::after {
     overflow: hidden;
     min-height: 0;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-template-rows: minmax(150px, auto) auto;
+    grid-template-rows: minmax(136px, auto) auto;
     border: 1px solid var(--j-line);
     border-radius: var(--j-r-md);
 }
@@ -5318,7 +5325,7 @@ body.judge-page::after {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
-    padding: 14px 16px;
+    padding: 13px 14px;
     border-right: 1px solid var(--j-line-soft);
     background: var(--j-surface);
 }
@@ -5354,7 +5361,7 @@ body.judge-page::after {
 }
 .judge-page .judge-score-input {
     width: 62px;
-    height: 40px;
+    height: 36px;
     padding: 0 8px;
     border: 1px solid #d9a8b9;
     border-radius: var(--j-r-sm);
@@ -5515,7 +5522,7 @@ body.judge-page::after {
 }
 
 @media (max-width: 1080px) {
-    .judge-workspace-layout { grid-template-columns: 336px minmax(0, 1fr); }
+    .judge-workspace-layout { grid-template-columns: 312px minmax(0, 1fr); }
     .judge-practitioner-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .judge-score-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .judge-score-row { border-bottom: 1px solid var(--j-line-soft); }
@@ -5540,15 +5547,16 @@ body.judge-page::after {
         padding: 16px 0 40px;
     }
     .judge-header {
-        width: calc(100% - 20px);
-        margin-top: 10px;
+        width: 100%;
+        margin: 0;
     }
     .judge-header-inner {
-        width: 100%;
+        width: calc(100% - 20px);
         gap: 12px;
         min-height: 72px;
-        padding: 12px 14px;
+        padding: 12px 0;
     }
+    .judge-detail-page .judge-header-inner { width: calc(100% - 20px); }
     .judge-brand { gap: 12px; }
     .judge-brand img { width: 46px; }
     .judge-brand > div { padding-left: 12px; }
