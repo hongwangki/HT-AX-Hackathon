@@ -229,6 +229,24 @@ class JudgeFeatureTests {
                 .isEqualTo(86);
     }
 
+    @Test
+    void scoresAboveTheCriterionMaximumAreRejected() throws Exception {
+        // 경영효과는 30점 만점인데 40점을 보냅니다.
+        mockMvc.perform(post("/judge/evaluations/{id}", numberedApplicationId)
+                        .with(user("judge-test").roles("JUDGE"))
+                        .with(csrf())
+                        .param("managementEffectScore", "40")
+                        .param("fieldUsabilityScore", "25")
+                        .param("expandabilityScore", "16")
+                        .param("innovationScore", "17")
+                        .param("action", "DRAFT"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("judge/evaluation-detail"))
+                .andExpect(content().string(containsString("경영효과는 30점을 초과할 수 없습니다.")));
+
+        assertThat(evaluationRepository.findAll()).isEmpty();
+    }
+
     private HackathonApplication saveApplication(String teamName, String topic) {
         HackathonApplication application = new HackathonApplication(
                 teamName,
