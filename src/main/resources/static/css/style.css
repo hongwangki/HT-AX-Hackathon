@@ -4831,13 +4831,22 @@ body.workspace-page.judge-page::after {
 .judge-assigned-score b { color: var(--j-brand); }
 .judge-practitioner-score b { color: var(--j-muted); }
 /* --- My ranking ---------------------------------------------------------- */
+.judge-ranking-toolbar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--j-line-soft);
+}
 .judge-ranking-link {
     display: flex;
-    width: calc(100% - 24px);
-    min-height: 42px;
+    min-width: 0;
+    min-height: 40px;
+    flex: 1 1 52%;
     align-items: center;
     justify-content: space-between;
-    margin: 10px 12px;
+    margin: 0;
     padding: 8px 12px;
     border: 1px solid var(--j-line);
     border-radius: var(--j-r-sm);
@@ -4860,6 +4869,11 @@ body.workspace-page.judge-page::after {
     font-size: 20px;
     font-weight: 500;
     line-height: 1;
+}
+.judge-ranking-toolbar .judge-list-status-summary {
+    flex: 0 0 auto;
+    margin-left: auto;
+    font-size: 11px;
 }
 .judge-ranking-progress {
     color: var(--j-muted);
@@ -5110,16 +5124,26 @@ body.workspace-page.judge-page::after {
     background: #fbfcfe;
 }
 .judge-task-grid > div {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 10px;
+    align-items: baseline;
     padding: 14px 16px;
     border-bottom: 1px solid var(--j-line-soft);
 }
 .judge-task-grid > div:last-child { border-bottom: 0; }
 .judge-task-grid dt {
-    margin-bottom: 6px;
+    margin: 0;
     color: var(--j-faint);
     font-size: 13px;
     font-weight: 500;
 }
+.judge-task-grid dt::after { content: ":"; }
+.judge-task-card .judge-task-grid.has-summary > div {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+}
+.judge-task-card .judge-task-grid dt { text-align: left; }
 .judge-task-grid dd {
     margin: 0;
     color: var(--j-text);
@@ -5164,6 +5188,7 @@ body.workspace-page.judge-page::after {
 }
 .judge-file-list {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
     margin: 0;
     padding: 0;
@@ -5181,18 +5206,18 @@ body.workspace-page.judge-page::after {
 }
 .judge-file-link {
     display: grid;
-    min-height: 48px;
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    gap: 12px;
+    min-height: 42px;
+    grid-template-columns: 25px minmax(0, 1fr) auto;
+    gap: 9px;
     align-items: center;
-    padding: 9px 13px;
+    padding: 7px 10px;
     color: inherit;
 }
 .judge-document-icon {
     position: relative;
-    width: 26px;
-    height: 29px;
-    margin-left: 2px;
+    width: 22px;
+    height: 25px;
+    margin-left: 1px;
     border: 1.5px solid #d95883;
     border-radius: 5px;
     background: #fff7fa;
@@ -5228,23 +5253,19 @@ body.workspace-page.judge-page::after {
 .judge-file-info strong {
     overflow: hidden;
     color: var(--j-ink);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.judge-file-info small {
-    color: var(--j-faint);
-    font-size: 12px;
-}
 .judge-download-label {
-    min-width: 68px;
-    padding: 7px 12px;
+    min-width: 60px;
+    padding: 6px 9px;
     border: 1px solid var(--j-line);
     border-radius: 7px;
     color: var(--j-muted);
     background: var(--j-surface);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     text-align: center;
 }
@@ -5285,6 +5306,9 @@ body.workspace-page.judge-page::after {
     display: flex;
     align-items: baseline;
     gap: 5px;
+    margin-left: 4px;
+    padding-left: 12px;
+    border-left: 1px solid var(--j-line);
     white-space: nowrap;
 }
 .judge-total-score > span {
@@ -5294,7 +5318,7 @@ body.workspace-page.judge-page::after {
 }
 .judge-total-score strong {
     color: var(--j-brand);
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 650;
     letter-spacing: -.025em;
 }
@@ -5377,10 +5401,24 @@ body.workspace-page.judge-page::after {
     border-color: var(--j-brand);
     box-shadow: 0 0 0 3px var(--j-ring);
 }
+.judge-page .judge-score-input.is-invalid {
+    border-color: var(--j-brand);
+    background: #fff8fa;
+    box-shadow: 0 0 0 3px var(--j-ring);
+}
 .judge-page .judge-score-input:disabled {
     color: var(--j-muted);
     background: var(--j-sunken);
 }
+.judge-score-limit-message {
+    display: none;
+    margin-top: -4px;
+    color: var(--j-brand-hover);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+.judge-score-limit-message.is-visible { display: block; }
 .judge-score-list-total {
     display: flex;
     min-height: 48px;
@@ -5419,6 +5457,9 @@ body.workspace-page.judge-page::after {
     display: flex;
     align-items: baseline;
     gap: 6px;
+    margin-left: 4px;
+    padding-left: 12px;
+    border-left: 1px solid var(--j-line);
     white-space: nowrap;
 }
 .judge-practitioner-total small {
@@ -5572,7 +5613,17 @@ body.workspace-page.judge-page::after {
         gap: 10px;
     }
     .judge-score-list,
-    .judge-practitioner-list { grid-template-columns: 1fr; }
+    .judge-practitioner-list,
+    .judge-file-list { grid-template-columns: 1fr; }
+    .judge-task-grid > div {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+    .judge-task-card .judge-task-grid.has-summary > div {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+    .judge-task-card .judge-task-grid dt { text-align: left; }
     .judge-score-row { border-right: 0; }
     .judge-score-row label { justify-content: flex-start; }
     .judge-file-link { grid-template-columns: 30px minmax(0, 1fr); }

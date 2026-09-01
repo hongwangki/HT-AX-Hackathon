@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>과제 평가 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260901-judge-compact-v53')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260901-judge-layout-v60')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page judge-page judge-detail-page">
@@ -50,7 +50,8 @@
                   th:if="${evaluation == null}">평가 전</span>
         </div>
 
-        <dl class="judge-task-grid">
+        <dl class="judge-task-grid"
+            th:classappend="${guideOverview != null and guideOverview.oneLineSummary != null} ? 'has-summary' : 'title-only'">
             <div class="judge-grid-full">
                 <dt>제목</dt>
                 <dd class="judge-task-title" th:text="${hackathonApplication.topic}">제목</dd>
@@ -92,13 +93,6 @@
                         <span class="judge-document-icon" aria-hidden="true"></span>
                         <span class="judge-file-info">
                             <strong th:text="${file.originalFileName}">파일명</strong>
-                            <small>
-                                <span th:if="${file.fileSize >= 1048576}"
-                                      th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1) + ' MB'}">1 MB</span>
-                                <span th:if="${file.fileSize >= 1024 and file.fileSize < 1048576}"
-                                      th:text="${#numbers.formatDecimal(file.fileSize / 1024.0, 1, 1) + ' KB'}">1 KB</span>
-                                <span th:if="${file.fileSize < 1024}" th:text="${file.fileSize + ' B'}">0 B</span>
-                            </small>
                         </span>
                         <span class="judge-download-label">다운로드</span>
                     </a>
@@ -111,18 +105,18 @@
     <div class="judge-review-layout">
     <form class="card judge-detail-card judge-score-card"
           th:action="@{/judge/evaluations/{id}(id=${hackathonApplication.id})}"
-          th:object="${evaluationForm}" method="post" id="judgeEvaluationForm">
+          th:object="${evaluationForm}" method="post" id="judgeEvaluationForm" novalidate>
         <div class="judge-section-heading">
             <div>
                 <span class="judge-section-icon is-score" aria-hidden="true">
                     <svg viewBox="0 0 24 24"><path d="M8 4h8v3a4 4 0 0 1-8 0V4Zm4 7v5m-3 4h6M6 6H4v1a4 4 0 0 0 4 4m10-5h2v1a4 4 0 0 1-4 4"/></svg>
                 </span>
                 <h2>최종 평가</h2>
-            </div>
-            <div class="judge-total-score">
-                <span>평가 총점</span>
-                <strong><b id="judgeTotalScore" th:text="${evaluationForm.totalScore()}">0</b>점</strong>
-                <small>/ 100점</small>
+                <div class="judge-total-score">
+                    <span>평가 총점</span>
+                    <strong><b id="judgeTotalScore" th:text="${evaluationForm.totalScore()}">0</b>점</strong>
+                    <small>/ 100점</small>
+                </div>
             </div>
         </div>
 
@@ -137,11 +131,13 @@
                     <span>업무시간과 비용 등에 미치는 효과</span>
                 </div>
                 <label>
-                    <input class="judge-score-input" type="number" min="0" max="30"
+                    <input class="judge-score-input" type="text" inputmode="numeric" maxlength="2"
+                           pattern="[0-9]{1,2}" data-max-score="30"
                            th:field="*{managementEffectScore}"
                            aria-label="경영효과 점수">
                     <span>/ 30</span>
                 </label>
+                <small class="judge-score-limit-message" aria-live="polite"></small>
             </div>
             <div class="judge-score-row">
                 <div>
@@ -149,11 +145,13 @@
                     <span>실제 업무에서 지속적으로 활용할 가치</span>
                 </div>
                 <label>
-                    <input class="judge-score-input" type="number" min="0" max="30"
+                    <input class="judge-score-input" type="text" inputmode="numeric" maxlength="2"
+                           pattern="[0-9]{1,2}" data-max-score="30"
                            th:field="*{fieldUsabilityScore}"
                            aria-label="현업 활용 가능성 점수">
                     <span>/ 30</span>
                 </label>
+                <small class="judge-score-limit-message" aria-live="polite"></small>
             </div>
             <div class="judge-score-row">
                 <div>
@@ -161,11 +159,13 @@
                     <span>다른 조직과 전사로 확대할 가능성</span>
                 </div>
                 <label>
-                    <input class="judge-score-input" type="number" min="0" max="20"
+                    <input class="judge-score-input" type="text" inputmode="numeric" maxlength="2"
+                           pattern="[0-9]{1,2}" data-max-score="20"
                            th:field="*{expandabilityScore}"
                            aria-label="타부서 적용 가능성 점수">
                     <span>/ 20</span>
                 </label>
+                <small class="judge-score-limit-message" aria-live="polite"></small>
             </div>
             <div class="judge-score-row">
                 <div>
@@ -173,11 +173,13 @@
                     <span>기존 업무 방식과 비교한 혁신 수준</span>
                 </div>
                 <label>
-                    <input class="judge-score-input" type="number" min="0" max="20"
+                    <input class="judge-score-input" type="text" inputmode="numeric" maxlength="2"
+                           pattern="[0-9]{1,2}" data-max-score="20"
                            th:field="*{innovationScore}"
                            aria-label="혁신 창의성 점수">
                     <span>/ 20</span>
                 </label>
+                <small class="judge-score-limit-message" aria-live="polite"></small>
             </div>
             <div class="judge-score-list-total">
                 <span>합계</span>
@@ -197,12 +199,12 @@
                     <svg viewBox="0 0 24 24"><path d="M7 4h10a2 2 0 0 1 2 2v14H5V6a2 2 0 0 1 2-2Zm2-2h6v4H9V2Zm0 8h6m-6 4h6"/></svg>
                 </span>
                 <h2>실무자 검토의견</h2>
+                <span class="judge-practitioner-total"
+                      th:if="${guideOverview != null and guideOverview.sourceTotalScore != null}">
+                    <small>실무자 총점</small>
+                    <strong th:text="${guideOverview.sourceTotalScore + '점'}">0점</strong>
+                </span>
             </div>
-            <span class="judge-practitioner-total"
-                  th:if="${guideOverview != null and guideOverview.sourceTotalScore != null}">
-                <small>실무자 총점</small>
-                <strong th:text="${guideOverview.sourceTotalScore + '점'}">0점</strong>
-            </span>
         </div>
         <p class="judge-guide-note">
             ※ 임원, 부서장 평가에 참고할 수 있도록 실무자 및 팀장이 항목별로 검토한 의견입니다.
@@ -232,6 +234,6 @@
     </div>
     </div>
 </main>
-<script th:src="@{/js/judge-evaluation.js(v='20260831-workspace-v24')}"></script>
+<script th:src="@{/js/judge-evaluation.js(v='20260901-score-validation-v25')}"></script>
 </body>
 </html>

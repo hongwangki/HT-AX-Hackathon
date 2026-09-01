@@ -29,6 +29,28 @@
         const scoreInputs = Array.from(root.querySelectorAll('.judge-score-input'));
         const totalScore = root.querySelector('#judgeTotalScore');
         const tableTotal = root.querySelector('#judgeTableTotal');
+        const scoreForm = root.querySelector('#judgeEvaluationForm');
+
+        const validateScoreInput = input => {
+            const digits = input.value.replace(/\D/g, '').slice(0, 2);
+            if (input.value !== digits) input.value = digits;
+
+            const maxScore = Number.parseInt(input.dataset.maxScore, 10);
+            const score = Number.parseInt(digits, 10);
+            const exceedsMax = Number.isFinite(score) && Number.isFinite(maxScore) && score > maxScore;
+            const message = input.closest('.judge-score-row')?.querySelector('.judge-score-limit-message');
+            const messageText = exceedsMax ? `최대 ${maxScore}점까지 입력할 수 있습니다.` : '';
+
+            input.classList.toggle('is-invalid', exceedsMax);
+            input.setAttribute('aria-invalid', String(exceedsMax));
+            input.setCustomValidity(messageText);
+            if (message) {
+                message.textContent = messageText;
+                message.classList.toggle('is-visible', exceedsMax);
+            }
+
+            return !exceedsMax;
+        };
 
         const updateTotal = () => {
             const total = scoreInputs.reduce((sum, input) => {
@@ -39,7 +61,20 @@
             if (tableTotal) tableTotal.textContent = String(total);
         };
 
-        scoreInputs.forEach(input => input.addEventListener('input', updateTotal));
+        scoreInputs.forEach(input => {
+            validateScoreInput(input);
+            input.addEventListener('input', () => {
+                validateScoreInput(input);
+                updateTotal();
+            });
+        });
+
+        scoreForm?.addEventListener('submit', event => {
+            const firstInvalid = scoreInputs.find(input => !validateScoreInput(input));
+            if (!firstInvalid) return;
+            event.preventDefault();
+            firstInvalid.focus();
+        });
     };
 
     const setActiveRow = applicationId => {
