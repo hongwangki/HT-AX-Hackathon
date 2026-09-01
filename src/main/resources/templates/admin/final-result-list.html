@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종 결과 확인 | HT AX 해커톤</title>
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260902-final-results-v1')}">
+    <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
+</head>
+<body class="workspace-page admin-list-page final-result-page">
+<main class="page-shell admin-shell">
+    <header class="page-header admin-header">
+        <div>
+            <span class="eyebrow">관리자</span>
+            <h1>최종 결과 확인</h1>
+            <p>활성 심사관의 평가 완료 현황과 팀별 총점·평균을 확인합니다.</p>
+        </div>
+        <form th:action="@{/admin/logout}" method="post">
+            <button class="logout-link" type="submit">로그아웃</button>
+        </form>
+    </header>
+
+    <nav class="admin-tabs">
+        <a class="admin-tab" th:href="@{/admin/applications}">신청 목록</a>
+        <a class="admin-tab" th:href="@{/admin/submissions}">과제 제출 현황</a>
+        <a class="admin-tab is-active" th:href="@{/admin/final-results}">최종 결과 확인</a>
+    </nav>
+
+    <section class="admin-stats-bar">
+        <div class="stat">
+            <span class="stat-label">심사 대상</span>
+            <strong class="stat-num" th:text="${targetCount}">0</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">활성 심사관</span>
+            <strong class="stat-num" th:text="${activeJudgeCount}">0</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">결과 확정</span>
+            <strong class="stat-num tone-approved" th:text="${confirmedCount}">0</strong>
+        </div>
+        <div class="stat">
+            <span class="stat-label">집계 중</span>
+            <strong class="stat-num tone-pending" th:text="${pendingCount}">0</strong>
+        </div>
+    </section>
+
+    <p class="final-result-guide">
+        총점과 평균은 <strong>평가 완료 심사관 기준</strong>의 잠정 수치이며, 활성 심사관 전원이 완료한 팀만 확정됩니다.
+    </p>
+
+    <section class="card table-card final-result-table-card">
+        <div class="table-card-head">
+            <h2>팀별 심사 결과
+                <small th:text="${targetCount + '팀'}">0팀</small>
+            </h2>
+        </div>
+        <div class="table-wrap">
+            <table class="final-result-table">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>팀명</th>
+                    <th>과제 제목</th>
+                    <th>심사 현황</th>
+                    <th>총점</th>
+                    <th>평균</th>
+                    <th>결과 상태</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="data-row" th:each="row, stat : ${results}"
+                    th:attr="data-href=@{/admin/final-results/{id}(id=${row.applicationId})}">
+                    <td class="cell-id" th:text="${stat.count}">1</td>
+                    <td class="strong-cell" th:text="${row.teamName}">팀명</td>
+                    <td class="topic-cell" th:text="${row.topic}" th:title="${row.topic}">과제 제목</td>
+                    <td>
+                        <span class="final-progress">
+                            <strong th:text="${row.completedJudgeCount}">0</strong>
+                            <span th:text="${' / ' + row.totalJudgeCount + '명'}">/ 0명</span>
+                        </span>
+                    </td>
+                    <td class="final-score-cell">
+                        <strong th:if="${row.hasScores()}" th:text="${row.totalScore + '점'}">0점</strong>
+                        <span th:unless="${row.hasScores()}">-</span>
+                        <small th:if="${row.hasScores() and !row.confirmed}">잠정</small>
+                    </td>
+                    <td class="final-score-cell">
+                        <strong th:if="${row.hasScores()}" th:text="${row.averageDisplay + '점'}">0.0점</strong>
+                        <span th:unless="${row.hasScores()}">-</span>
+                        <small th:if="${row.hasScores() and !row.confirmed}">완료자 기준</small>
+                    </td>
+                    <td>
+                        <span class="final-result-status"
+                              th:classappend="${row.confirmed} ? 'is-confirmed' : 'is-pending'"
+                              th:text="${row.statusLabel}">집계 중</span>
+                    </td>
+                    <td>
+                        <a class="button button-secondary button-small"
+                           th:href="@{/admin/final-results/{id}(id=${row.applicationId})}">상세 보기</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(results)}">
+                    <td class="empty-cell" colspan="8">
+                        <div class="empty-state">
+                            <strong>집계할 심사 대상이 없습니다</strong>
+                            <span>실무자 검토와 과제 제출이 완료되면 이곳에 표시됩니다.</span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script>
+    document.querySelectorAll('tr.data-row').forEach(function (row) {
+        row.addEventListener('click', function (event) {
+            if (event.target.closest('a, button, form')) return;
+            window.location.href = row.dataset.href;
+        });
+    });
+</script>
+</body>
+</html>

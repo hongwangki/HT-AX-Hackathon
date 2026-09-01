@@ -4452,6 +4452,151 @@ body.admin-delete-page.admin-delete-page::after {
     }
 }
 
+/* Admin final results: extends the existing admin list shell and table language. */
+.final-result-page .admin-shell {
+    width: min(1240px, calc(100% - 48px));
+    max-width: 1240px;
+}
+.final-result-guide {
+    margin: 0 2px 12px;
+    padding: 11px 14px;
+    border: 1px solid #dfe4ec;
+    border-radius: 10px;
+    color: #687386;
+    background: rgba(255, 255, 255, .72);
+    font-size: 12px;
+    line-height: 1.6;
+}
+.final-result-guide strong { color: #323847; }
+.final-result-table { min-width: 960px; }
+.final-result-table .topic-cell { max-width: 300px; }
+.final-progress {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    white-space: nowrap;
+}
+.final-progress strong { color: #ee2f78; font-size: 14px; }
+.final-progress span { color: #8a94a6; font-size: 11px; }
+.final-score-cell { white-space: nowrap; }
+.final-score-cell strong { color: #142033; font-size: 13px; }
+.final-score-cell small {
+    display: block;
+    margin-top: 2px;
+    color: #98a1b2;
+    font-size: 9px;
+}
+.final-result-status,
+.final-judge-status {
+    display: inline-flex;
+    min-height: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 9px;
+    border: 1px solid;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.final-result-status.is-confirmed,
+.final-judge-status.is-complete {
+    border-color: #b9dfcd;
+    color: #137451;
+    background: #edf8f3;
+}
+.final-result-status.is-pending,
+.final-judge-status.is-draft {
+    border-color: #ead5ab;
+    color: #8d600f;
+    background: #fdf7eb;
+}
+.final-judge-status.is-waiting {
+    border-color: #dfe4ec;
+    color: #7d8799;
+    background: #f6f8fb;
+}
+.final-detail-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+.final-detail-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow: hidden;
+    margin-bottom: 14px;
+    padding: 0;
+    border-radius: 12px;
+}
+.final-detail-summary > div {
+    display: grid;
+    gap: 3px;
+    padding: 16px 18px;
+    border-left: 1px solid #e5e9f0;
+}
+.final-detail-summary > div:first-child { border-left: 0; }
+.final-detail-summary span { color: #7c879a; font-size: 11px; font-weight: 600; }
+.final-detail-summary strong { color: #142033; font-size: 20px; letter-spacing: -.03em; }
+.final-judge-table { min-width: 980px; }
+.final-judge-table th,
+.final-judge-table td { text-align: center; }
+.final-judge-table th:nth-child(2),
+.final-judge-table td:nth-child(2) { text-align: left; }
+.final-judge-table th small { color: #a0a8b6; font-size: 9px; font-weight: 500; }
+.final-judge-username { color: #7c879a; font-variant-numeric: tabular-nums; }
+.final-judge-total strong { color: #142033; font-size: 14px; }
+.final-judge-total small { display: block; color: #b27a17; font-size: 9px; }
+.final-aggregate {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 18px;
+    border-top: 1px solid #e1e6ee;
+    background: #f8fafc;
+}
+.final-aggregate > div { display: grid; gap: 3px; }
+.final-aggregate > div > span { color: #142033; font-size: 14px; font-weight: 700; }
+.final-aggregate > div > small { color: #7c879a; font-size: 10px; }
+.final-aggregate dl { display: flex; align-items: center; gap: 26px; margin: 0; }
+.final-aggregate dl div { display: flex; align-items: baseline; gap: 7px; }
+.final-aggregate dt { color: #7c879a; font-size: 11px; }
+.final-aggregate dd { margin: 0; color: #142033; font-size: 15px; font-weight: 700; }
+.final-aggregate.is-confirmed { background: #f1f8f5; }
+.final-aggregate.is-confirmed dd { color: #137451; }
+
+@media (max-width: 900px) {
+    .final-result-page .admin-shell { width: min(100% - 28px, 980px); }
+    .final-detail-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .final-detail-summary > div:nth-child(3) {
+        border-top: 1px solid #e5e9f0;
+        border-left: 0;
+    }
+    .final-detail-summary > div:nth-child(4) { border-top: 1px solid #e5e9f0; }
+}
+@media (max-width: 640px) {
+    .final-result-page .admin-tabs {
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .final-result-page .admin-shell { width: min(100% - 18px, 520px); }
+    .final-detail-summary { grid-template-columns: 1fr; }
+    .final-detail-summary > div,
+    .final-detail-summary > div:nth-child(3),
+    .final-detail-summary > div:nth-child(4) {
+        border-top: 1px solid #e5e9f0;
+        border-left: 0;
+    }
+    .final-detail-summary > div:first-child { border-top: 0; }
+    .final-aggregate { align-items: stretch; flex-direction: column; }
+    .final-aggregate dl { justify-content: space-between; gap: 10px; }
+    .final-aggregate dl div { display: grid; gap: 2px; }
+}
+
 /* ==========================================================================
    Judge workspace — single source of truth.
    Every colour, radius, spacing and type size comes from the tokens below.
@@ -4515,9 +4660,10 @@ body.workspace-page.judge-page {
     overflow-x: hidden;
     color: var(--j-text);
     background:
-        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, .96) 0%, transparent 32%),
-        radial-gradient(circle at 88% 16%, rgba(215, 222, 233, .52) 0%, transparent 30%),
-        linear-gradient(135deg, #f6f7f9 0%, #edf0f4 52%, #f6f7fa 100%) !important;
+        radial-gradient(820px 520px at 0% 0%, rgba(216, 31, 95, .13), transparent 68%),
+        radial-gradient(900px 560px at 100% 2%, rgba(68, 56, 168, .14), transparent 68%),
+        linear-gradient(180deg, #f8f9fd 0%, #eceff5 100%) !important;
+    background-attachment: fixed;
     font-family: "Pretendard Variable", "Pretendard", "Noto Sans KR", sans-serif;
     letter-spacing: -.01em;
     text-rendering: optimizeLegibility;
