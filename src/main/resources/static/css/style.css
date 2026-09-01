@@ -4793,10 +4793,14 @@ body.workspace-page.judge-page::after {
     background: var(--j-warn-soft);
 }
 .judge-target-row[data-status="SUBMITTED"] .judge-target-number {
-    border-color: var(--j-ok-line);
-    color: var(--j-ok);
-    background: var(--j-ok-soft);
+    border-color: #21805f;
+    color: #fff;
+    background: #21805f;
+    box-shadow: 0 2px 6px rgba(15, 122, 85, .2);
 }
+.judge-target-row[data-status="SUBMITTED"] { background: #f2faf6; }
+.judge-target-row[data-status="SUBMITTED"]:hover { background: #e8f6ef; }
+.judge-target-row[data-status="SUBMITTED"].is-active { background: var(--j-brand-soft); }
 .judge-target-main { min-width: 0; }
 .judge-target-main strong {
     display: block;
