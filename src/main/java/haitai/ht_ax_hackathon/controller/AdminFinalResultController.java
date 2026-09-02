@@ -2,8 +2,14 @@ package haitai.ht_ax_hackathon.controller;
 
 import haitai.ht_ax_hackathon.dto.AdminFinalResultDetail;
 import haitai.ht_ax_hackathon.dto.AdminFinalResultSummary;
+import haitai.ht_ax_hackathon.dto.ExcelDownload;
 import haitai.ht_ax_hackathon.service.AdminFinalResultService;
+import haitai.ht_ax_hackathon.service.JudgeProgressExcelExportService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 @Controller
 @RequestMapping("/admin/final-results")
@@ -18,6 +25,7 @@ import java.util.List;
 public class AdminFinalResultController {
 
     private final AdminFinalResultService finalResultService;
+    private final JudgeProgressExcelExportService judgeProgressExcelExportService;
 
     @GetMapping
     public String finalResultList(Model model) {
@@ -35,5 +43,19 @@ public class AdminFinalResultController {
         AdminFinalResultDetail result = finalResultService.findResultDetail(applicationId);
         model.addAttribute("result", result);
         return "admin/final-result-detail";
+    }
+
+    @GetMapping("/judge-progress/export")
+    public ResponseEntity<byte[]> exportJudgeProgress() {
+        ExcelDownload download = judgeProgressExcelExportService.createDownload();
+        ContentDisposition disposition = ContentDisposition.attachment()
+                .filename(download.fileName(), StandardCharsets.UTF_8)
+                .build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .contentType(MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ))
+                .body(download.content());
     }
 }

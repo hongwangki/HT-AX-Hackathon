@@ -17,6 +17,7 @@ import haitai.ht_ax_hackathon.repository.TaskSubmissionRepository;
 import haitai.ht_ax_hackathon.service.AdminFinalResultService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,10 +25,13 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -128,6 +132,15 @@ class AdminFinalResultFeatureTests {
         assertThat(provisional.confirmed()).isFalse();
         assertThat(provisional.getStatusLabel()).isEqualTo("집계 중");
 
+        var progress = finalResultService.findJudgeProgress();
+        assertThat(progress).hasSize(3);
+        assertThat(progress).extracting(row -> row.username()).doesNotContain("1273498");
+        assertThat(progress.get(0).judgeName()).isEqualTo("박심사 이사");
+        assertThat(progress.get(0).completedCount()).isEqualTo(1);
+        assertThat(progress.get(0).totalCount()).isEqualTo(1);
+        assertThat(progress.get(0).remainingCount()).isZero();
+        assertThat(progress.get(0).statusLabel()).isEqualTo("완료");
+
         var detail = finalResultService.findResultDetail(applicationId);
         assertThat(detail.judgeScores()).hasSize(3);
         assertThat(finalResultService.countActiveJudges()).isEqualTo(3);
@@ -162,6 +175,27 @@ class AdminFinalResultFeatureTests {
                 .andExpect(content().string(containsString("이심사 과장")))
                 .andExpect(content().string(org.hamcrest.Matchers.not(containsString("1273498"))))
                 .andExpect(content().string(containsString("작성 중")));
+
+        byte[] excelContent = mockMvc.perform(get("/admin/final-results/judge-progress/export"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Disposition", containsString(".xlsx")))
+                .andExpect(content().contentType(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                ))
+                .andReturn()
+                .getResponse()
+                .getContentAsByteArray();
+
+        try (var workbook = new XSSFWorkbook(new ByteArrayInputStream(excelContent))) {
+            var sheet = workbook.getSheet("심사 진행 현황");
+            assertThat(sheet).isNotNull();
+            assertThat(sheet.getRow(0).getCell(0).getStringCellValue())
+                    .isEqualTo("HT AX 해커톤 심사 진행 현황");
+            assertThat(sheet.getRow(7).getCell(1).getStringCellValue()).isEqualTo("박심사 이사");
+            assertThat(sheet.getRow(6).getCell(2).getStringCellValue()).isEqualTo("완료 (팀)");
+            assertThat(sheet.getRow(7).getCell(6).getStringCellValue()).isEqualTo("완료");
+            assertThat(sheet.getLastRowNum()).isEqualTo(9);
+        }
 
         thirdDraft.saveScores(20, 20, 15, 15); // 70점
         evaluationRepository.saveAndFlush(thirdDraft);

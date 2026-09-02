@@ -7,6 +7,7 @@ import haitai.ht_ax_hackathon.domain.JudgeEvaluationStatus;
 import haitai.ht_ax_hackathon.domain.TaskSubmission;
 import haitai.ht_ax_hackathon.dto.AdminFinalResultDetail;
 import haitai.ht_ax_hackathon.dto.AdminFinalResultSummary;
+import haitai.ht_ax_hackathon.dto.AdminJudgeProgressRow;
 import haitai.ht_ax_hackathon.dto.AdminJudgeScoreRow;
 import haitai.ht_ax_hackathon.exception.ApplicationNotFoundException;
 import haitai.ht_ax_hackathon.repository.JudgeEvaluationRepository;
@@ -78,6 +79,28 @@ public class AdminFinalResultService {
     @Transactional(readOnly = true)
     public long countActiveJudges() {
         return findActiveJudges().size();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminJudgeProgressRow> findJudgeProgress() {
+        List<TaskSubmission> targets = submissionRepository.findJudgeEvaluationTargets();
+        List<Judge> judges = findActiveJudges();
+        Map<Long, Long> completedByJudge = findEvaluations(targets, judges).stream()
+                .filter(evaluation -> evaluation.getStatus() == JudgeEvaluationStatus.SUBMITTED)
+                .collect(Collectors.groupingBy(
+                        evaluation -> evaluation.getJudge().getId(),
+                        Collectors.counting()
+                ));
+
+        return judges.stream()
+                .map(judge -> new AdminJudgeProgressRow(
+                        judge.getId(),
+                        judge.getName(),
+                        judge.getUsername(),
+                        completedByJudge.getOrDefault(judge.getId(), 0L).intValue(),
+                        targets.size()
+                ))
+                .toList();
     }
 
     private List<Judge> findActiveJudges() {

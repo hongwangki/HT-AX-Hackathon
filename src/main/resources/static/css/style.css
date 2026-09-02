@@ -4468,6 +4468,37 @@ body.admin-delete-page.admin-delete-page::after {
     line-height: 1.6;
 }
 .final-result-guide strong { color: #323847; }
+.final-export-button {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    border: 1px solid #cfd8e4;
+    border-radius: 9px;
+    color: #43516a;
+    background: #fff;
+    box-shadow: 0 3px 9px rgba(30, 41, 59, .05);
+    font-size: 12px;
+    font-weight: 700;
+}
+.final-export-button span {
+    display: grid;
+    width: 19px;
+    height: 19px;
+    place-items: center;
+    border-radius: 6px;
+    color: #137451;
+    background: #e8f6ef;
+    font-size: 13px;
+    line-height: 1;
+}
+.final-export-button:hover {
+    border-color: #a8cdbd;
+    color: #126747;
+    background: #f7fcf9;
+    transform: none;
+}
 .final-result-table { min-width: 960px; }
 .final-result-table .topic-cell { max-width: 300px; }
 .final-progress {
