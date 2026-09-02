@@ -1,4 +1,66 @@
 (() => {
+    let validationPopupTimer;
+
+    const showValidationPopup = input => {
+        let popup = document.getElementById('judgeValidationPopup');
+        if (!popup) {
+            popup = document.createElement('div');
+            popup.id = 'judgeValidationPopup';
+            popup.className = 'judge-validation-popup';
+            popup.setAttribute('role', 'alert');
+            popup.setAttribute('aria-live', 'assertive');
+            popup.innerHTML = `
+                <span class="judge-validation-popup-mark" aria-hidden="true">!</span>
+                <span>
+                    <strong></strong>
+                </span>`;
+            document.body.appendChild(popup);
+        }
+
+        const maxScore = input.dataset.maxScore;
+        popup.querySelector('strong').textContent = `${maxScore}점 이하로 입력해 주세요.`;
+
+        const positionPopup = () => {
+            const inputRect = input.getBoundingClientRect();
+            const popupRect = popup.getBoundingClientRect();
+            const gap = 9;
+            const fitsRight = inputRect.right + gap + popupRect.width <= window.innerWidth - 12;
+            const left = fitsRight
+                ? inputRect.right + gap
+                : Math.max(12, inputRect.left - popupRect.width - gap);
+            const top = Math.max(
+                12,
+                Math.min(
+                    inputRect.top + (inputRect.height - popupRect.height) / 2,
+                    window.innerHeight - popupRect.height - 12
+                )
+            );
+            popup.style.left = `${left}px`;
+            popup.style.top = `${top}px`;
+        };
+
+        if (popup.positionHandler) {
+            window.removeEventListener('scroll', popup.positionHandler, true);
+            window.removeEventListener('resize', popup.positionHandler);
+        }
+        popup.positionHandler = positionPopup;
+        window.addEventListener('scroll', positionPopup, true);
+        window.addEventListener('resize', positionPopup);
+
+        window.clearTimeout(validationPopupTimer);
+        popup.classList.remove('is-visible');
+        positionPopup();
+        window.requestAnimationFrame(() => {
+            positionPopup();
+            popup.classList.add('is-visible');
+        });
+        validationPopupTimer = window.setTimeout(() => {
+            popup.classList.remove('is-visible');
+            window.removeEventListener('scroll', positionPopup, true);
+            window.removeEventListener('resize', positionPopup);
+        }, 3200);
+    };
+
     const detailPane = document.getElementById('judgeDetailPane');
     const statusFilter = document.getElementById('judgeStatusFilter');
     const targetRows = Array.from(document.querySelectorAll('.judge-target-row'));
@@ -73,6 +135,8 @@
             const firstInvalid = scoreInputs.find(input => !validateScoreInput(input));
             if (!firstInvalid) return;
             event.preventDefault();
+            showValidationPopup(firstInvalid);
+            firstInvalid.scrollIntoView({behavior: 'smooth', block: 'center'});
             firstInvalid.focus();
         });
     };

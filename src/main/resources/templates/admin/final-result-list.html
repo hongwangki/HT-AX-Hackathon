@@ -13,7 +13,7 @@
         <div>
             <span class="eyebrow">관리자</span>
             <h1>최종 결과 확인</h1>
-            <p>활성 심사관의 평가 완료 현황과 팀별 총점·평균을 확인합니다.</p>
+            <p>집계 대상 심사관의 평가 완료 현황과 팀별 총점·평균을 확인합니다.</p>
         </div>
         <form th:action="@{/admin/logout}" method="post">
             <button class="logout-link" type="submit">로그아웃</button>
@@ -32,7 +32,7 @@
             <strong class="stat-num" th:text="${targetCount}">0</strong>
         </div>
         <div class="stat">
-            <span class="stat-label">활성 심사관</span>
+            <span class="stat-label">집계 심사관</span>
             <strong class="stat-num" th:text="${activeJudgeCount}">0</strong>
         </div>
         <div class="stat">
@@ -46,7 +46,7 @@
     </section>
 
     <p class="final-result-guide">
-        총점과 평균은 <strong>평가 완료 심사관 기준</strong>의 잠정 수치이며, 활성 심사관 전원이 완료한 팀만 확정됩니다.
+        총점과 평균은 <strong>평가 완료 심사관 기준</strong>의 잠정 수치이며, 집계 대상 심사관 전원이 완료한 팀만 확정됩니다.
     </p>
 
     <section class="card table-card final-result-table-card">

@@ -12,5 +12,4 @@ public interface JudgeRepository extends JpaRepository<Judge, Long> {
 
     List<Judge> findByActiveTrueOrderByNameAscUsernameAsc();
 
-    long countByActiveTrue();
 }

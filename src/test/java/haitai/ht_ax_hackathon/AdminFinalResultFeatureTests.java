@@ -64,6 +64,7 @@ class AdminFinalResultFeatureTests {
     private Judge firstJudge;
     private Judge secondJudge;
     private Judge thirdJudge;
+    private Judge excludedViewer;
     private JudgeEvaluation thirdDraft;
     private Long applicationId;
 
@@ -79,6 +80,7 @@ class AdminFinalResultFeatureTests {
         firstJudge = judgeRepository.save(new Judge("0000001", "hash", "김심사 부장"));
         secondJudge = judgeRepository.save(new Judge("0000002", "hash", "박심사 이사"));
         thirdJudge = judgeRepository.save(new Judge("0000003", "hash", "이심사 과장"));
+        excludedViewer = judgeRepository.save(new Judge("1273498", "hash", "열람 심사자"));
 
         HackathonApplication application = new HackathonApplication(
                 "집계 테스트팀",
@@ -109,6 +111,7 @@ class AdminFinalResultFeatureTests {
 
         saveCompletedEvaluation(firstJudge, application, 20, 25, 17, 18); // 80점
         saveCompletedEvaluation(secondJudge, application, 28, 27, 18, 17); // 90점
+        saveCompletedEvaluation(excludedViewer, application, 30, 30, 20, 20); // 집계 제외 100점
         thirdDraft = new JudgeEvaluation(thirdJudge, application);
         thirdDraft.saveScores(10, null, null, null);
         thirdDraft = evaluationRepository.save(thirdDraft);
@@ -127,9 +130,13 @@ class AdminFinalResultFeatureTests {
 
         var detail = finalResultService.findResultDetail(applicationId);
         assertThat(detail.judgeScores()).hasSize(3);
+        assertThat(finalResultService.countActiveJudges()).isEqualTo(3);
         assertThat(detail.judgeScores())
                 .extracting(row -> row.judgeName())
                 .containsExactly("박심사 이사", "김심사 부장", "이심사 과장");
+        assertThat(detail.judgeScores())
+                .extracting(row -> row.username())
+                .doesNotContain("1273498");
         assertThat(detail.judgeScores())
                 .filteredOn(row -> row.username().equals("0000003"))
                 .singleElement()
@@ -153,6 +160,7 @@ class AdminFinalResultFeatureTests {
                 .andExpect(content().string(containsString("김심사 부장")))
                 .andExpect(content().string(containsString("박심사 이사")))
                 .andExpect(content().string(containsString("이심사 과장")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("1273498"))))
                 .andExpect(content().string(containsString("작성 중")));
 
         thirdDraft.saveScores(20, 20, 15, 15); // 70점

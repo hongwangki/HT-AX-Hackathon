@@ -21,12 +21,16 @@ import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AdminFinalResultService {
+
+    /** 열람과 개인 평가는 가능하지만 관리자 최종 집계에는 참여하지 않는 계정입니다. */
+    private static final Set<String> FINAL_RESULT_EXCLUDED_JUDGE_USERNAMES = Set.of("1273498");
 
     private final TaskSubmissionRepository submissionRepository;
     private final JudgeRepository judgeRepository;
@@ -73,11 +77,12 @@ public class AdminFinalResultService {
 
     @Transactional(readOnly = true)
     public long countActiveJudges() {
-        return judgeRepository.countByActiveTrue();
+        return findActiveJudges().size();
     }
 
     private List<Judge> findActiveJudges() {
         return judgeRepository.findByActiveTrueOrderByNameAscUsernameAsc().stream()
+                .filter(judge -> !FINAL_RESULT_EXCLUDED_JUDGE_USERNAMES.contains(judge.getUsername()))
                 .sorted(Comparator
                         .comparingInt((Judge judge) -> titleOrder(judge.getName()))
                         .thenComparing(Judge::getName)
