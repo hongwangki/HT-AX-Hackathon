@@ -65,6 +65,17 @@ class DemoAccessInfoServiceTests {
         assertThat(noDemo.message()).contains("시연 영상");
     }
 
+    @Test
+    void directsTheSalesDashboardTaskToItsSubmittedVideo() {
+        DemoAccessInfo accessInfo = find(
+                "신준섭",
+                "AI 기반 실적 업로드형 영업실적분석 및 모니터링 표준 대시보드"
+        );
+
+        assertThat(accessInfo.type()).isEqualTo(DemoAccessInfo.Type.NO_DEMO);
+        assertThat(accessInfo.message()).contains("제출된 시연 영상");
+    }
+
     private DemoAccessInfo find(String teamName, String topic) {
         HackathonApplication application = new HackathonApplication(
                 teamName,

@@ -33,7 +33,6 @@ public class DemoAccessInfoService {
         registerNoLogin("센서리프로젝트", "AI 기반 감각검사 결과 예측 및 배합 최적화 시스템 모델링을 통한 미래형 제품 개발 시스템 구축");
         registerNoLogin("니맘두 내맘두 고향만두", "영업 데이터 통합 자동화 구축, 다각적인 AI분석을 통한 영업 활용");
         registerNoLogin("버터링", "원료 정보 및 식품 법규 자동 로드와 가상 공정 시뮬레이션을 통한 신제품 출시 속도 극대");
-        registerNoLogin("신준섭", "AI 기반 실적 업로드형 영업실적분석 및 모니터링 표준 대시보드");
         registerNoLogin("분석팀", "분석결과 자동 판정 어시스턴트 — 표시사항·기준규격 적합/부적합 자동 판정");
 
         registerNoDemo("천안공장 AI팀", "AI 품질검사 자동화 시스템 도입", "시연 페이지가 없습니다. 별도 어플로 시연합니다.");
@@ -44,6 +43,7 @@ public class DemoAccessInfoService {
         registerNoDemo("H-AI T-AI", "사내 맞춤형 신제품 AI 렌더링 봇", "시연 페이지가 없습니다. 제출된 시연 영상을 확인해 주세요.");
         registerNoDemo("안전보건관리부", "안전보건관리 효율성 증진을 위한 AI 챗봇 및 프롬프트 라이브러리 활용", "시연 페이지가 없습니다. 제출된 시연 영상을 확인해 주세요.");
         registerNoDemo("지름길", "AI 기반의 클레임 원인 추정 및 자동 라우팅을 통한 CS 프로세스 효율화 제안", "시연 페이지가 없습니다. 제출된 시연 영상을 확인해 주세요.");
+        registerNoDemo("신준섭", "AI 기반 실적 업로드형 영업실적분석 및 모니터링 표준 대시보드", "시연 페이지가 없습니다. 제출된 시연 영상을 확인해 주세요.");
         registerNoDemo("Oh-Yes, No-Loss", "AI 기반 크림 Just-In-Time 배합 시스템", "시연 페이지가 없습니다.");
         registerNoDemo("김규섭", "ChatGPT & Gemini 하이브리드 모델을 활용한 신제품 개발 프로세스 효율화", "시연 페이지가 없습니다.");
         registerNoDemo("회계팀", "AI 기반 전표 증빙 검증 자동화 시스템 구축", "시연 페이지가 없습니다.");
