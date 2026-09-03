@@ -36,6 +36,9 @@ public class HtmlPreviewService {
 
     private static final int MAX_ZIP_ENTRIES = 10_000;
     private static final long MAX_PREVIEW_ENTRY_SIZE = 50L * 1024 * 1024;
+    private static final String MARKETING_TREND_TEAM = "마케팅기획부";
+    private static final String MARKETING_TREND_TOPIC = "유튜브 기반 FMCG 트렌드 조기 포착 자동화 시스템";
+    private static final String MARKETING_TREND_PREVIEW = "keyword_lifecycle_20260805.html";
     private static final Pattern DATED_HTML_FILE = Pattern.compile(
             "^(.*?)(?:[_-])(\\d{8})(\\.html?)$",
             Pattern.CASE_INSENSITIVE
@@ -49,14 +52,19 @@ public class HtmlPreviewService {
             return List.of();
         }
 
+        String requiredPreviewFileName = isMarketingTrendTask(submission)
+                ? MARKETING_TREND_PREVIEW
+                : null;
         List<PreviewCandidate> candidates = new ArrayList<>(submission.getFiles().stream()
                 .filter(file -> hasExtension(file.getOriginalFileName(), ".html", ".htm"))
+                .filter(file -> requiredPreviewFileName == null
+                        || requiredPreviewFileName.equalsIgnoreCase(file.getOriginalFileName()))
                 .map(file -> new PreviewCandidate(file, sanitizeEntryPath(file.getOriginalFileName())))
                 .toList());
 
         for (TaskSubmissionFile file : submission.getFiles()) {
             if (!hasExtension(file.getOriginalFileName(), ".zip")) continue;
-            findZipHtmlPages(file).stream()
+            findZipHtmlPages(file, requiredPreviewFileName).stream()
                     .map(entry -> new PreviewCandidate(file, entry))
                     .forEach(candidates::add);
         }
@@ -125,7 +133,7 @@ public class HtmlPreviewService {
         }
     }
 
-    private List<String> findZipHtmlPages(TaskSubmissionFile file) {
+    private List<String> findZipHtmlPages(TaskSubmissionFile file, String requiredFileName) {
         try (ZipFile zipFile = openZip(file.getFilePath())) {
             List<String> htmlEntries = new ArrayList<>();
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -135,7 +143,9 @@ public class HtmlPreviewService {
                 if (++entryCount > MAX_ZIP_ENTRIES) return List.of();
                 if (!entry.isDirectory()
                         && isSafeEntry(entry.getName())
-                        && hasExtension(entry.getName(), ".html", ".htm")) {
+                        && hasExtension(entry.getName(), ".html", ".htm")
+                        && (requiredFileName == null
+                        || requiredFileName.equalsIgnoreCase(fileName(entry.getName())))) {
                     htmlEntries.add(entry.getName());
                 }
             }
@@ -153,6 +163,11 @@ public class HtmlPreviewService {
         } catch (IOException exception) {
             return List.of();
         }
+    }
+
+    private boolean isMarketingTrendTask(TaskSubmission submission) {
+        return MARKETING_TREND_TEAM.equals(submission.getApplication().getTeamName().strip())
+                && MARKETING_TREND_TOPIC.equals(submission.getApplication().getTopic().strip());
     }
 
     private List<PreviewCandidate> keepLatestDatedCandidates(List<PreviewCandidate> candidates) {

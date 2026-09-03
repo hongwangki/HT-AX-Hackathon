@@ -108,6 +108,26 @@ class HtmlPreviewServiceTests {
     }
 
     @Test
+    void exposesOnlyTheDesignatedMarketingTrendHtml() throws IOException {
+        Path zipPath = tempDirectory.resolve("marketing-trend-results.zip");
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(zipPath), StandardCharsets.UTF_8)) {
+            writeEntry(zip, "results/keyword_lifecycle_20260804.html", "old");
+            writeEntry(zip, "results/keyword_lifecycle_20260805.html", "selected");
+            writeEntry(zip, "results/market_overview_20260805.html", "not selected");
+        }
+        TestFixture fixture = fixture(
+                "marketing-trend-results.zip",
+                zipPath,
+                "마케팅기획부",
+                "유튜브 기반 FMCG 트렌드 조기 포착 자동화 시스템"
+        );
+
+        assertThat(fixture.service().findPreviews(fixture.submission(), DemoAccessInfo.noLoginRequired()))
+                .extracting(preview -> preview.displayFileName())
+                .containsExactly("keyword_lifecycle_20260805.html");
+    }
+
+    @Test
     void doesNotPromoteFilesForTasksMarkedAsHavingNoDemo() throws IOException {
         Path htmlPath = tempDirectory.resolve("demo.html");
         Files.writeString(htmlPath, "<h1>demo</h1>");
@@ -134,10 +154,14 @@ class HtmlPreviewServiceTests {
     }
 
     private TestFixture fixture(String originalFileName, Path filePath) {
+        return fixture(originalFileName, filePath, "테스트팀", "테스트 과제");
+    }
+
+    private TestFixture fixture(String originalFileName, Path filePath, String teamName, String topic) {
         HackathonApplication application = new HackathonApplication(
-                "테스트팀",
+                teamName,
                 ApplicationCategory.MARKETING,
-                "테스트 과제",
+                topic,
                 "내용",
                 "010-0000-0000",
                 "password"
