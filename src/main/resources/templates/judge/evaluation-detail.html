@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>과제 평가 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260902-judge-admin-canvas-v63')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260903-demo-account-v67')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page judge-page judge-detail-page">
@@ -74,20 +74,57 @@
             <time th:text="${'최종 제출 ' + #temporals.format(submission.updatedAt, 'yyyy-MM-dd HH:mm')}">최종 제출</time>
         </div>
 
-        <dl class="judge-task-grid judge-submission-grid" th:if="${submission.demoUrl != null}">
-            <div class="judge-grid-full">
+        <dl class="judge-task-grid judge-submission-grid"
+            th:if="${submission.demoUrl != null or htmlPreview != null or demoAccessInfo != null}">
+            <div class="judge-grid-full" th:if="${submission.demoUrl != null or htmlPreview != null}">
                 <dt>데모 · 참고 URL</dt>
                 <dd>
                     <a class="file-link" th:href="${submission.demoUrl}" th:text="${submission.demoUrl}"
+                       th:if="${submission.demoUrl != null}"
                        target="_blank" rel="noopener noreferrer">URL</a>
+                    <span class="judge-preview-separator"
+                          th:if="${submission.demoUrl != null and htmlPreview != null}">·</span>
+                    <a class="file-link" th:if="${htmlPreview != null}"
+                       th:href="${htmlPreview.previewUrl}"
+                       th:text="${htmlPreview.displayFileName}"
+                       target="_blank" rel="noopener noreferrer">demo.html</a>
+                </dd>
+            </div>
+            <div class="judge-grid-full judge-demo-access" th:if="${demoAccessInfo != null}">
+                <dt>시연 안내</dt>
+                <dd>
+                    <div class="judge-demo-credentials" th:if="${demoAccessInfo.credentials}">
+                        <span class="judge-demo-role" th:if="${demoAccessInfo.hasAdminAccount()}">사용자</span>
+                        <span class="judge-demo-account" th:if="${demoAccessInfo.hasUsername()}">
+                            <small>ID</small>
+                            <strong th:text="${demoAccessInfo.username}">demo</strong>
+                        </span>
+                        <span class="judge-demo-account" th:if="${demoAccessInfo.hasPassword()}">
+                            <small>PW</small>
+                            <strong th:text="${demoAccessInfo.password}">password</strong>
+                        </span>
+                        <span class="judge-demo-role is-admin" th:if="${demoAccessInfo.hasAdminAccount()}">관리자</span>
+                        <span class="judge-demo-account" th:if="${demoAccessInfo.hasAdminAccount()}">
+                            <small>ID</small>
+                            <strong th:text="${demoAccessInfo.adminUsername}">admin</strong>
+                        </span>
+                        <span class="judge-demo-account" th:if="${demoAccessInfo.hasAdminAccount()}">
+                            <small>PW</small>
+                            <strong th:text="${demoAccessInfo.adminPassword}">password</strong>
+                        </span>
+                    </div>
+                    <span class="judge-demo-message"
+                          th:classappend="${demoAccessInfo.noLoginRequired} ? 'is-open' : 'is-unavailable'"
+                          th:unless="${demoAccessInfo.credentials}"
+                          th:text="${demoAccessInfo.message}">시연 안내</span>
                 </dd>
             </div>
         </dl>
 
         <div class="judge-file-panel">
-            <h3>첨부파일 <small th:text="${#lists.size(submission.files) + '개'}">0개</small></h3>
-            <ul class="judge-file-list" th:if="${!#lists.isEmpty(submission.files)}">
-                <li th:each="file : ${submission.files}">
+            <h3>첨부파일 <small th:text="${#lists.size(visibleSubmissionFiles) + '개'}">0개</small></h3>
+            <ul class="judge-file-list" th:if="${!#lists.isEmpty(visibleSubmissionFiles)}">
+                <li th:each="file : ${visibleSubmissionFiles}">
                     <a class="judge-file-link"
                        th:href="@{/judge/evaluations/{applicationId}/files/{fileId}/download(applicationId=${hackathonApplication.id},fileId=${file.id})}">
                         <span class="judge-document-icon" aria-hidden="true"></span>
@@ -98,7 +135,7 @@
                     </a>
                 </li>
             </ul>
-            <p class="judge-muted" th:if="${#lists.isEmpty(submission.files)}">제출된 첨부파일이 없습니다.</p>
+            <p class="judge-muted" th:if="${#lists.isEmpty(visibleSubmissionFiles)}">추가 첨부파일이 없습니다.</p>
         </div>
     </section>
 

@@ -1,11 +1,17 @@
 package haitai.ht_ax_hackathon.controller;
 
 import haitai.ht_ax_hackathon.domain.JudgeEvaluationStatus;
+import haitai.ht_ax_hackathon.domain.TaskSubmissionFile;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
+import haitai.ht_ax_hackathon.dto.DemoAccessInfo;
+import haitai.ht_ax_hackathon.dto.HtmlPreview;
+import haitai.ht_ax_hackathon.dto.HtmlPreviewContent;
 import haitai.ht_ax_hackathon.dto.JudgeEvaluationDetail;
 import haitai.ht_ax_hackathon.dto.JudgeEvaluationForm;
 import haitai.ht_ax_hackathon.dto.JudgeSubmissionListItem;
 import haitai.ht_ax_hackathon.service.JudgeEvaluationService;
+import haitai.ht_ax_hackathon.service.DemoAccessInfoService;
+import haitai.ht_ax_hackathon.service.HtmlPreviewService;
 import haitai.ht_ax_hackathon.service.TaskSubmissionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +38,8 @@ public class JudgeController {
 
     private final JudgeEvaluationService evaluationService;
     private final TaskSubmissionService submissionService;
+    private final DemoAccessInfoService demoAccessInfoService;
+    private final HtmlPreviewService htmlPreviewService;
 
     @GetMapping("/judge/login")
     public String loginPage() {
@@ -114,10 +122,56 @@ public class JudgeController {
                 .body(download.resource());
     }
 
+    @GetMapping("/judge/evaluations/{applicationId}/files/{fileId}/preview/{*entryPath}")
+    public ResponseEntity<byte[]> previewHtmlFile(
+            @PathVariable Long applicationId,
+            @PathVariable Long fileId,
+            @PathVariable String entryPath,
+            Principal principal
+    ) {
+        evaluationService.findEvaluationDetail(principal.getName(), applicationId);
+        String normalizedEntryPath = entryPath.startsWith("/") ? entryPath.substring(1) : entryPath;
+        HtmlPreviewContent preview = htmlPreviewService
+                .loadPreviewContent(applicationId, fileId, normalizedEntryPath);
+        ResponseEntity.BodyBuilder response = ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline()
+                        .filename(preview.fileName(), StandardCharsets.UTF_8)
+                        .build().toString())
+                .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .header("X-Content-Type-Options", "nosniff")
+                .header("Referrer-Policy", "no-referrer");
+        if (preview.contentType().startsWith("text/html")) {
+            response.header(
+                    "Content-Security-Policy",
+                    "sandbox allow-scripts allow-forms allow-modals allow-downloads; "
+                            + "default-src 'self' data: blob: https: http:; "
+                            + "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; "
+                            + "style-src 'self' 'unsafe-inline' https: http:"
+            );
+        }
+        return response
+                .contentType(MediaType.parseMediaType(preview.contentType()))
+                .body(preview.content());
+    }
+
     private void populateDetailModel(Principal principal, JudgeEvaluationDetail detail, Model model) {
         model.addAttribute("judge", evaluationService.findJudge(principal.getName()));
         model.addAttribute("submission", detail.submission());
         model.addAttribute("hackathonApplication", detail.submission().getApplication());
+        DemoAccessInfo demoAccessInfo = demoAccessInfoService
+                .findFor(detail.submission().getApplication())
+                .orElse(null);
+        HtmlPreview htmlPreview = htmlPreviewService
+                .findPreview(detail.submission(), demoAccessInfo)
+                .orElse(null);
+        List<TaskSubmissionFile> visibleSubmissionFiles = detail.submission().getFiles().stream()
+                .filter(file -> htmlPreview == null
+                        || htmlPreview.archive()
+                        || !file.getId().equals(htmlPreview.fileId()))
+                .toList();
+        model.addAttribute("demoAccessInfo", demoAccessInfo);
+        model.addAttribute("htmlPreview", htmlPreview);
+        model.addAttribute("visibleSubmissionFiles", visibleSubmissionFiles);
         model.addAttribute("evaluation", detail.evaluation().orElse(null));
         model.addAttribute("guideOverview", detail.guideOverview().orElse(null));
         model.addAttribute("guideItems", detail.guideItems());

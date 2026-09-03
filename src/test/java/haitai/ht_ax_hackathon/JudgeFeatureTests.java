@@ -8,6 +8,7 @@ import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.domain.Judge;
 import haitai.ht_ax_hackathon.domain.JudgeEvaluationStatus;
 import haitai.ht_ax_hackathon.domain.TaskSubmission;
+import haitai.ht_ax_hackathon.domain.TaskSubmissionFile;
 import haitai.ht_ax_hackathon.repository.EvaluationGuideItemRepository;
 import haitai.ht_ax_hackathon.repository.EvaluationGuideOverviewRepository;
 import haitai.ht_ax_hackathon.repository.HackathonApplicationRepository;
@@ -17,12 +18,20 @@ import haitai.ht_ax_hackathon.repository.TaskSubmissionRepository;
 import haitai.ht_ax_hackathon.service.JudgeEvaluationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -32,6 +41,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -40,6 +50,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 class JudgeFeatureTests {
+
+    @TempDir
+    Path tempDirectory;
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,9 +83,10 @@ class JudgeFeatureTests {
 
     private Long numberedApplicationId;
     private Long unnumberedApplicationId;
+    private Long htmlPreviewFileId;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         evaluationRepository.deleteAll();
         guideItemRepository.deleteAll();
         guideOverviewRepository.deleteAll();
@@ -86,8 +100,23 @@ class JudgeFeatureTests {
                 "테스트 심사자"
         ));
 
-        HackathonApplication numbered = saveApplication("번호 대상팀", "번호가 있는 과제");
-        submissionRepository.save(new TaskSubmission(numbered, "번호 대상 제출물", null));
+        HackathonApplication numbered = saveApplication("총무팀2", "AI 해태 챗봇");
+        TaskSubmission numberedSubmission = new TaskSubmission(numbered, "번호 대상 제출물", null);
+        Path htmlPath = tempDirectory.resolve("demo-package.zip");
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(htmlPath), StandardCharsets.UTF_8)) {
+            zip.putNextEntry(new ZipEntry("result/demo-page.html"));
+            zip.write("<html><body><h1>브라우저 시연</h1></body></html>".getBytes(StandardCharsets.UTF_8));
+            zip.closeEntry();
+        }
+        numberedSubmission.addFile(new TaskSubmissionFile(
+                "demo-package.zip",
+                "demo-package.zip",
+                htmlPath.toString(),
+                Files.size(htmlPath),
+                "application/zip"
+        ));
+        numberedSubmission = submissionRepository.save(numberedSubmission);
+        htmlPreviewFileId = numberedSubmission.getFiles().get(0).getId();
         guideOverviewRepository.save(new EvaluationGuideOverview(numbered, "가이드 요약", 80));
         for (int order = 1; order <= 6; order++) {
             guideItemRepository.save(new EvaluationGuideItem(
@@ -122,8 +151,8 @@ class JudgeFeatureTests {
                         .with(user("judge-test").roles("JUDGE")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("judge/evaluation-list"))
-                .andExpect(content().string(containsString("번호가 있는 과제")))
-                .andExpect(content().string(not(containsString("번호 대상팀"))))
+                .andExpect(content().string(containsString("AI 해태 챗봇")))
+                .andExpect(content().string(not(containsString("총무팀2"))))
                 .andExpect(content().string(not(containsString("번호가 없는 과제"))))
                 // 목록은 한 줄로 압축되어 점수를 짧은 라벨과 숫자만으로 보여줍니다.
                 .andExpect(content().string(containsString("실무자 의견 점수")))
@@ -138,7 +167,7 @@ class JudgeFeatureTests {
                         .with(user("judge-test").roles("JUDGE")))
                 .andExpect(status().isOk())
                 .andExpect(view().name("judge/evaluation-detail :: evaluationPanel"))
-                .andExpect(content().string(containsString("번호가 있는 과제")))
+                .andExpect(content().string(containsString("AI 해태 챗봇")))
                 .andExpect(content().string(containsString("가이드 요약")))
                 .andExpect(content().string(containsString("실무자 검토의견")))
                 // 과제 내용과 평가는 한 화면으로 합쳤으므로 탭 마크업은 더 이상 없습니다.
@@ -150,9 +179,25 @@ class JudgeFeatureTests {
                 .andExpect(content().string(containsString("judge-review-layout")))
                 .andExpect(content().string(containsString("judge-score-list")))
                 .andExpect(content().string(containsString("judge-practitioner-list")))
+                .andExpect(content().string(containsString("시연 안내")))
+                .andExpect(content().string(containsString(">admin<")))
+                .andExpect(content().string(containsString(">1234<")))
+                .andExpect(content().string(containsString(">demo-page.html<")))
+                .andExpect(content().string(not(containsString("원본 파일 받기"))))
+                .andExpect(content().string(containsString("demo-package.zip")))
                 .andExpect(content().string(containsString(" / 20점")))
-                .andExpect(content().string(not(containsString("번호 대상팀"))))
+                .andExpect(content().string(not(containsString("총무팀2"))))
                 .andExpect(content().string(not(containsString("<dt>분류</dt>"))));
+
+        mockMvc.perform(get(
+                        "/judge/evaluations/{applicationId}/files/{fileId}/preview/result/demo-page.html",
+                        numberedApplicationId,
+                        htmlPreviewFileId
+                ).with(user("judge-test").roles("JUDGE")))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/html"))
+                .andExpect(header().string("Content-Security-Policy", containsString("sandbox")))
+                .andExpect(content().string(containsString("브라우저 시연")));
 
         mockMvc.perform(get("/judge/evaluations/{id}", unnumberedApplicationId)
                         .with(user("judge-test").roles("JUDGE")))

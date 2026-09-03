@@ -5342,6 +5342,75 @@ body.workspace-page.judge-page::after {
     font-weight: 600;
     word-break: break-all;
 }
+.judge-preview-separator { margin: 0 6px; color: var(--j-faint); }
+.judge-task-grid > .judge-demo-access {
+    align-items: center;
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+.judge-demo-access dd { min-width: 0; }
+.judge-demo-credentials {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 9px;
+    line-height: 1.5;
+}
+.judge-demo-role {
+    color: #6658c8;
+    font-size: 13px;
+    font-weight: 750;
+    white-space: nowrap;
+}
+.judge-demo-role.is-admin {
+    margin-left: 8px;
+    color: var(--j-brand);
+}
+.judge-demo-role.is-admin::before {
+    margin-right: 12px;
+    color: #c3c8d1;
+    content: "·";
+}
+.judge-demo-account {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    color: var(--j-ink);
+    background: transparent;
+    font-size: 14px;
+    line-height: 1.3;
+}
+.judge-demo-account small {
+    color: #7f8999;
+    font-size: 11px;
+    font-weight: 750;
+}
+.judge-demo-account strong {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    color: #202a3a;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+.judge-demo-message {
+    display: inline-flex;
+    min-height: 26px;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 7px;
+    color: #737d8d;
+    background: #f2f4f7;
+    font-size: 11px;
+    font-weight: 550;
+    line-height: 1.45;
+}
+.judge-demo-message.is-open {
+    color: #176b4f;
+    background: #eaf7f1;
+}
 
 /* --- Attachments --------------------------------------------------------- */
 .judge-file-panel {
