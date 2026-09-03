@@ -54,7 +54,7 @@ class HtmlPreviewServiceTests {
     }
 
     @Test
-    void choosesTheFirstShallowHtmlWhenNoClearStartPageExists() throws IOException {
+    void exposesEveryHtmlWhenZipContainsDifferentResults() throws IOException {
         Path zipPath = tempDirectory.resolve("ambiguous.zip");
         try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(zipPath), StandardCharsets.UTF_8)) {
             writeEntry(zip, "first.html", "first");
@@ -63,10 +63,9 @@ class HtmlPreviewServiceTests {
 
         TestFixture fixture = fixture("ambiguous.zip", zipPath);
 
-        assertThat(fixture.service().findPreview(fixture.submission(), DemoAccessInfo.noLoginRequired()))
-                .get()
+        assertThat(fixture.service().findPreviews(fixture.submission(), DemoAccessInfo.noLoginRequired()))
                 .extracting(preview -> preview.displayFileName())
-                .isEqualTo("first.html");
+                .containsExactly("first.html", "second.html");
     }
 
     @Test

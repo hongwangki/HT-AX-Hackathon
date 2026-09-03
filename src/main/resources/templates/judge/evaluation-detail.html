@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>과제 평가 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260903-demo-account-v67')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260903-multi-preview-v68')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page judge-page judge-detail-page">
@@ -75,19 +75,29 @@
         </div>
 
         <dl class="judge-task-grid judge-submission-grid"
-            th:if="${submission.demoUrl != null or htmlPreview != null or demoAccessInfo != null}">
-            <div class="judge-grid-full" th:if="${submission.demoUrl != null or htmlPreview != null}">
+            th:if="${submission.demoUrl != null or !#lists.isEmpty(htmlPreviews) or demoAccessInfo != null}">
+            <div class="judge-grid-full" th:if="${submission.demoUrl != null or !#lists.isEmpty(htmlPreviews)}">
                 <dt>데모 · 참고 URL</dt>
                 <dd>
                     <a class="file-link" th:href="${submission.demoUrl}" th:text="${submission.demoUrl}"
                        th:if="${submission.demoUrl != null}"
                        target="_blank" rel="noopener noreferrer">URL</a>
                     <span class="judge-preview-separator"
-                          th:if="${submission.demoUrl != null and htmlPreview != null}">·</span>
-                    <a class="file-link" th:if="${htmlPreview != null}"
-                       th:href="${htmlPreview.previewUrl}"
-                       th:text="${htmlPreview.displayFileName}"
+                          th:if="${submission.demoUrl != null and !#lists.isEmpty(htmlPreviews)}">·</span>
+                    <a class="file-link" th:if="${#lists.size(htmlPreviews) == 1}"
+                       th:href="${htmlPreviews[0].previewUrl}"
+                       th:text="${htmlPreviews[0].displayFileName}"
                        target="_blank" rel="noopener noreferrer">demo.html</a>
+                    <details class="judge-preview-menu" th:if="${#lists.size(htmlPreviews) > 1}">
+                        <summary th:text="${'HTML 결과물 ' + #lists.size(htmlPreviews) + '개 보기'}">HTML 결과물 보기</summary>
+                        <div class="judge-preview-menu-list">
+                            <a th:each="htmlPreview : ${htmlPreviews}"
+                               th:href="${htmlPreview.previewUrl}"
+                               th:text="${htmlPreview.displayFileName}"
+                               th:title="${htmlPreview.displayFileName}"
+                               target="_blank" rel="noopener noreferrer">demo.html</a>
+                        </div>
+                    </details>
                 </dd>
             </div>
             <div class="judge-grid-full judge-demo-access" th:if="${demoAccessInfo != null}">

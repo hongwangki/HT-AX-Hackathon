@@ -5304,6 +5304,10 @@ body.workspace-page.judge-page::after {
     border-radius: var(--j-r-sm);
     background: #fbfcfe;
 }
+.judge-submission-grid {
+    position: relative;
+    overflow: visible;
+}
 .judge-task-grid > div {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
@@ -5343,6 +5347,54 @@ body.workspace-page.judge-page::after {
     word-break: break-all;
 }
 .judge-preview-separator { margin: 0 6px; color: var(--j-faint); }
+.judge-preview-menu {
+    position: relative;
+    display: inline-block;
+}
+.judge-preview-menu summary {
+    color: var(--j-brand);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    list-style: none;
+    white-space: nowrap;
+}
+.judge-preview-menu summary::-webkit-details-marker { display: none; }
+.judge-preview-menu summary::after {
+    margin-left: 5px;
+    color: #9aa2af;
+    content: "▾";
+    font-size: 9px;
+}
+.judge-preview-menu[open] summary::after { content: "▴"; }
+.judge-preview-menu-list {
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 0;
+    z-index: 20;
+    display: grid;
+    width: min(320px, 70vw);
+    overflow: hidden;
+    padding: 5px;
+    border: 1px solid var(--j-line);
+    border-radius: 9px;
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(19, 28, 46, .14);
+}
+.judge-preview-menu-list a {
+    overflow: hidden;
+    padding: 7px 9px;
+    border-radius: 6px;
+    color: var(--j-text);
+    font-size: 12px;
+    font-weight: 550;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.judge-preview-menu-list a:hover {
+    color: var(--j-brand);
+    background: var(--j-brand-soft);
+}
 .judge-task-grid > .judge-demo-access {
     align-items: center;
     padding-top: 9px;

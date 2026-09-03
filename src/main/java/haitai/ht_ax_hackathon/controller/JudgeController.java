@@ -161,16 +161,17 @@ public class JudgeController {
         DemoAccessInfo demoAccessInfo = demoAccessInfoService
                 .findFor(detail.submission().getApplication())
                 .orElse(null);
-        HtmlPreview htmlPreview = htmlPreviewService
-                .findPreview(detail.submission(), demoAccessInfo)
-                .orElse(null);
+        List<HtmlPreview> htmlPreviews = htmlPreviewService
+                .findPreviews(detail.submission(), demoAccessInfo);
+        List<Long> hiddenHtmlFileIds = htmlPreviews.stream()
+                .filter(preview -> !preview.archive())
+                .map(HtmlPreview::fileId)
+                .toList();
         List<TaskSubmissionFile> visibleSubmissionFiles = detail.submission().getFiles().stream()
-                .filter(file -> htmlPreview == null
-                        || htmlPreview.archive()
-                        || !file.getId().equals(htmlPreview.fileId()))
+                .filter(file -> !hiddenHtmlFileIds.contains(file.getId()))
                 .toList();
         model.addAttribute("demoAccessInfo", demoAccessInfo);
-        model.addAttribute("htmlPreview", htmlPreview);
+        model.addAttribute("htmlPreviews", htmlPreviews);
         model.addAttribute("visibleSubmissionFiles", visibleSubmissionFiles);
         model.addAttribute("evaluation", detail.evaluation().orElse(null));
         model.addAttribute("guideOverview", detail.guideOverview().orElse(null));

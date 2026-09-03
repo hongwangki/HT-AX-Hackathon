@@ -107,6 +107,11 @@ class JudgeFeatureTests {
             zip.putNextEntry(new ZipEntry("result/demo-page.html"));
             zip.write("<html><body><h1>브라우저 시연</h1></body></html>".getBytes(StandardCharsets.UTF_8));
             zip.closeEntry();
+            for (int page = 2; page <= 4; page++) {
+                zip.putNextEntry(new ZipEntry("result/demo-page-" + page + ".html"));
+                zip.write(("<h1>시연 " + page + "</h1>").getBytes(StandardCharsets.UTF_8));
+                zip.closeEntry();
+            }
         }
         numberedSubmission.addFile(new TaskSubmissionFile(
                 "demo-package.zip",
@@ -183,6 +188,8 @@ class JudgeFeatureTests {
                 .andExpect(content().string(containsString(">admin<")))
                 .andExpect(content().string(containsString(">1234<")))
                 .andExpect(content().string(containsString(">demo-page.html<")))
+                .andExpect(content().string(containsString("HTML 결과물 4개 보기")))
+                .andExpect(content().string(containsString(">demo-page-4.html<")))
                 .andExpect(content().string(not(containsString("원본 파일 받기"))))
                 .andExpect(content().string(containsString("demo-package.zip")))
                 .andExpect(content().string(containsString(" / 20점")))

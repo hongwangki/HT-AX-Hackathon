@@ -36,30 +36,29 @@ public class HtmlPreviewService {
     private final TaskSubmissionRepository submissionRepository;
     private final FileStorageService fileStorageService;
 
-    public Optional<HtmlPreview> findPreview(TaskSubmission submission, DemoAccessInfo accessInfo) {
+    public List<HtmlPreview> findPreviews(TaskSubmission submission, DemoAccessInfo accessInfo) {
         if (accessInfo != null && accessInfo.type() == DemoAccessInfo.Type.NO_DEMO) {
-            return Optional.empty();
+            return List.of();
         }
 
-        List<PreviewCandidate> directHtml = submission.getFiles().stream()
+        List<PreviewCandidate> candidates = new ArrayList<>(submission.getFiles().stream()
                 .filter(file -> hasExtension(file.getOriginalFileName(), ".html", ".htm"))
                 .map(file -> new PreviewCandidate(file, sanitizeEntryPath(file.getOriginalFileName())))
-                .toList();
-        if (directHtml.size() == 1) {
-            return Optional.of(toPreview(submission, directHtml.get(0)));
-        }
-        if (directHtml.size() > 1) {
-            return Optional.empty();
-        }
+                .toList());
 
-        List<PreviewCandidate> zipCandidates = new ArrayList<>();
         for (TaskSubmissionFile file : submission.getFiles()) {
             if (!hasExtension(file.getOriginalFileName(), ".zip")) continue;
-            findZipStartPage(file).ifPresent(entry -> zipCandidates.add(new PreviewCandidate(file, entry)));
+            findZipHtmlPages(file).stream()
+                    .map(entry -> new PreviewCandidate(file, entry))
+                    .forEach(candidates::add);
         }
-        return zipCandidates.size() == 1
-                ? Optional.of(toPreview(submission, zipCandidates.get(0)))
-                : Optional.empty();
+        return candidates.stream()
+                .map(candidate -> toPreview(submission, candidate))
+                .toList();
+    }
+
+    public Optional<HtmlPreview> findPreview(TaskSubmission submission, DemoAccessInfo accessInfo) {
+        return findPreviews(submission, accessInfo).stream().findFirst();
     }
 
     @Transactional(readOnly = true)
@@ -118,23 +117,33 @@ public class HtmlPreviewService {
         }
     }
 
-    private Optional<String> findZipStartPage(TaskSubmissionFile file) {
+    private List<String> findZipHtmlPages(TaskSubmissionFile file) {
         try (ZipFile zipFile = openZip(file.getFilePath())) {
             List<String> htmlEntries = new ArrayList<>();
             Enumeration<? extends ZipEntry> entries = zipFile.entries();
             int entryCount = 0;
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
-                if (++entryCount > MAX_ZIP_ENTRIES) return Optional.empty();
+                if (++entryCount > MAX_ZIP_ENTRIES) return List.of();
                 if (!entry.isDirectory()
                         && isSafeEntry(entry.getName())
                         && hasExtension(entry.getName(), ".html", ".htm")) {
                     htmlEntries.add(entry.getName());
                 }
             }
-            return selectStartPage(htmlEntries, baseName(file.getOriginalFileName()));
+            Optional<String> startPage = selectStartPage(htmlEntries, baseName(file.getOriginalFileName()));
+            return htmlEntries.stream()
+                    .sorted((left, right) -> {
+                        if (startPage.isPresent()) {
+                            if (left.equals(startPage.get())) return -1;
+                            if (right.equals(startPage.get())) return 1;
+                        }
+                        int depthComparison = Integer.compare(pathDepth(left), pathDepth(right));
+                        return depthComparison != 0 ? depthComparison : left.compareToIgnoreCase(right);
+                    })
+                    .toList();
         } catch (IOException exception) {
-            return Optional.empty();
+            return List.of();
         }
     }
 
