@@ -4,6 +4,9 @@ import haitai.ht_ax_hackathon.domain.HackathonApplication;
 import haitai.ht_ax_hackathon.domain.TaskSubmission;
 import haitai.ht_ax_hackathon.dto.AttachmentDownload;
 import haitai.ht_ax_hackathon.dto.SubmissionArchiveDownload;
+import haitai.ht_ax_hackathon.exception.AttachmentFileNotFoundException;
+import haitai.ht_ax_hackathon.exception.FileStorageException;
+import haitai.ht_ax_hackathon.exception.TaskSubmissionSizeExceededException;
 import haitai.ht_ax_hackathon.service.HackathonApplicationService;
 import haitai.ht_ax_hackathon.service.StatusAccessService;
 import haitai.ht_ax_hackathon.service.TaskSubmissionService;
@@ -17,7 +20,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.InputStream;
@@ -58,6 +65,37 @@ public class AdminSubmissionController {
         model.addAttribute("hackathonApplication", application);
         model.addAttribute("submission", submission);
         return "admin/submission-detail";
+    }
+
+    @PostMapping("/{applicationId}/files")
+    public String addFiles(
+            @PathVariable Long applicationId,
+            @RequestParam(value = "files", required = false) List<MultipartFile> files,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            submissionService.addFiles(applicationId, files);
+            redirectAttributes.addFlashAttribute("submissionFileMessage", "파일을 추가했습니다.");
+        } catch (IllegalArgumentException | FileStorageException
+                 | TaskSubmissionSizeExceededException | AttachmentFileNotFoundException exception) {
+            redirectAttributes.addFlashAttribute("submissionFileError", exception.getMessage());
+        }
+        return "redirect:/admin/submissions/" + applicationId;
+    }
+
+    @PostMapping("/{applicationId}/files/{fileId}/delete")
+    public String deleteFile(
+            @PathVariable Long applicationId,
+            @PathVariable Long fileId,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            submissionService.deleteFile(applicationId, fileId);
+            redirectAttributes.addFlashAttribute("submissionFileMessage", "파일을 삭제했습니다.");
+        } catch (AttachmentFileNotFoundException exception) {
+            redirectAttributes.addFlashAttribute("submissionFileError", exception.getMessage());
+        }
+        return "redirect:/admin/submissions/" + applicationId;
     }
 
     @GetMapping("/{applicationId}/files/{fileId}/download")

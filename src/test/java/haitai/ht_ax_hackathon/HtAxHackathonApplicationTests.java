@@ -441,7 +441,34 @@ class HtAxHackathonApplicationTests {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("홍길동")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("4000005")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("홍길길")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("deck.pptx")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("deck.pptx")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("파일 추가")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("삭제")));
+
+        MockMultipartFile video = new MockMultipartFile(
+                "files", "demo-video.mp4", "video/mp4", "video-content".getBytes());
+        mockMvc.perform(multipart("/admin/submissions/{id}/files", id)
+                        .file(video)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/submissions/" + id));
+
+        TaskSubmission afterAdminUpload = submissionService.findByApplication(id).orElseThrow();
+        assertThat(afterAdminUpload.getSummary()).isEqualTo("Demo agent");
+        assertThat(afterAdminUpload.getFiles()).hasSize(2);
+        var uploadedVideo = afterAdminUpload.getFiles().stream()
+                .filter(file -> file.getOriginalFileName().equals("demo-video.mp4"))
+                .findFirst()
+                .orElseThrow();
+        Path uploadedVideoPath = Path.of(uploadedVideo.getFilePath());
+        assertThat(Files.exists(uploadedVideoPath)).isTrue();
+
+        mockMvc.perform(post("/admin/submissions/{applicationId}/files/{fileId}/delete",
+                        id, uploadedVideo.getId()).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/submissions/" + id));
+        assertThat(Files.exists(uploadedVideoPath)).isFalse();
+        assertThat(submissionService.findByApplication(id).orElseThrow().getFiles()).hasSize(1);
 
         MvcResult fileDownloadResult = mockMvc.perform(
                         get("/admin/submissions/{id}/files/{fileId}/download", id, fileId))

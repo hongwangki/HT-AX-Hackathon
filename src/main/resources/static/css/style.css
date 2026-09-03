@@ -385,8 +385,102 @@ th, td { border-bottom-color: #e7eaef; }
 .admin-submission-detail-page .submission-files-panel .admin-sub-heading h3::before {
     display: none;
 }
+.admin-file-manage {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #e7ebf1;
+}
+.admin-file-manage-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 9px;
+}
+.admin-file-manage-heading strong {
+    color: #394458;
+    font-size: 13px;
+    font-weight: 700;
+}
+.admin-file-manage-heading span {
+    color: #929bad;
+    font-size: 11px;
+}
+.admin-submission-file-upload {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+.admin-submission-file-upload input[type="file"] {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    padding: 3px 8px 3px 3px;
+    border: 1px solid #dfe4ec;
+    border-radius: 9px;
+    color: #596477;
+    background: #f8f9fc;
+    font: inherit;
+    font-size: 12px;
+    line-height: 30px;
+}
+.admin-submission-file-upload input[type="file"]::file-selector-button {
+    height: 30px;
+    margin-right: 8px;
+    padding: 0 11px;
+    border: 1px solid #d9dee8;
+    border-radius: 7px;
+    color: #4f596a;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+}
+.admin-submission-file-upload > .button { min-height: 38px; }
+.admin-submission-file-upload > small {
+    grid-column: 1 / -1;
+    margin-top: -2px;
+    color: #929bad;
+    font-size: 10px;
+}
+.admin-file-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+}
+.admin-file-actions form { margin: 0; }
+.admin-file-delete {
+    padding: 2px 0;
+    border: 0;
+    color: #c94b61;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+}
+.admin-file-delete:hover { text-decoration: underline; text-underline-offset: 2px; }
+.admin-file-feedback {
+    margin-bottom: 10px;
+    padding: 9px 11px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.admin-file-feedback.is-success { color: #187552; background: #edf9f4; }
+.admin-file-feedback.is-error { color: #b43c52; background: #fff0f3; }
 .admin-submission-detail-page .submission-empty-state {
     min-height: 120px;
+}
+@media (max-width: 640px) {
+    .admin-file-manage-heading { align-items: flex-start; flex-direction: column; gap: 2px; }
+    .admin-submission-file-upload { grid-template-columns: 1fr; }
+    .admin-submission-file-upload .button { width: 100%; }
+    .admin-submission-file-upload > small { grid-column: auto; }
+    .admin-file-list li { align-items: flex-start; }
+    .admin-file-actions { gap: 8px; }
 }
 
 /* Font weight tuning for workspace pages. */

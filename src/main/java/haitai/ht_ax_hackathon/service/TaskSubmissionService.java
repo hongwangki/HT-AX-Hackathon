@@ -74,26 +74,45 @@ public class TaskSubmissionService {
         HackathonApplication application = applicationRepository.getReferenceById(applicationId);
         TaskSubmission submission = submissionRepository.findByApplicationId(applicationId)
                 .orElseGet(() -> new TaskSubmission(application, null, null));
+        submission.updateDetails(blankToNull(summary), blankToNull(demoUrl));
+        return storeAdditionalFiles(submission, attachments, false);
+    }
+
+    /** Adds files from the admin detail page without reopening or changing the submission text. */
+    @Transactional
+    public TaskSubmission addFiles(Long applicationId, List<MultipartFile> attachments) {
+        TaskSubmission submission = submissionRepository.findByApplicationId(applicationId)
+                .orElseThrow(() -> new AttachmentFileNotFoundException("제출된 과제를 찾을 수 없습니다."));
+        return storeAdditionalFiles(submission, attachments, true);
+    }
+
+    private TaskSubmission storeAdditionalFiles(
+            TaskSubmission submission,
+            List<MultipartFile> attachments,
+            boolean requireFile
+    ) {
+        List<MultipartFile> uploadFiles = attachments == null ? List.of() : attachments.stream()
+                .filter(file -> file != null && !file.isEmpty())
+                .toList();
+        if (requireFile && uploadFiles.isEmpty()) {
+            throw new IllegalArgumentException("추가할 파일을 선택해 주세요.");
+        }
         long existingFileSize = submission.getFiles().stream()
                 .mapToLong(TaskSubmissionFile::getFileSize)
                 .sum();
-        long newFileSize = attachments.stream()
-                .filter(file -> file != null && !file.isEmpty())
+        long newFileSize = uploadFiles.stream()
                 .mapToLong(MultipartFile::getSize)
                 .sum();
         if (existingFileSize + newFileSize > MAX_SUBMISSION_SIZE) {
             throw new TaskSubmissionSizeExceededException();
         }
-        submission.updateDetails(blankToNull(summary), blankToNull(demoUrl));
 
         List<TaskSubmissionFile> storedFiles = new ArrayList<>();
         try {
-            for (MultipartFile multipartFile : attachments) {
-                if (multipartFile != null && !multipartFile.isEmpty()) {
-                    TaskSubmissionFile file = fileStorageService.storeSubmissionFile(multipartFile);
-                    storedFiles.add(file);
-                    submission.addFile(file);
-                }
+            for (MultipartFile multipartFile : uploadFiles) {
+                TaskSubmissionFile file = fileStorageService.storeSubmissionFile(multipartFile);
+                storedFiles.add(file);
+                submission.addFile(file);
             }
             return submissionRepository.save(submission);
         } catch (RuntimeException exception) {
