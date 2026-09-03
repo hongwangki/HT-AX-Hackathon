@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -68,6 +69,12 @@ public class HtmlPreviewService {
                     .map(entry -> new PreviewCandidate(file, entry))
                     .forEach(candidates::add);
         }
+        if (requiredPreviewFileName != null) {
+            return candidates.stream()
+                    .min(Comparator.comparingInt(candidate -> pathDepth(candidate.entryPath())))
+                    .map(candidate -> List.of(toPreview(submission, candidate)))
+                    .orElseGet(List::of);
+        }
         return keepLatestDatedCandidates(candidates).stream()
                 .map(candidate -> toPreview(submission, candidate))
                 .toList();
@@ -75,6 +82,10 @@ public class HtmlPreviewService {
 
     public Optional<HtmlPreview> findPreview(TaskSubmission submission, DemoAccessInfo accessInfo) {
         return findPreviews(submission, accessInfo).stream().findFirst();
+    }
+
+    public boolean usesDesignatedPreview(TaskSubmission submission) {
+        return isMarketingTrendTask(submission);
     }
 
     @Transactional(readOnly = true)

@@ -113,6 +113,7 @@ class HtmlPreviewServiceTests {
         try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(zipPath), StandardCharsets.UTF_8)) {
             writeEntry(zip, "results/keyword_lifecycle_20260804.html", "old");
             writeEntry(zip, "results/keyword_lifecycle_20260805.html", "selected");
+            writeEntry(zip, "backup/results/keyword_lifecycle_20260805.html", "duplicate");
             writeEntry(zip, "results/market_overview_20260805.html", "not selected");
         }
         TestFixture fixture = fixture(
@@ -125,6 +126,10 @@ class HtmlPreviewServiceTests {
         assertThat(fixture.service().findPreviews(fixture.submission(), DemoAccessInfo.noLoginRequired()))
                 .extracting(preview -> preview.displayFileName())
                 .containsExactly("keyword_lifecycle_20260805.html");
+        assertThat(fixture.service().findPreviews(fixture.submission(), DemoAccessInfo.noLoginRequired()))
+                .singleElement()
+                .satisfies(preview -> assertThat(preview.previewUrl())
+                        .endsWith("/preview/results/keyword_lifecycle_20260805.html"));
     }
 
     @Test

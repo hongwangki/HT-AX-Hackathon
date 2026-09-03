@@ -75,15 +75,15 @@
         </div>
 
         <dl class="judge-task-grid judge-submission-grid"
-            th:if="${submission.demoUrl != null or !#lists.isEmpty(htmlPreviews) or demoAccessInfo != null}">
-            <div class="judge-grid-full" th:if="${submission.demoUrl != null or !#lists.isEmpty(htmlPreviews)}">
+            th:if="${displayDemoUrl != null or !#lists.isEmpty(htmlPreviews) or demoAccessInfo != null}">
+            <div class="judge-grid-full" th:if="${displayDemoUrl != null or !#lists.isEmpty(htmlPreviews)}">
                 <dt>데모 · 참고 URL</dt>
                 <dd>
-                    <a class="file-link" th:href="${submission.demoUrl}" th:text="${submission.demoUrl}"
-                       th:if="${submission.demoUrl != null}"
+                    <a class="file-link" th:href="${displayDemoUrl}" th:text="${displayDemoUrl}"
+                       th:if="${displayDemoUrl != null}"
                        target="_blank" rel="noopener noreferrer">URL</a>
                     <span class="judge-preview-separator"
-                          th:if="${submission.demoUrl != null and !#lists.isEmpty(htmlPreviews)}">·</span>
+                          th:if="${displayDemoUrl != null and !#lists.isEmpty(htmlPreviews)}">·</span>
                     <a class="file-link" th:if="${#lists.size(htmlPreviews) == 1}"
                        th:href="${htmlPreviews[0].previewUrl}"
                        th:text="${htmlPreviews[0].displayFileName}"
