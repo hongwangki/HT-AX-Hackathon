@@ -22,7 +22,11 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,6 +36,10 @@ public class HtmlPreviewService {
 
     private static final int MAX_ZIP_ENTRIES = 10_000;
     private static final long MAX_PREVIEW_ENTRY_SIZE = 50L * 1024 * 1024;
+    private static final Pattern DATED_HTML_FILE = Pattern.compile(
+            "^(.*?)(?:[_-])(\\d{8})(\\.html?)$",
+            Pattern.CASE_INSENSITIVE
+    );
 
     private final TaskSubmissionRepository submissionRepository;
     private final FileStorageService fileStorageService;
@@ -52,7 +60,7 @@ public class HtmlPreviewService {
                     .map(entry -> new PreviewCandidate(file, entry))
                     .forEach(candidates::add);
         }
-        return candidates.stream()
+        return keepLatestDatedCandidates(candidates).stream()
                 .map(candidate -> toPreview(submission, candidate))
                 .toList();
     }
@@ -145,6 +153,37 @@ public class HtmlPreviewService {
         } catch (IOException exception) {
             return List.of();
         }
+    }
+
+    private List<PreviewCandidate> keepLatestDatedCandidates(List<PreviewCandidate> candidates) {
+        Map<String, PreviewCandidate> latestBySeries = new LinkedHashMap<>();
+        List<PreviewCandidate> undatedCandidates = new ArrayList<>();
+
+        for (PreviewCandidate candidate : candidates) {
+            String name = fileName(candidate.entryPath());
+            Matcher matcher = DATED_HTML_FILE.matcher(name);
+            if (!matcher.matches()) {
+                undatedCandidates.add(candidate);
+                continue;
+            }
+
+            String directory = candidate.entryPath().substring(0, candidate.entryPath().length() - name.length());
+            String seriesKey = (directory + matcher.group(1) + matcher.group(3)).toLowerCase(Locale.ROOT);
+            latestBySeries.merge(seriesKey, candidate, (current, replacement) ->
+                    datedFileVersion(replacement.entryPath()).compareTo(datedFileVersion(current.entryPath())) > 0
+                            ? replacement
+                            : current
+            );
+        }
+
+        List<PreviewCandidate> result = new ArrayList<>(undatedCandidates);
+        result.addAll(latestBySeries.values());
+        return result;
+    }
+
+    private String datedFileVersion(String entry) {
+        Matcher matcher = DATED_HTML_FILE.matcher(fileName(entry));
+        return matcher.matches() ? matcher.group(2) : "";
     }
 
     private Optional<String> selectStartPage(List<String> entries, String archiveBaseName) {

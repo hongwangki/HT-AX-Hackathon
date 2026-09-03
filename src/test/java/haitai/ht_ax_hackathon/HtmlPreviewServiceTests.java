@@ -69,6 +69,45 @@ class HtmlPreviewServiceTests {
     }
 
     @Test
+    void keepsOnlyTheLatestDatedHtmlForTheSameResult() throws IOException {
+        Path zipPath = tempDirectory.resolve("trend-results.zip");
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(zipPath), StandardCharsets.UTF_8)) {
+            writeEntry(zip, "results/keyword_lifecycle_20260803.html", "old");
+            writeEntry(zip, "results/keyword_lifecycle_20260804.html", "older");
+            writeEntry(zip, "results/keyword_lifecycle_20260805.html", "latest");
+            writeEntry(zip, "results/market_overview_20260805.html", "different result");
+        }
+
+        TestFixture fixture = fixture("trend-results.zip", zipPath);
+
+        assertThat(fixture.service().findPreviews(fixture.submission(), DemoAccessInfo.noLoginRequired()))
+                .extracting(preview -> preview.displayFileName())
+                .containsExactly("keyword_lifecycle_20260805.html", "market_overview_20260805.html");
+    }
+
+    @Test
+    void keepsOnlyTheLatestDatedHtmlWhenVersionsAreSeparateAttachments() throws IOException {
+        Path oldPath = tempDirectory.resolve("keyword_lifecycle_20260804.html");
+        Path latestPath = tempDirectory.resolve("keyword_lifecycle_20260805.html");
+        Files.writeString(oldPath, "old");
+        Files.writeString(latestPath, "latest");
+        TestFixture fixture = fixture(oldPath.getFileName().toString(), oldPath);
+        TaskSubmissionFile latestFile = new TaskSubmissionFile(
+                latestPath.getFileName().toString(),
+                latestPath.getFileName().toString(),
+                latestPath.toString(),
+                Files.size(latestPath),
+                "text/html"
+        );
+        ReflectionTestUtils.setField(latestFile, "id", 11L);
+        fixture.submission().addFile(latestFile);
+
+        assertThat(fixture.service().findPreviews(fixture.submission(), DemoAccessInfo.noLoginRequired()))
+                .extracting(preview -> preview.displayFileName())
+                .containsExactly("keyword_lifecycle_20260805.html");
+    }
+
+    @Test
     void doesNotPromoteFilesForTasksMarkedAsHavingNoDemo() throws IOException {
         Path htmlPath = tempDirectory.resolve("demo.html");
         Files.writeString(htmlPath, "<h1>demo</h1>");

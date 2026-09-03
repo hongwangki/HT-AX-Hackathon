@@ -163,12 +163,8 @@ public class JudgeController {
                 .orElse(null);
         List<HtmlPreview> htmlPreviews = htmlPreviewService
                 .findPreviews(detail.submission(), demoAccessInfo);
-        List<Long> hiddenHtmlFileIds = htmlPreviews.stream()
-                .filter(preview -> !preview.archive())
-                .map(HtmlPreview::fileId)
-                .toList();
         List<TaskSubmissionFile> visibleSubmissionFiles = detail.submission().getFiles().stream()
-                .filter(file -> !hiddenHtmlFileIds.contains(file.getId()))
+                .filter(file -> htmlPreviews.isEmpty() || !isHtmlFile(file.getOriginalFileName()))
                 .toList();
         model.addAttribute("demoAccessInfo", demoAccessInfo);
         model.addAttribute("htmlPreviews", htmlPreviews);
@@ -178,6 +174,10 @@ public class JudgeController {
         model.addAttribute("guideItems", detail.guideItems());
     }
 
+    private boolean isHtmlFile(String fileName) {
+        String lowerName = fileName == null ? "" : fileName.toLowerCase(java.util.Locale.ROOT);
+        return lowerName.endsWith(".html") || lowerName.endsWith(".htm");
+    }
 
     private MediaType resolveContentType(String contentType) {
         try {
