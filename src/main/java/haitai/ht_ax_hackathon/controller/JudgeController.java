@@ -10,6 +10,7 @@ import haitai.ht_ax_hackathon.dto.JudgeEvaluationDetail;
 import haitai.ht_ax_hackathon.dto.JudgeEvaluationForm;
 import haitai.ht_ax_hackathon.dto.JudgeSubmissionListItem;
 import haitai.ht_ax_hackathon.service.JudgeEvaluationService;
+import haitai.ht_ax_hackathon.service.AiUsageInfoService;
 import haitai.ht_ax_hackathon.service.DemoAccessInfoService;
 import haitai.ht_ax_hackathon.service.HtmlPreviewService;
 import haitai.ht_ax_hackathon.service.TaskSubmissionService;
@@ -39,6 +40,7 @@ public class JudgeController {
     private final JudgeEvaluationService evaluationService;
     private final TaskSubmissionService submissionService;
     private final DemoAccessInfoService demoAccessInfoService;
+    private final AiUsageInfoService aiUsageInfoService;
     private final HtmlPreviewService htmlPreviewService;
 
     @GetMapping("/judge/login")
@@ -161,6 +163,9 @@ public class JudgeController {
         DemoAccessInfo demoAccessInfo = demoAccessInfoService
                 .findFor(detail.submission().getApplication())
                 .orElse(null);
+        String aiUsage = aiUsageInfoService
+                .findFor(detail.submission().getApplication())
+                .orElse(null);
         List<HtmlPreview> htmlPreviews = htmlPreviewService
                 .findPreviews(detail.submission(), demoAccessInfo);
         String displayDemoUrl = htmlPreviewService.usesDesignatedPreview(detail.submission())
@@ -170,6 +175,7 @@ public class JudgeController {
                 .filter(file -> htmlPreviews.isEmpty() || !isHtmlFile(file.getOriginalFileName()))
                 .toList();
         model.addAttribute("demoAccessInfo", demoAccessInfo);
+        model.addAttribute("aiUsage", aiUsage);
         model.addAttribute("displayDemoUrl", displayDemoUrl);
         model.addAttribute("htmlPreviews", htmlPreviews);
         model.addAttribute("visibleSubmissionFiles", visibleSubmissionFiles);

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>과제 평가 상세 | HT AX 해커톤</title>
-    <link rel="stylesheet" th:href="@{/css/style.css(v='20260903-multi-preview-v68')}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v='20260907-ai-usage-v69')}">
     <link rel="icon" type="image/png" th:href="@{/images/Logo.png}">
 </head>
 <body class="workspace-page judge-page judge-detail-page">
@@ -75,7 +75,7 @@
         </div>
 
         <dl class="judge-task-grid judge-submission-grid"
-            th:if="${displayDemoUrl != null or !#lists.isEmpty(htmlPreviews) or demoAccessInfo != null}">
+            th:if="${displayDemoUrl != null or !#lists.isEmpty(htmlPreviews) or demoAccessInfo != null or aiUsage != null}">
             <div class="judge-grid-full" th:if="${displayDemoUrl != null or !#lists.isEmpty(htmlPreviews)}">
                 <dt>데모 · 참고 URL</dt>
                 <dd>
@@ -128,6 +128,10 @@
                           th:unless="${demoAccessInfo.credentials}"
                           th:text="${demoAccessInfo.message}">시연 안내</span>
                 </dd>
+            </div>
+            <div class="judge-grid-full judge-ai-usage" th:if="${aiUsage != null}">
+                <dt>사용 AI</dt>
+                <dd th:text="${aiUsage}">Claude, ChatGPT</dd>
             </div>
         </dl>
 

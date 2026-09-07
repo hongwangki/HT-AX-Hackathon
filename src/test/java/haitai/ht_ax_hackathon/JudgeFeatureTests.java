@@ -187,6 +187,7 @@ class JudgeFeatureTests {
                 .andExpect(content().string(containsString("시연 안내")))
                 .andExpect(content().string(containsString(">admin<")))
                 .andExpect(content().string(containsString(">1234<")))
+                .andExpect(content().string(containsString("CHAT GPT, CODEX")))
                 .andExpect(content().string(containsString(">demo-page.html<")))
                 .andExpect(content().string(containsString("HTML 결과물 4개 보기")))
                 .andExpect(content().string(containsString(">demo-page-4.html<")))

@@ -5494,6 +5494,15 @@ body.workspace-page.judge-page::after {
     padding-top: 9px;
     padding-bottom: 9px;
 }
+.judge-task-grid > .judge-ai-usage {
+    align-items: start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.judge-ai-usage dd {
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
 .judge-demo-access dd { min-width: 0; }
 .judge-demo-credentials {
     display: flex;
